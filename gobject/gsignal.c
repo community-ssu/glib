@@ -139,7 +139,7 @@ struct _SignalNode
   /* permanent portion */
   guint              signal_id;
   GType              itype;
-  gchar             *name;
+  const gchar        *name;
   guint              destroyed : 1;
   
   /* reinitializable portion */
@@ -1082,14 +1082,14 @@ G_CONST_RETURN gchar*
 g_signal_name (guint signal_id)
 {
   SignalNode *node;
-  gchar *name;
+  const gchar *name;
   
   SIGNAL_LOCK ();
   node = LOOKUP_SIGNAL_NODE (signal_id);
   name = node ? node->name : NULL;
   SIGNAL_UNLOCK ();
   
-  return name;
+  return (char*) name;
 }
 
 void
@@ -1315,8 +1315,9 @@ g_signal_newv (const gchar       *signal_name,
       key.quark = g_quark_from_string (node->name);
       key.signal_id = signal_id;
       g_signal_key_bsa = g_bsearch_array_insert (g_signal_key_bsa, &g_signal_key_bconfig, &key);
-      g_strdelimit (node->name, "_", '-');
-      key.quark = g_quark_from_static_string (node->name);
+      g_strdelimit (name, "_", '-');
+      node->name = g_quark_to_string (g_quark_from_string(name));
+      key.quark = g_quark_from_string (name);
       g_signal_key_bsa = g_bsearch_array_insert (g_signal_key_bsa, &g_signal_key_bconfig, &key);
     }
   node->destroyed = FALSE;
@@ -1347,6 +1348,7 @@ g_signal_newv (const gchar       *signal_name,
     }
   SIGNAL_UNLOCK ();
 
+  g_free (name);
   return signal_id;
 }
 
