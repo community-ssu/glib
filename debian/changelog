@@ -1,3 +1,9 @@
+glib2.0 (2.8.6-1osso5) unstable; urgency=low
+
+  * version of 2.8 with patch to NB#24380 
+
+ -- Tapani Palli <tapani.palli@nokia.com>  Wed, 17 May 2006 13:26:25 +0300
+
 glib2.0 (2.8.6-1osso4) unstable; urgency=low
 
   * glib/gmem.h: Don't use // comments in C<99 code 
