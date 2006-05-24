@@ -1,3 +1,9 @@
+glib2.0 (2.8.6-1osso6) unstable; urgency=low
+
+  * applied thumb code generation flag 
+
+ -- Tapani Palli <tapani.palli@nokia.com>  Wed, 24 May 2006 14:01:51 +0300
+
 glib2.0 (2.8.6-1osso5) unstable; urgency=low
 
   * version of 2.8 with patch to NB#24380 
