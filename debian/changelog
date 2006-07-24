@@ -1,6 +1,8 @@
 glib2.0 (2.8.6-1osso7) unstable; urgency=low
 
-  * remove unneeded files, fixes NB#35591 [UNRELEASED]
+  * remove unneeded files, fixes NB#35591,
+  * disable __noreturn__ in arm, fixes NB#35237
+  * UNRELEASED
 
  -- Tapani Palli <tapani.palli@nokia.com>  Mon, 24 Jul 2006 09:46:10 +0300
 
