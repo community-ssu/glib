@@ -3,6 +3,7 @@ glib2.0 (2.8.6-1osso7) unstable; urgency=low
   * remove unneeded files, fixes NB#35591,
   * disable __noreturn__ in arm, fixes NB#35237
   * applied '-g' compilation flag to get .debug_frame, fixes NB#32643
+  * disabled thumb flag for now
 
  -- Tapani Palli <tapani.palli@nokia.com>  Mon, 24 Jul 2006 09:46:10 +0300
 
