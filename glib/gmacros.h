@@ -70,12 +70,8 @@
   __attribute__((__format__ (__scanf__, format_idx, arg_idx)))
 #define G_GNUC_FORMAT( arg_idx )                \
   __attribute__((__format_arg__ (arg_idx)))
-#ifndef __arm__
 #define G_GNUC_NORETURN                         \
   __attribute__((__noreturn__))
-#else	/* !__arm__ */
-#define G_GNUC_NORETURN
-#endif
 #define G_GNUC_CONST                            \
   __attribute__((__const__))
 #define G_GNUC_UNUSED                           \
