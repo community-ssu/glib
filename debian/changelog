@@ -3,8 +3,9 @@ glib2.0 (2.8.6-1osso8) unstable; urgency=low
   * enabled thumb flag, fixes 26705
   * restore noreturn attributes and compile gmessages.c with
     -fno-omit-frame-pointer, fixes NB#37096
+  * backported upstream patch to g_parse_debug_string(), fixes NB#37690
 
- -- Tapani Palli <tapani.palli@nokia.com>  Thu, 10 Aug 2006 14:36:54 +0300
+ -- Tapani Palli <tapani.palli@nokia.com>  Thu, 15 Aug 2006 14:36:54 +0300
 
 glib2.0 (2.8.6-1osso7) unstable; urgency=low
 
