@@ -1,3 +1,9 @@
+glib2.0 (2.8.6-1osso9) unstable; urgency=low
+
+  * disabled thumb compilation
+
+ -- Tapani Palli <tapani.palli@nokia.com>  Tue, 15 Aug 2006 13:11:12 +0300
+
 glib2.0 (2.8.6-1osso8) unstable; urgency=low
 
   * enabled thumb flag, fixes 26705
