@@ -121,12 +121,6 @@ libglib_2_0_la_SOURCES = 	\
 	gprintf.c		\
 	gprintfint.h
 
-GMESSAGES = gmessages
-$(GMESSAGES).o $(GMESSAGES).obj $(GMESSAGES).lo: $(GMESSAGES).c
-	$(MAKE) $(AM_MAKEFLAGS) \
-		AM_CFLAGS='$(AM_CLFAGS) -fno-omit-frame-pointer' \
-		GMESSAGES=dummy '$@'
-
 EXTRA_libglib_2_0_la_SOURCES = \
 	giounix.c	\
 	giowin32.c	\
