@@ -1,12 +1,12 @@
 glib2.0 (2.8.6-1osso9) unstable; urgency=low
 
-  * disabled thumb compilation
+  * reverted patch to NB#37096 (caused build problems)
 
  -- Tapani Palli <tapani.palli@nokia.com>  Tue, 15 Aug 2006 13:11:12 +0300
 
 glib2.0 (2.8.6-1osso8) unstable; urgency=low
 
-  * enabled thumb flag, fixes 26705
+  * enabled thumb flag, fixes NB#26705
   * restore noreturn attributes and compile gmessages.c with
     -fno-omit-frame-pointer, fixes NB#37096
   * backported upstream patch to g_parse_debug_string(), fixes NB#37690
