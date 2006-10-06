@@ -1,3 +1,9 @@
+glib2.0 (2.8.6-1osso10) unstable; urgency=low
+
+  * Fixes NB#38815 (enabled paraller build options) 
+
+ -- Tapani Palli <tapani.palli@nokia.com>  Fri,  6 Oct 2006 09:43:07 +0300
+
 glib2.0 (2.8.6-1osso9) unstable; urgency=low
 
   * reverted patch to NB#37096 (caused build problems)

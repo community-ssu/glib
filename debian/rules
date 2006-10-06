@@ -29,6 +29,14 @@ ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
 endif
 
+ifneq (,$(findstring parallel,$(DEB_BUILD_OPTIONS)))
+	NJOBS_OPT := $(shell ( \
+		expr x"$$DEB_BUILD_OPTIONS" : x'.*parallel=\([0-9][0-9]*\)' \
+		|| grep -c ^processor /proc/cpuinfo 2>/dev/null             \
+		) | sed -n -e '/[1-9]/s/^/-j/p' )
+	MAKEFLAGS += $(NJOBS_OPT)
+endif
+
 # Ensure the build aborts when there are still references to undefined
 # symbols.
 LDFLAGS += -Wl,-z,defs
@@ -88,8 +96,8 @@ $(BUILD_DEB_DIR)/config.status: $(SOURCE_DIR)/configure
 
 configure: configure-deb
 
-build-deb: debian/control configure-deb $(BUILD_DEB_DIR)/build-stamp
-$(BUILD_DEB_DIR)/build-stamp:
+build-deb: debian/control $(BUILD_DEB_DIR)/build-stamp
+$(BUILD_DEB_DIR)/build-stamp: configure-deb
 	dh_testdir
 
 	# Add here commands to compile the package.
@@ -141,6 +149,8 @@ install: install-deb
 	-find $(CURDIR)/debian/ -type d -empty | xargs rmdir -p 2>&1 > /dev/null
 
 # Build architecture-independent files here.
+binary-indep-after-arch: binary-arch
+binary-indep-after-arch \
 binary-indep: build install
 	dh_testdir -i
 	dh_testroot -i
@@ -206,5 +216,5 @@ binary-arch: build install
 	dh_md5sums -a
 	dh_builddeb -a
 
-binary: binary-indep binary-arch
-.PHONY: build build-deb clean binary-indep binary-arch binary install install-deb install-test configure configure-deb extract debian/control
+binary: binary-arch binary-indep-after-arch
+.PHONY: build build-deb clean binary-indep-after-arch binary-indep binary-arch binary install install-deb install-test configure configure-deb extract debian/control
