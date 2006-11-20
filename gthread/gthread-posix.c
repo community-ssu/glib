@@ -328,11 +328,15 @@ g_thread_create_posix_impl (GThreadFunc thread_func,
 #ifdef HAVE_PRIORITIES
 # ifdef G_THREADS_IMPL_POSIX
   {
+    int policy, pprio;
     struct sched_param sched;
-    int pprio, policy;
-    posix_check_cmd (pthread_attr_getschedparam (&attr, &sched));
-    posix_check_cmd (pthread_attr_getschedpolicy(&attr, &policy));
-
+    /* this would use the default values */
+    /*posix_check_cmd (pthread_attr_getschedpolicy(&attr, &policy));
+      posix_check_cmd (pthread_attr_getschedparam (&attr, &sched));*/
+    /* but we want to inherit...
+     * priority maps are initialized based on inheritance assumption
+    anyway and that's where the problem comes from... */
+    posix_check_cmd (pthread_getschedparam (pthread_self(), &policy, &sched));
     pprio = g_thread_priority_map [priority];
 
     if (pprio < sched_get_priority_min(policy))
@@ -343,7 +347,9 @@ g_thread_create_posix_impl (GThreadFunc thread_func,
       {
 	pprio = sched_get_priority_max(policy);
       }
+
     sched.sched_priority = pprio;
+    posix_check_cmd_prio (pthread_attr_setschedpolicy (&attr, policy));
     posix_check_cmd_prio (pthread_attr_setschedparam (&attr, &sched));
   }
 # else /* G_THREADS_IMPL_DCE */
