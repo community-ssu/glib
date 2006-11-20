@@ -329,8 +329,21 @@ g_thread_create_posix_impl (GThreadFunc thread_func,
 # ifdef G_THREADS_IMPL_POSIX
   {
     struct sched_param sched;
+    int pprio, policy;
     posix_check_cmd (pthread_attr_getschedparam (&attr, &sched));
-    sched.sched_priority = g_thread_priority_map [priority];
+    posix_check_cmd (pthread_attr_getschedpolicy(&attr, &policy));
+
+    pprio = g_thread_priority_map [priority];
+
+    if (pprio < sched_get_priority_min(policy))
+      {
+	pprio = sched_get_priority_min(policy);
+      }
+    else if (pprio > sched_get_priority_max(policy))
+      {
+	pprio = sched_get_priority_max(policy);
+      }
+    sched.sched_priority = pprio;
     posix_check_cmd_prio (pthread_attr_setschedparam (&attr, &sched));
   }
 # else /* G_THREADS_IMPL_DCE */

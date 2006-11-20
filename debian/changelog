@@ -1,3 +1,10 @@
+glib2.0 (2.8.6-1osso11) unstable; urgency=low
+
+  * applied patch from Jussi Laako for gthread/gthread-posix.c
+  * Fixes: NB#47178 (glib faults on realtime scheduling)
+
+ -- Tapani Palli <tapani.palli@nokia.com>  Mon, 20 Nov 2006 13:49:01 +0200
+
 glib2.0 (2.8.6-1osso10) unstable; urgency=low
 
   * Fixes NB#38815 (enabled paraller build options) 
