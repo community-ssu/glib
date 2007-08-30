@@ -1,3 +1,9 @@
+glib2.0 (2.12.12-1osso7) unstable; urgency=low
+
+  * Enable floating point. Patch by Leonid  Moiseichuk. Fixes: NB#61971
+
+ -- Fernando Herrera <fernando.herrera-de-las-heras@nokia.com>  Thu, 30 Aug 2007 17:38:21 +0300
+
 glib2.0 (2.12.12-1osso6) unstable; urgency=low
 
   * backport glib upstream trunk fixes for GSLice late thread initialization.
