@@ -1,3 +1,9 @@
+2007-09-10  Fernando Herrera  <fernando.herrera-de-las-heras@nokia.com>
+
+	* glib/Makefile.am: compile gmessages.c with -fno-omit-framepointer so
+	we can get nice backtraces with g_assert_warning functions. Fixes
+	NB#68368
+
 2007-07-30  Michael Natterer  <mitch@imendio.com>
 
 	* glib/gslice.[ch]: replace with versions from upstream trunk,

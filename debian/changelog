@@ -1,3 +1,9 @@
+glib2.0 (2.12.12-1osso8) unstable; urgency=low
+
+  * compile gmessages.c with -fno-omit-frame-pointer. Fixes: NB#68368
+
+ -- Fernando Herrera <fernando.herrera-de-las-heras@nokia.com>  Thu, 10 Sep 2007 10:44:21 +0300
+
 glib2.0 (2.12.12-1osso7) unstable; urgency=low
 
   * Enable floating point. Patch by Leonid  Moiseichuk. Fixes: NB#61971
