@@ -30,6 +30,11 @@ ifneq (,$(findstring thumb,$(DEB_BUILD_OPTIONS)))
 endif
 endif
 
+ifeq (,$(findstring nodocs,$(DEB_BUILD_OPTIONS)))
+ENABLE_GTK_DOC = --enable-gtk-doc
+else
+ENABLE_GTK_DOC = --disable-gtk-doc
+endif
 
 ifeq (,$(findstring nostrip,$(DEB_BUILD_OPTIONS)))
 	INSTALL_PROGRAM += -s
@@ -82,7 +87,7 @@ $(BUILD_DEB_DIR)/config.status: $(SOURCE_DIR)/configure
 			--infodir=\$${prefix}/share/info \
 			--with-html-dir=\$${prefix}/share/doc/libglib$(apiver)-doc \
 			--enable-static \
-			--disable-gtk-doc
+			$(ENABLE_GTK_DOC)
 
 	cd $(BUILD_DEB_DIR) && \
 	sed < libtool > libtool-2 \

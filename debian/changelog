@@ -1,3 +1,12 @@
+glib2.0 (2.12.12-1osso9) UNRELEASE; urgency=low
+
+  * NOT RELEASED YET
+
+  * debian/rules: --enable-gtk-doc (with nodocs DEB_BUILD_OPTIONS support)
+    (Fixes: NB#69302)
+
+ -- Tommi Komulainen <tommi.komulainen@nokia.com>  Fri, 14 Sep 2007 16:41:24 +0300
+
 glib2.0 (2.12.12-1osso8) unstable; urgency=low
 
   * compile gmessages.c with -fno-omit-frame-pointer. Fixes: NB#68368
