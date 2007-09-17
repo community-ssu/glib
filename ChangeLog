@@ -1,3 +1,15 @@
+2007-09-17  Michael Natterer  <mitch@imendio.com>
+
+	Reintroduce GScanner cache. Addresses NB#61907:
+
+	* configure.in: define MAEMO_CHANGES the same way as in maemo-gtk.
+
+	* glib/gscanner.[ch]: applied cleaned up and renamespaced version
+	of binary scanner cache patch. The environment variable to create
+	the cache is now HILDON_SCANNER_CACHE_CREATE. The function to open
+	the cache is hildon_scanner_cache_open() and takes the filename of
+	the original RC file instead of the cache file.
+
 2007-09-10  Fernando Herrera  <fernando.herrera-de-las-heras@nokia.com>
 
 	* glib/Makefile.am: compile gmessages.c with -fno-omit-framepointer so
