@@ -211,7 +211,7 @@ binary-arch: build install
 
 # shlibs
 	dh_makeshlibs -a -Nlibglib$(apiver)-dbg
-	dh_makeshlibs -n -X usr/lib/glib-$(apiver) -plibglib$(apiver)-$(soname)$(suffix) -V "libglib${apiver}-${soname}${suffix} (>= 2.12.12-1osso3)"
+	dh_makeshlibs -n -X usr/lib/glib-$(apiver) -plibglib$(apiver)-$(soname)$(suffix) -V "libglib${apiver}-${soname}${suffix} (>= 2.12.12-1osso10)"
 	dh_installdeb -a
 	dh_shlibdeps -l$(libpath) -a
 	cat debian/*/DEBIAN/shlibs > debian/shlibs.local
