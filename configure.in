@@ -2089,6 +2089,35 @@ if test x"$GCC" = xyes; then
 		   	 [s390 atomic implementation])
       glib_memory_barrier_needed=no
       ;;	
+    arm*)
+      AC_MSG_RESULT([arm])
+      AC_MSG_CHECKING(arm atomic operations type)
+      if test x$glib_os_linux != xyes; then
+        AC_MSG_RESULT(inline asm)
+        glib_save_CFLAGS=$CFLAGS
+        AC_MSG_CHECKING(architecture supports ARMv6 instructions)
+          cp $srcdir/armv6-test.c conftest.$ac_ext
+          CFLAGS="$CFLAGS -march=armv6"
+          AC_TRY_RUN(ac_compile,
+            [AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 6,
+                                [armv6 atomic implementation])
+             glib_memory_barrier_needed=yes
+             add_flags="-march=armv6"
+             AC_MSG_RESULT(armv6)],
+            [AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 1,
+                                [arm atomic implementation])
+             glib_memory_barrier_needed=no
+             add_flags=""
+             AC_MSG_RESULT(pre-armv6)])
+        CFLAGS=$glib_save_CFLAGS
+        CFLAGS="$CFLAGS $add_flags"
+      else
+        AC_MSG_RESULT(kernel helper)
+        AC_DEFINE_UNQUOTED(G_ATOMIC_ARM_LINUX, 1,
+                           [special arm linux implementation])
+        glib_memory_barrier_needed=yes
+      fi
+      ;;
     *)
       AC_MSG_RESULT([none])
       glib_memory_barrier_needed=yes

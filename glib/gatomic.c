@@ -3,6 +3,7 @@
  *
  * g_atomic_*: atomic operations.
  * Copyright (C) 2003 Sebastian Wilhelmi
+ * Copyright (C) 2007 Nokia Corporation
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
@@ -19,8 +20,12 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
- 
+
 #include "config.h"
+
+#if defined (G_ATOMIC_ARM)
+#include <sched.h>
+#endif
 
 #include "glib.h"
 #include "gthreadprivate.h"
@@ -482,7 +487,282 @@ g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic,
 #  else /* What's that */
 #    error "Your system has an unsupported pointer size"
 #  endif /* GLIB_SIZEOF_VOID_P */
-# else /* !G_ATOMIC_IA64 */
+# elif defined (G_ATOMIC_ARM)
+#  if (G_ATOMIC_ARM < 6)
+static volatile int atomic_spin = 0;
+
+static int atomic_spin_trylock (void)
+{
+  int result;
+
+  asm volatile (
+    "swp %0, %1, [%2]\n"
+    : "=&r,&r" (result)
+    : "r,0" (1), "r,r" (&atomic_spin)
+    : "memory");
+  if (result == 0)
+    return 0;
+  else
+    return -1;
+}
+
+static void atomic_spin_lock (void)
+{
+  while (atomic_spin_trylock())
+    sched_yield();
+}
+
+static void atomic_spin_unlock (void)
+{
+  atomic_spin = 0;
+}
+
+gint
+g_atomic_int_exchange_and_add (volatile gint *atomic, 
+			       gint           val)
+{
+  gint result;
+ 
+  atomic_spin_lock();  
+  result = *atomic;
+  *atomic += val;
+  atomic_spin_unlock();
+
+  return result;
+}
+
+void
+g_atomic_int_add (volatile gint *atomic,
+		  gint           val)
+{
+  atomic_spin_lock();
+  *atomic += val;
+  atomic_spin_unlock();
+}
+
+gboolean
+g_atomic_int_compare_and_exchange (volatile gint *atomic, 
+				   gint           oldval, 
+				   gint           newval)
+{
+  gboolean result;
+
+  atomic_spin_lock();
+  if (*atomic == oldval)
+    {
+      result = TRUE;
+      *atomic = newval;
+    }
+  else
+    result = FALSE;
+  atomic_spin_unlock();
+
+  return result;
+}
+
+gboolean
+g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic, 
+				       gpointer           oldval, 
+				       gpointer           newval)
+{
+  gboolean result;
+ 
+  atomic_spin_lock();
+  if (*atomic == oldval)
+    {
+      result = TRUE;
+      *atomic = newval;
+    }
+  else
+    result = FALSE;
+  atomic_spin_unlock();
+
+  return result;
+}
+#  else /* G_ATOMIC_ARM < 6 */
+gint
+g_atomic_int_exchange_and_add (volatile gint *atomic, 
+			       gint           val)
+{
+  unsigned long result;
+  int old, tmp;
+
+  do {
+    asm volatile (
+      "ldrex %0, [%3]\n"
+      "add %1, %0, %4\n"
+      "strex %2, %1, [%3]\n"
+      : "=&r" (old), "=&r" (tmp), "=&r" (result)
+      : "r" (atomic), "Ir" (val)
+      : "cc", "memory");
+  } while (result);
+  return old;
+}
+
+void
+g_atomic_int_add (volatile gint *atomic,
+		  gint           val)
+{
+  unsigned long result;
+  int tmp;
+
+  do {
+    asm volatile (
+      "ldrex %0, [%2]\n"
+      "add %0, %0, %3\n"
+      "strex %1, %0, [%2]\n"
+      : "=&r" (tmp), "=&r" (result)
+      : "r" (atomic), "Ir" (val)
+      : "cc", "memory");
+  } while (result);
+}
+
+gboolean
+g_atomic_int_compare_and_exchange (volatile gint *atomic, 
+				   gint           oldval, 
+				   gint           newval)
+{
+  unsigned long result;
+  int old;
+
+  asm volatile (
+    "ldrex %1, [%2]\n"
+    "mov %0, #0\n"
+    "teq %1, %3\n"
+    "strexeq %0, %4, [%2]\n"
+    : "=&r" (result), "=&r" (old)
+    : "r" (atomic), "Ir" (oldval), "r" (newval)
+    : "cc", "memory");
+  return (result) ? FALSE : TRUE;
+}
+
+gboolean
+g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic, 
+				       gpointer           oldval, 
+				       gpointer           newval)
+{
+  unsigned long result;
+  void *old;
+
+  asm volatile (
+    "ldrex %1, [%2]\n"
+    "mov %0, #0\n"
+    "teq %1, %3\n"
+    "strexeq %0, %4, [%2]\n"
+    : "=&r" (result), "=&r" (old)
+    : "r" (atomic), "Ir" (oldval), "r" (newval)
+    : "cc", "memory");
+  return (result) ? FALSE : TRUE;
+}
+
+gint
+g_atomic_int_get (volatile gint *atomic)
+{
+  return *atomic;
+}
+
+void
+g_atomic_int_set (volatile gint *atomic,
+                  gint           newval)
+{
+  unsigned long result;
+
+  do {
+    asm volatile (
+      "ldrex %0, [%1]\n"
+      "strex %0, %2, [%1]\n"
+      : "=&r" (result)
+      : "r" (atomic), "r" (newval)
+      : "cc", "memory");
+  } while (result);
+}
+
+gpointer
+g_atomic_pointer_get (volatile gpointer *atomic)
+{
+  return *atomic;
+}   
+
+void
+g_atomic_pointer_set (volatile gpointer *atomic,
+                      gpointer           newval)
+{
+  unsigned long result;
+
+  do {
+    asm volatile (
+      "ldrex %0, [%1]\n"
+      "strex %0, %2, [%1]\n"
+      : "=&r" (result)
+      : "r" (atomic), "r" (newval)
+      : "cc", "memory");
+  } while (result);
+}
+#  endif /* G_ATOMIC_ARM < 6 */
+# elif defined(G_ATOMIC_ARM_LINUX)
+/* use special helper functions provided by the linux kernel */
+
+typedef void (_khelper_barrier_t)(void);
+#define _khelper_barrier (*(_khelper_barrier_t *)0xffff0fa0)
+/*#define G_ATOMIC_MEMORY_BARRIER _khelper_barrier()*/
+/* scratchbox/qemu explodes on barrier */
+#define G_ATOMIC_MEMORY_BARRIER while(0)
+typedef int (_khelper_cmpxchg_t)(int oldval, int newval, volatile int *ptr);
+#define _khelper_cmpxchg (*(_khelper_cmpxchg_t *)0xffff0fc0)
+
+gint
+g_atomic_int_exchange_and_add (volatile gint *atomic, 
+			       gint           val)
+{
+  int result;
+  int old, new;
+
+  do {
+    old = *atomic;
+    new = old + val;
+    result = _khelper_cmpxchg(old, new, atomic);
+  } while (result);
+  return old;
+}
+
+void
+g_atomic_int_add (volatile gint *atomic,
+		  gint           val)
+{
+  int result;
+  int old, new;
+
+  do {
+    old = *atomic;
+    new = old + val;
+    result = _khelper_cmpxchg(old, new, atomic);
+  } while (result);
+}
+
+gboolean
+g_atomic_int_compare_and_exchange (volatile gint *atomic, 
+				   gint           oldval, 
+				   gint           newval)
+{
+  int result;
+
+  result = _khelper_cmpxchg(oldval, newval, atomic);
+  return (result) ? FALSE : TRUE;
+}
+
+gboolean
+g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic, 
+				       gpointer           oldval, 
+				       gpointer           newval)
+{
+  int result;
+
+  result = _khelper_cmpxchg(*((int *) &oldval),
+                            *((int *) &newval),
+                            (int *) atomic);
+  return (result) ? FALSE : TRUE;
+}
+# else /* !G_ATOMIC_ARM_LINUX */
 #  define DEFINE_WITH_MUTEXES
 # endif /* G_ATOMIC_IA64 */
 #else /* !__GNUC__ */
@@ -663,7 +943,7 @@ g_atomic_pointer_set (volatile gpointer *atomic,
   g_mutex_unlock (g_atomic_mutex);
 }
 #endif /* G_ATOMIC_OP_MEMORY_BARRIER_NEEDED */   
-#elif defined (G_ATOMIC_OP_MEMORY_BARRIER_NEEDED)
+#elif (defined(G_ATOMIC_OP_MEMORY_BARRIER_NEEDED) && !defined(G_ATOMIC_ARM))
 gint
 g_atomic_int_get (volatile gint *atomic)
 {
