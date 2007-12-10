@@ -1,3 +1,9 @@
+glib2.0 (2.12.12-1osso11) gutsy; urgency=low
+
+  * Add realtime scheduling for GThreadPools and atomic operations for ARM.
+
+ -- Xan Lopez <xan.lopez@nokia.com>  Mon, 10 Dec 2007 14:54:28 +0200
+
 glib2.0 (2.12.12-1osso10) unstable; urgency=low
 
   * Fix shlibs in debian/rules
