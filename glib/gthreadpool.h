@@ -1,6 +1,8 @@
 /* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
+ * Copyright (C) 2007 Nokia Corporation
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -55,6 +57,14 @@ GThreadPool*    g_thread_pool_new             (GFunc            func,
                                                gint             max_threads,
                                                gboolean         exclusive,
                                                GError         **error);
+
+GThreadPool*    g_thread_pool_new_with_priority (GFunc            func,
+                                                 gpointer         user_data,
+                                                 gint             max_threads,
+                                                 gboolean         exclusive,
+                                                 GThreadScheduler scheduler,
+                                                 gint             priority,
+                                                 GError         **error);
 
 /* Push new data into the thread pool. This task is assigned to a thread later
  * (when the maximal number of threads is reached for that pool) or now

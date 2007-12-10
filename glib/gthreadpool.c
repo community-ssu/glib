@@ -4,6 +4,8 @@
  * GAsyncQueue: thread pool implementation.
  * Copyright (C) 2000 Sebastian Wilhelmi; University of Karlsruhe
  *
+ * Copyright (C) 2007 Nokia Corporation
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -46,6 +48,8 @@ struct _GRealThreadPool
   gboolean waiting;
   GCompareDataFunc sort_func;
   gpointer sort_user_data;
+  GThreadScheduler scheduler;
+  gint priority;
 };
 
 /* The following is just an address to mark the wakeup order for a
@@ -245,6 +249,15 @@ g_thread_pool_thread_proxy (gpointer data)
   DEBUG_MSG (("thread %p started for pool %p.", 
 	      g_thread_self (), pool));
 
+  /* thread self-modifies the scheduler and priority
+   */
+  if (!(pool->scheduler == G_THREAD_SCHEDULER_DEFAULT &&
+        pool->priority == 0))
+    {
+      if (!g_thread_set_scheduler(g_thread_self(), pool->scheduler, pool->priority))
+        g_warning("g_thread_set_scheduler() failed for pool %p", pool);
+    }
+
   g_async_queue_lock (pool->queue);
 
   while (TRUE)
@@ -420,6 +433,20 @@ g_thread_pool_new (GFunc            func,
 		   gboolean         exclusive,
 		   GError         **error)
 {
+  return g_thread_pool_new_with_priority(func, user_data, max_threads,
+                                         exclusive, G_THREAD_SCHEDULER_DEFAULT,
+                                         0, error);
+}
+
+GThreadPool* 
+g_thread_pool_new_with_priority (GFunc            func,
+                                 gpointer         user_data,
+                                 gint             max_threads,
+                                 gboolean         exclusive,
+                                 GThreadScheduler scheduler,
+                                 gint             priority,
+                                 GError         **error)
+{
   GRealThreadPool *retval;
   G_LOCK_DEFINE_STATIC (init);
 
@@ -438,6 +465,8 @@ g_thread_pool_new (GFunc            func,
   retval->max_threads = max_threads;
   retval->num_threads = 0;
   retval->running = TRUE;
+  retval->scheduler = scheduler;
+  retval->priority = priority;
   retval->sort_func = NULL;
   retval->sort_user_data = NULL;
 

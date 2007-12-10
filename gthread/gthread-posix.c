@@ -4,6 +4,8 @@
  * gthread.c: posix thread system implementation
  * Copyright 1998 Sebastian Wilhelmi; University of Karlsruhe
  *
+ * Copyright (C) 2007 Nokia Corporation
+ *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -441,6 +443,61 @@ g_thread_equal_posix_impl (gpointer thread1, gpointer thread2)
   return (pthread_equal (*(pthread_t*)thread1, *(pthread_t*)thread2) != 0);
 }
 
+gint g_thread_scheduler_priority_min_posix_impl (GThreadScheduler scheduler)
+{
+  switch (scheduler)
+  {
+    case G_THREAD_SCHEDULER_DEFAULT:
+      return sched_get_priority_min(SCHED_OTHER);
+    case G_THREAD_SCHEDULER_FIFO:
+      return sched_get_priority_min(SCHED_FIFO);
+    case G_THREAD_SCHEDULER_RR:
+      return sched_get_priority_min(SCHED_RR);
+    default:
+      return 0;
+  }
+}
+
+gint g_thread_scheduler_priority_max_posix_impl (GThreadScheduler scheduler)
+{
+  switch (scheduler)
+  {
+    case G_THREAD_SCHEDULER_DEFAULT:
+      return sched_get_priority_max(SCHED_OTHER);
+    case G_THREAD_SCHEDULER_FIFO:
+      return sched_get_priority_max(SCHED_FIFO);
+    case G_THREAD_SCHEDULER_RR:
+      return sched_get_priority_max(SCHED_RR);
+    default:
+      return 0;
+  }
+}
+
+gboolean g_thread_scheduler_set_posix_impl (gpointer         thread,
+		                            GThreadScheduler scheduler,
+                                            gint             priority)
+{
+  int schedpol;
+  struct sched_param schedprio;
+
+  switch (scheduler)
+  {
+    case G_THREAD_SCHEDULER_FIFO:
+      schedpol = SCHED_FIFO;
+      break;
+    case G_THREAD_SCHEDULER_RR:
+      schedpol = SCHED_RR;
+      break;
+    case G_THREAD_SCHEDULER_DEFAULT:
+    default:
+      schedpol = SCHED_OTHER;
+  }
+  schedprio.sched_priority = priority;
+  if (pthread_setschedparam(*(pthread_t *) thread, schedpol, &schedprio))
+    return FALSE;
+  return TRUE;
+}
+
 #ifdef USE_CLOCK_GETTIME 
 static guint64
 gettime (void)
@@ -478,5 +535,8 @@ static GThreadFunctions g_thread_functions_for_glib_use_default =
   g_thread_exit_posix_impl,
   g_thread_set_priority_posix_impl,
   g_thread_self_posix_impl,
-  g_thread_equal_posix_impl
+  g_thread_equal_posix_impl,
+  g_thread_scheduler_priority_min_posix_impl,
+  g_thread_scheduler_priority_max_posix_impl,
+  g_thread_scheduler_set_posix_impl
 };
