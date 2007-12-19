@@ -1,10 +1,16 @@
-glib2.0 (2.12.12-1osso12) gutsy; urgency=low
+glib2.0 (2.12.12-1osso13) unstable; urgency=low
+
+  * Revert  realtime scheduling for GThreadPools, it breaks ABI.
+
+ -- Xan Lopez <xan.lopez@nokia.com>  Tue, 18 Dec 2007 16:00:19 +0200
+
+glib2.0 (2.12.12-1osso12) unstable; urgency=low
 
   * Blah, actually include the test. 
 
  -- Xan Lopez <xan.lopez@nokia.com>  Mon, 10 Dec 2007 14:58:50 +0200
 
-glib2.0 (2.12.12-1osso11) gutsy; urgency=low
+glib2.0 (2.12.12-1osso11) unstable; urgency=low
 
   * Add realtime scheduling for GThreadPools and atomic operations for ARM.
 
