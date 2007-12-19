@@ -1,8 +1,6 @@
 /* GLIB - Library of useful routines for C programming
  * Copyright (C) 1995-1997  Peter Mattis, Spencer Kimball and Josh MacDonald
  *
- * Copyright (C) 2007 Nokia Corporation
- *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
  * License as published by the Free Software Foundation; either
@@ -56,13 +54,6 @@ typedef enum
   G_THREAD_PRIORITY_URGENT
 } GThreadPriority;
 
-typedef enum
-{
-  G_THREAD_SCHEDULER_DEFAULT,
-  G_THREAD_SCHEDULER_FIFO,
-  G_THREAD_SCHEDULER_RR
-} GThreadScheduler;
-
 typedef struct _GThread         GThread;
 struct  _GThread
 {
@@ -115,11 +106,6 @@ struct _GThreadFunctions
   void      (*thread_self)        (gpointer              thread);
   gboolean  (*thread_equal)       (gpointer              thread1,
 				   gpointer              thread2);
-  gint      (*priority_min)       (GThreadScheduler      scheduler);
-  gint      (*priority_max)       (GThreadScheduler      scheduler);
-  gboolean  (*scheduler_set)      (gpointer              thread,
-                                   GThreadScheduler      scheduler,
-                                   gint                  priority);
 };
 
 GLIB_VAR GThreadFunctions       g_thread_functions_for_glib_use;
@@ -218,13 +204,6 @@ GMutex* g_static_mutex_get_mutex_impl   (GMutex **mutex);
                                                        (private_key, value))
 #define g_thread_yield()              G_THREAD_CF (thread_yield, (void)0, ())
 
-#define g_thread_scheduler_get_priority_min(sched) G_THREAD_CF (priority_min, \
-                                                            0, \
-                                                            (sched))
-#define g_thread_scheduler_get_priority_max(sched) G_THREAD_CF (priority_max, \
-                                                            0, \
-                                                            (sched))
-
 #define g_thread_create(func, data, joinable, error)			\
   (g_thread_create_full (func, data, 0, joinable, FALSE, 		\
                          G_THREAD_PRIORITY_NORMAL, error))
@@ -242,9 +221,6 @@ gpointer g_thread_join         (GThread               *thread);
 
 void     g_thread_set_priority (GThread               *thread,
                                 GThreadPriority        priority);
-gboolean g_thread_set_scheduler (GThread              *thread,
-                                 GThreadScheduler      scheduler,
-                                 gint                  priority);
 
 /* GStaticMutexes can be statically initialized with the value
  * G_STATIC_MUTEX_INIT, and then they can directly be used, that is

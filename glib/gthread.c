@@ -881,15 +881,6 @@ g_static_rw_lock_free (GStaticRWLock* lock)
   g_static_mutex_free (&lock->mutex);
 }
 
-gboolean g_thread_set_scheduler (GThread         *thread,
-                                 GThreadScheduler scheduler,
-                                 gint             priority)
-{
-  GRealThread* real = (GRealThread*) thread;
-
-  return G_THREAD_CF(scheduler_set, 0, (&real->system_thread, scheduler, priority));
-}
-
 /**
  * g_thread_foreach
  * @thread_func: function to call for all GThread structures
