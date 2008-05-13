@@ -1,5 +1,18 @@
 2008-05-13  Michael Natterer  <mitch@imendio.com>
 
+	* docs/Changes-2.0.txt
+	* docs/reference/README.cvs-commits
+	* glib.spec.in
+	* gobject/gobjectalias.h
+	* gobject/gobjectaliasdef.c
+	* gthread/gthread-solaris.c
+	* po/no.po
+	* tests/gobject/stamp-testmarshal.h: remove files that were
+	accidentially comitted or were forgotten to remove in earlier
+	upgrades.
+
+2008-05-13  Michael Natterer  <mitch@imendio.com>
+
 	* ChangeLog.pre-2-12
 	* MAINTAINERS
 	* tests/bookmarks/*.xbel: add files from upstream 2.12 that were
