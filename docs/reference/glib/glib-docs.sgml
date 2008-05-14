@@ -60,9 +60,12 @@
 <!ENTITY glib-Keyfile SYSTEM "xml/keyfile.xml">
 <!ENTITY glib-Bookmarkfile SYSTEM "xml/bookmarkfile.xml">
 <!ENTITY glib-Base64 SYSTEM "xml/base64.xml">
+<!ENTITY glib-Checksum SYSTEM "xml/checksum.xml">
 <!ENTITY glib-i18n SYSTEM "xml/i18n.xml">
 <!ENTITY glib-Regex SYSTEM "xml/gregex.xml">
 <!ENTITY glib-Version SYSTEM "xml/version.xml">
+<!ENTITY glib-Uri SYSTEM "xml/gurifuncs.xml">
+<!ENTITY glib-Testing SYSTEM "xml/testing.xml">
 
 <!ENTITY glib-Compiling SYSTEM "compiling.sgml">
 <!ENTITY glib-Building SYSTEM "building.sgml">
@@ -141,6 +144,7 @@ synchronize their operation.
     &glib-Character-Set-Conversion;
     &glib-Unicode-Manipulation;
     &glib-Base64;
+    &glib-Checksum;
     &glib-i18n;
     &glib-Date-and-Time-Functions;
     &glib-Random-Numbers;   
@@ -151,6 +155,7 @@ synchronize their operation.
     &glib-Timers;
     &glib-Spawn;
     &glib-Fileutils;
+    &glib-Uri;
     &glib-Shell;
     &glib-Option;
     &glib-Pattern-Matching;
@@ -158,6 +163,7 @@ synchronize their operation.
     &glib-Markup;
     &glib-Keyfile;
     &glib-Bookmarkfile;
+    &glib-Testing;
     &glib-Windows-Compatibility-Functions;
   </chapter>
 
@@ -218,6 +224,9 @@ synchronize their operation.
   </index>  
   <index role="2.14">
     <title>Index of new symbols in 2.14</title>
+  </index>  
+  <index role="2.16">
+    <title>Index of new symbols in 2.16</title>
   </index>  
   <index role="maemo">
     <title>Index of new symbols in Maemo</title>

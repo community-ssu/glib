@@ -58,6 +58,7 @@ g_async_queue_length
 g_async_queue_length_unlocked
 g_async_queue_lock
 g_async_queue_new
+g_async_queue_new_full
 g_async_queue_pop
 g_async_queue_pop_unlocked
 g_async_queue_push
@@ -168,6 +169,20 @@ g_cache_remove
 #ifndef G_DISABLE_DEPRECATED
 g_cache_value_foreach
 #endif
+#endif
+#endif
+
+#if IN_HEADER(__G_CHECKSUM_H__)
+#if IN_FILE(__G_CHECKSUM_C__)
+g_checksum_type_get_length
+g_checksum_new
+g_checksum_copy
+g_checksum_free
+g_checksum_update
+g_checksum_get_string
+g_checksum_get_digest
+g_compute_checksum_for_data
+g_compute_checksum_for_string
 #endif
 #endif
 
@@ -320,6 +335,8 @@ g_error_new G_GNUC_PRINTF(3,4)
 g_error_new_literal
 g_propagate_error
 g_set_error G_GNUC_PRINTF(4,5)
+g_prefix_error G_GNUC_PRINTF(2,3)
+g_propagate_prefixed_error G_GNUC_PRINTF(3,4)
 #endif
 #endif
 
@@ -336,6 +353,7 @@ g_file_set_contents
 g_file_open_tmp PRIVATE
 g_file_test PRIVATE
 g_file_read_link
+g_format_size_for_display
 g_mkstemp PRIVATE
 g_mkdir_with_parents
 #ifdef G_OS_WIN32
@@ -369,6 +387,11 @@ g_hash_table_replace
 g_hash_table_size
 g_hash_table_steal
 g_hash_table_steal_all
+g_hash_table_iter_init
+g_hash_table_iter_next
+g_hash_table_iter_get_hash_table
+g_hash_table_iter_remove
+g_hash_table_iter_steal
 #endif
 #endif
 
@@ -644,11 +667,13 @@ g_markup_escape_text
 g_markup_parse_context_end_parse
 g_markup_parse_context_free
 g_markup_parse_context_get_element
+g_markup_parse_context_get_element_stack
 g_markup_parse_context_get_position
 g_markup_parse_context_new
 g_markup_parse_context_parse
 g_markup_printf_escaped G_GNUC_PRINTF(1,2)
 g_markup_vprintf_escaped
+g_markup_collect_attributes
 #endif
 #endif
 
@@ -711,7 +736,10 @@ g_log_set_fatal_mask
 g_log_set_handler
 g_logv
 g_return_if_fail_warning
+g_warn_message
+#ifndef G_DISABLE_DEPRECATED
 g_assert_warning G_GNUC_NORETURN
+#endif
 g_print G_GNUC_PRINTF(1,2)
 g_printerr G_GNUC_PRINTF(1,2)
 g_set_printerr_handler
@@ -1118,6 +1146,16 @@ g_strdown
 #endif
 g_strv_length
 g_strip_context
+g_dpgettext
+#endif
+#endif
+
+#if IN_HEADER(__G_URI_FUNCS_H__)
+#if IN_FILE(__G_URI_FUNCS_C__)
+g_uri_unescape_string 
+g_uri_unescape_segment 
+g_uri_parse_scheme 
+g_uri_escape_string 
 #endif
 #endif
 
@@ -1157,6 +1195,7 @@ g_string_printf G_GNUC_PRINTF(2,3)
 g_string_set_size
 g_string_sized_new
 g_string_truncate
+g_string_append_uri_escaped
 #ifndef G_DISABLE_DEPRECATED
 g_string_down
 g_string_up
@@ -1234,6 +1273,52 @@ g_thread_pool_set_max_idle_time
 g_thread_pool_stop_unused_threads
 g_thread_pool_unprocessed
 g_thread_pool_set_sort_function
+#endif
+#endif
+
+#if IN_HEADER(__G_TEST_UTILS_H__)
+#if IN_FILE(__G_TEST_UTILS_C__)
+g_assertion_message G_GNUC_NORETURN
+g_assertion_message_cmpnum G_GNUC_NORETURN
+g_assertion_message_cmpstr G_GNUC_NORETURN
+g_assertion_message_expr G_GNUC_NORETURN
+g_strcmp0
+g_test_add_data_func
+g_test_add_func
+g_test_add_vtable
+g_test_bug
+g_test_bug_base
+g_test_config_vars
+g_test_create_case
+g_test_create_suite
+g_test_get_root
+g_test_init
+g_test_log_buffer_free
+g_test_log_buffer_new
+g_test_log_buffer_pop
+g_test_log_buffer_push
+g_test_log_msg_free
+g_test_log_type_name
+g_test_maximized_result
+g_test_message
+g_test_minimized_result
+g_test_queue_destroy
+g_test_queue_free
+g_test_rand_double
+g_test_rand_double_range
+g_test_rand_int
+g_test_rand_int_range
+g_test_run
+g_test_run_suite
+g_test_suite_add
+g_test_suite_add_suite
+g_test_timer_elapsed
+g_test_timer_last
+g_test_timer_start
+g_test_trap_assertions
+g_test_trap_fork
+g_test_trap_has_passed
+g_test_trap_reached_timeout
 #endif
 #endif
 
@@ -1359,6 +1444,12 @@ g_unichar_validate
 #endif
 #endif
 
+#if IN_HEADER(__GLIBINTL_H__)
+#if IN_FILE(__G_UTILS_C__)
+glib_gettext
+#endif
+#endif
+
 #if IN_HEADER(__G_HASH_H__)
 #if IN_FILE(__G_UTILS_C__)
 g_int_equal
@@ -1480,6 +1571,7 @@ g_match_info_fetch_all
 #ifdef G_OS_WIN32
 g_win32_error_message
 g_win32_ftruncate
+g_win32_get_package_installation_directory_of_module
 g_win32_get_package_installation_directory PRIVATE
 g_win32_get_package_installation_directory_utf8
 g_win32_get_package_installation_subdirectory PRIVATE
@@ -1507,4 +1599,3 @@ glib_minor_version
 glib_on_error_halt
 g_mem_gc_friendly
 #endif
-

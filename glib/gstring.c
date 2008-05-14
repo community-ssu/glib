@@ -713,6 +713,88 @@ g_string_insert_len (GString     *string,
   return string;
 }
 
+#define SUB_DELIM_CHARS  "!$&'()*+,;="
+
+static gboolean
+is_valid (char c, const char *reserved_chars_allowed)
+{
+  if (g_ascii_isalnum (c) ||
+      c == '-' ||
+      c == '.' ||
+      c == '_' ||
+      c == '~')
+    return TRUE;
+
+  if (reserved_chars_allowed &&
+      strchr (reserved_chars_allowed, c) != NULL)
+    return TRUE;
+  
+  return FALSE;
+}
+
+static gboolean 
+gunichar_ok (gunichar c)
+{
+  return
+    (c != (gunichar) -2) &&
+    (c != (gunichar) -1);
+}
+
+/**
+ * g_string_append_uri_escaped:
+ * @string: a #GString
+ * @unescaped: a string
+ * @reserved_chars_allowed: a string of reserved characters allowed to be used
+ * @allow_utf8: set %TRUE if the escaped string may include UTF8 characters
+ * 
+ * Appends @unescaped to @string, escaped any characters that
+ * are reserved in URIs using URI-style escape sequences.
+ * 
+ * Returns: @string
+ *
+ * Since: 2.16
+ **/
+GString *
+g_string_append_uri_escaped (GString *string,
+			     const char *unescaped,
+			     const char *reserved_chars_allowed,
+			     gboolean allow_utf8)
+{
+  unsigned char c;
+  const char *end;
+  static const gchar hex[16] = "0123456789ABCDEF";
+
+  g_return_val_if_fail (string != NULL, NULL);
+  g_return_val_if_fail (unescaped != NULL, NULL);
+
+  end = unescaped + strlen (unescaped);
+  
+  while ((c = *unescaped) != 0)
+    {
+      if (c >= 0x80 && allow_utf8 &&
+	  gunichar_ok (g_utf8_get_char_validated (unescaped, end - unescaped)))
+	{
+	  int len = g_utf8_skip [c];
+	  g_string_append_len (string, unescaped, len);
+	  unescaped += len;
+	}
+      else if (is_valid (c, reserved_chars_allowed))
+	{
+	  g_string_append_c (string, c);
+	  unescaped++;
+	}
+      else
+	{
+	  g_string_append_c (string, '%');
+	  g_string_append_c (string, hex[((guchar)c) >> 4]);
+	  g_string_append_c (string, hex[((guchar)c) & 0xf]);
+	  unescaped++;
+	}
+    }
+
+  return string;
+}
+
 /**
  * g_string_append:
  * @string: a #GString
@@ -1273,7 +1355,7 @@ g_string_up (GString *string)
  * @args: the list of arguments to insert in the output
  *
  * Appends a formatted string onto the end of a #GString.
- * This function is is similar to g_string_append_printf()
+ * This function is similar to g_string_append_printf()
  * except that the arguments to the format string are passed
  * as a va_list.
  *
@@ -1370,7 +1452,7 @@ g_string_printf (GString     *string,
  * @Varargs: the parameters to insert into the format string
  *
  * Appends a formatted string onto the end of a #GString.
- * This function is is similar to g_string_sprintf() except that
+ * This function is similar to g_string_sprintf() except that
  * the text is appended to the #GString. 
  *
  * Deprecated: This function has been renamed to g_string_append_printf()
@@ -1383,7 +1465,7 @@ g_string_printf (GString     *string,
  * @Varargs: the parameters to insert into the format string
  *
  * Appends a formatted string onto the end of a #GString.
- * This function is is similar to g_string_printf() except 
+ * This function is similar to g_string_printf() except 
  * that the text is appended to the #GString.
  */
 void

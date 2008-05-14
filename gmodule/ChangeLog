@@ -1,21 +1,60 @@
-2008-02-06  Matthias Clasen  <mclasen@redhat.com>
+2008-04-08  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.14.6 ===
+	* === Released 2.16.3 ===
 
-2008-01-07  Matthias Clasen  <mclasen@redhat.com>
+2008-03-31  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.14.5 ===
+	* === Released 2.16.2 ===
 
-2008-01-07  Matthias Clasen  <mclasen@redhat.com>
+2008-03-10  Matthias Clasen  <mclasen@redhat.com>
+	
+	* === Released 2.16.1 ===
 
-	Merged from trunk:
+2008-03-10  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.16.0 ===
+
+2008-02-25  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.6 ===
+
+2008-02-11  Matthias Clasen <mclasen@redhat.com>
+
+	* === Released 2.15.5 ===
+
+2008-01-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.4 ===
+
+2008-01-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.3 ===
+
+2008-01-14  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.2 ===
+
+008-01-07  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.1 ===
+
+2007-12-22  Matthias Clasen  <mclasen@redhat.com>
 
 	* gmodule.c (g_module_open): Don't fail to load modules
 	with suffix .la.  (#480122, Andrey Tsyvarev)
 
-2007-11-24  Matthias Clasen  <mclasen@redhat.com>
+2007-12-20  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.14.4 ===
+	* === Released 2.15.0 ===
+
+2007-11-08  Matthias Clasen <mclasen@redhat.com>
+
+	* gmodule.c: Include glibconfig.h before checking G_OS_WIN32.
+
+2007-11-07  Matthias Clasen <mclasen@redhat.com>
+
+	* *.c: Make header include order consistent (#71704,
+	Diego Escalante Urrelo)
 
 2007-11-07  Matthias Clasen <mclasen@redhat.com>
 

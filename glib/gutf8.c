@@ -510,6 +510,12 @@ charset_cache_free (gpointer data)
  * other encoding. (Frequently g_locale_to_utf8() and g_locale_from_utf8()
  * are nice shortcuts, though.)
  *
+ * On Windows the character set returned by this function is the
+ * so-called system default ANSI code-page. That is the character set
+ * used by the "narrow" versions of C library and Win32 functions that
+ * handle file names. It might be different from the character set
+ * used by the C library's current locale.
+ *
  * The return value is %TRUE if the locale's encoding is UTF-8, in that
  * case you can perhaps avoid calling g_convert().
  *
@@ -1772,6 +1778,12 @@ g_unichar_validate (gunichar ch)
  * Reverses a UTF-8 string. @str must be valid UTF-8 encoded text. 
  * (Use g_utf8_validate() on all text before trying to use UTF-8 
  * utility functions with it.)
+ *
+ * This function is intended for programmatic uses of reversed strings.
+ * It pays no attention to decomposed characters, combining marks, byte 
+ * order marks, directional indicators (LRM, LRO, etc) and similar 
+ * characters which might need special handling when reversing a string 
+ * for display purposes.
  *
  * Note that unlike g_strreverse(), this function returns
  * newly-allocated memory, which should be freed with g_free() when

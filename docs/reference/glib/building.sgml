@@ -148,13 +148,29 @@ How to compile GLib itself
       </listitem>
       <listitem>
 	<para>
-	  GRegex uses the the <ulink url="http://www.pcre.org/">PCRE library</ulink>
+	  GRegex uses the <ulink url="http://www.pcre.org/">PCRE library</ulink>
 	  for regular expression matching. The default is to use the internal
 	  version of PCRE that is patched to use GLib for memory management
 	  and Unicode handling. If you prefer to use the system-supplied PCRE
 	  library  you can pass the --with-pcre=system option to configure,
 	  but it is not recommended.
 	</para>
+      </listitem>
+      <listitem>
+        <para>
+          The optional extended attribute support in GIO requires the 
+          getxattr() family of functions that may be provided by glibc or 
+          by the standalone libattr library. To build GLib without extended 
+          attribute support, use the <option>--disable-xattr</option> 
+          configure option.
+        </para>
+      </listitem>
+      <listitem>
+        <para>
+          The optional SELinux support in GIO requires libselinux. To build 
+          GLib without SELinux support, use the 
+          <option>--disable-selinux</option> configure option.
+        </para>
       </listitem>
     </itemizedlist>
 
@@ -209,6 +225,14 @@ How to compile GLib itself
           <group>
             <arg>--disable-man</arg>
             <arg>--enable-man</arg>
+          </group>
+          <group>
+            <arg>--disable-xattr</arg>
+            <arg>--enable-xattr</arg>
+          </group>
+          <group>
+            <arg>--disable-selinux</arg>
+            <arg>--enable-selinux</arg>
           </group>
         </cmdsynopsis>
       </para>
@@ -504,6 +528,33 @@ How to compile GLib itself
         </para>
       </formalpara>
 
+      <formalpara>
+        <title><systemitem>--disable-xattr</systemitem> and
+          <systemitem>--enable-xattr</systemitem></title>
+
+        <para>
+          By default the <command>configure</command> script will try
+          to auto-detect whether the getxattr() family of functions
+          is available. If it is, then extended attribute support
+          will be included in GIO. These options can be used to
+          explicitly control whether extended attribute support 
+          should be included or not. getxattr() and friends can
+          be provided by glibc or by the standalone libattr library.
+        </para>
+     </formalpara>
+
+      <formalpara>
+        <title><systemitem>--disable-selinux</systemitem> and
+          <systemitem>--enable-selinux</systemitem></title>
+
+        <para>
+          By default the <command>configure</command> script will
+          auto-detect if libselinux is available and include
+          SELinux support in GIO if it is. These options can be
+          used to explicitly control whether SELinxu support should
+	  be included.
+        </para>
+     </formalpara>
    </refsect1>
 
 </refentry>

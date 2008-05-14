@@ -1,21 +1,22 @@
 # Japanese translation of glib.
-# Copyright (C) 2001-2007 Free Software Foundation, Inc.
+# Copyright (C) 2001-2008 Free Software Foundation, Inc.
 # Takayuki KUSANO <AE5T-KSN@asahi-net.or.jp>, 2001-2002.
 # KAMAGASAKO Masatoshi <emerald@gnome.gr.jp>, 2003.
-# Takeshi AIHANA <takeshi.aihana@gmail.com>, 2004-2007.
+# Takeshi AIHANA <takeshi.aihana@gmail.com>, 2004-2008.
 # Ryoichi INAGAKI <ryo1@bc.wakwak.com>, 2004.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: glib trunk\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-02-07 01:08-0500\n"
-"PO-Revision-Date: 2008-01-09 00:05+0900\n"
+"POT-Creation-Date: 2008-04-08 00:40-0400\n"
+"PO-Revision-Date: 2008-03-11 20:46+0900\n"
 "Last-Translator: Takeshi AIHANA <takeshi.aihana@gmail.com>\n"
 "Language-Team: Japanese <gnome-translation@gnome.gr.jp>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: glib/gbookmarkfile.c:705 glib/gbookmarkfile.c:782 glib/gbookmarkfile.c:861
 #: glib/gbookmarkfile.c:908
@@ -90,71 +91,71 @@ msgstr "アプリケーション '%s' は '%s' のブックマークを登録し
 msgid "Failed to expand exec line '%s' with URI '%s'"
 msgstr "実行ラインの '%s' を URI '%s' で展開できませんでした"
 
-#: glib/gconvert.c:424 glib/gconvert.c:502 glib/giochannel.c:1148
+#: glib/gconvert.c:431 glib/gconvert.c:509 glib/giochannel.c:1158
 #, c-format
 msgid "Conversion from character set '%s' to '%s' is not supported"
 msgstr "文字セット '%s' から '%s' への変換はサポートしていません"
 
-#: glib/gconvert.c:428 glib/gconvert.c:506
+#: glib/gconvert.c:435 glib/gconvert.c:513
 #, c-format
 msgid "Could not open converter from '%s' to '%s'"
 msgstr "'%s' から '%s' へのコンバータを開けませんでした"
 
-#: glib/gconvert.c:625 glib/gconvert.c:1010 glib/giochannel.c:1320
-#: glib/giochannel.c:1362 glib/giochannel.c:2204 glib/gutf8.c:950
-#: glib/gutf8.c:1399
+#: glib/gconvert.c:632 glib/gconvert.c:1017 glib/giochannel.c:1330
+#: glib/giochannel.c:1372 glib/giochannel.c:2215 glib/gutf8.c:956
+#: glib/gutf8.c:1405
 #, c-format
 msgid "Invalid byte sequence in conversion input"
 msgstr "変換する入力に無効なバイトの並びがあります"
 
-#: glib/gconvert.c:631 glib/gconvert.c:937 glib/giochannel.c:1327
-#: glib/giochannel.c:2216
+#: glib/gconvert.c:638 glib/gconvert.c:944 glib/giochannel.c:1337
+#: glib/giochannel.c:2227
 #, c-format
 msgid "Error during conversion: %s"
 msgstr "変換中にエラー: %s"
 
-#: glib/gconvert.c:662 glib/gutf8.c:946 glib/gutf8.c:1150 glib/gutf8.c:1291
-#: glib/gutf8.c:1395
+#: glib/gconvert.c:669 glib/gutf8.c:952 glib/gutf8.c:1156 glib/gutf8.c:1297
+#: glib/gutf8.c:1401
 #, c-format
 msgid "Partial character sequence at end of input"
 msgstr "入力の最後に不完全な文字シーケンスがあります"
 
-#: glib/gconvert.c:912
+#: glib/gconvert.c:919
 #, c-format
 msgid "Cannot convert fallback '%s' to codeset '%s'"
 msgstr "フォールバック '%s' を文字セット '%s' に変換できません"
 
-#: glib/gconvert.c:1726
+#: glib/gconvert.c:1734
 #, c-format
 msgid "The URI '%s' is not an absolute URI using the \"file\" scheme"
 msgstr "URI '%s' は \"file\" スキームの絶対 URI ではありません"
 
-#: glib/gconvert.c:1736
+#: glib/gconvert.c:1744
 #, c-format
 msgid "The local file URI '%s' may not include a '#'"
 msgstr "ローカル・ファイルの URI '%s' は '#' は含みません"
 
-#: glib/gconvert.c:1753
+#: glib/gconvert.c:1761
 #, c-format
 msgid "The URI '%s' is invalid"
 msgstr "URI '%s' は正しくありません"
 
-#: glib/gconvert.c:1765
+#: glib/gconvert.c:1773
 #, c-format
 msgid "The hostname of the URI '%s' is invalid"
 msgstr "URI のホスト名 '%s' がおかしいです"
 
-#: glib/gconvert.c:1781
+#: glib/gconvert.c:1789
 #, c-format
 msgid "The URI '%s' contains invalidly escaped characters"
 msgstr "URI '%s' に無効なエスケープ文字が含まれています"
 
-#: glib/gconvert.c:1876
+#: glib/gconvert.c:1884
 #, c-format
 msgid "The pathname '%s' is not an absolute path"
 msgstr "パス名 '%s' が絶対パスではありません"
 
-#: glib/gconvert.c:1886
+#: glib/gconvert.c:1894
 #, c-format
 msgid "Invalid hostname"
 msgstr "無効なホスト名です"
@@ -235,37 +236,59 @@ msgstr "テンプレート '%s' が正しくありません ('%s' を含めな�
 msgid "Template '%s' doesn't contain XXXXXX"
 msgstr "テンプレート '%s' に XXXXXX が含まれていません"
 
-#: glib/gfileutils.c:1840
+#: glib/gfileutils.c:1826
+#, c-format
+msgid "%u byte"
+msgid_plural "%u bytes"
+msgstr[0] "%u バイト"
+msgstr[1] "%u バイト"
+
+#: glib/gfileutils.c:1834
+#, c-format
+msgid "%.1f KB"
+msgstr "%.1f KB"
+
+#: glib/gfileutils.c:1839
+#, c-format
+msgid "%.1f MB"
+msgstr "%.1f MB"
+
+#: glib/gfileutils.c:1844
+#, c-format
+msgid "%.1f GB"
+msgstr "%.1f GB"
+
+#: glib/gfileutils.c:1887
 #, c-format
 msgid "Failed to read the symbolic link '%s': %s"
 msgstr "シンボリック・リンク '%s' の読み込みが失敗: %s"
 
-#: glib/gfileutils.c:1861
+#: glib/gfileutils.c:1908
 #, c-format
 msgid "Symbolic links not supported"
 msgstr "シンボリック・リンクはサポートしていません"
 
-#: glib/giochannel.c:1152
+#: glib/giochannel.c:1162
 #, c-format
 msgid "Could not open converter from '%s' to '%s': %s"
 msgstr "'%s' から '%s' へ変換するコンバータを開けませんでした: %s"
 
-#: glib/giochannel.c:1497
+#: glib/giochannel.c:1507
 #, c-format
 msgid "Can't do a raw read in g_io_channel_read_line_string"
 msgstr "g_io_channel_read_line_string では raw モードで読めません"
 
-#: glib/giochannel.c:1544 glib/giochannel.c:1801 glib/giochannel.c:1887
+#: glib/giochannel.c:1554 glib/giochannel.c:1811 glib/giochannel.c:1898
 #, c-format
 msgid "Leftover unconverted data in read buffer"
 msgstr "変換されていないデータが読みこみバッファに残っています"
 
-#: glib/giochannel.c:1624 glib/giochannel.c:1701
+#: glib/giochannel.c:1634 glib/giochannel.c:1711
 #, c-format
 msgid "Channel terminates in a partial character"
 msgstr "チャンネルが不完全な文字で終わっています"
 
-#: glib/giochannel.c:1687
+#: glib/giochannel.c:1697
 #, c-format
 msgid "Can't do a raw read in g_io_channel_read_to_end"
 msgstr "g_io_channel_read_to_end では raw モードで読めません"
@@ -280,24 +303,24 @@ msgstr "ファイル '%s' を開けません: open() が失敗: %s"
 msgid "Failed to map file '%s': mmap() failed: %s"
 msgstr "ファイル '%s' のマップに失敗しました: mmap() が失敗: %s"
 
-#: glib/gmarkup.c:226
+#: glib/gmarkup.c:234 glib/gmarkup.c:250
 #, c-format
-msgid "Error on line %d char %d: %s"
-msgstr "行 %d の %d 文字目でエラー: %s"
+msgid "Error on line %d char %d: "
+msgstr "%d 行の %d 文字目でエラー:"
 
-#: glib/gmarkup.c:324
+#: glib/gmarkup.c:344
 #, c-format
 msgid "Error on line %d: %s"
 msgstr "%d 行目でエラー: %s"
 
-#: glib/gmarkup.c:428
+#: glib/gmarkup.c:448
 msgid ""
 "Empty entity '&;' seen; valid entities are: &amp; &quot; &lt; &gt; &apos;"
 msgstr ""
 "空のエンティティ '&;' があります; 正しいエンティティは: &amp; &quot; &lt; "
 "&gt; &apos;"
 
-#: glib/gmarkup.c:438
+#: glib/gmarkup.c:458
 #, c-format
 msgid ""
 "Character '%s' is not valid at the start of an entity name; the & character "
@@ -308,17 +331,17 @@ msgstr ""
 "表わします。もしアンパサンドがエンティティでなければ、&amp; のようにエスケー"
 "プしてください"
 
-#: glib/gmarkup.c:472
+#: glib/gmarkup.c:492
 #, c-format
 msgid "Character '%s' is not valid inside an entity name"
 msgstr "文字 '%s' はエンティティ名として使えません"
 
-#: glib/gmarkup.c:509
+#: glib/gmarkup.c:529
 #, c-format
 msgid "Entity name '%s' is not known"
 msgstr "エンティティ名 '%s' というのは不明です"
 
-#: glib/gmarkup.c:520
+#: glib/gmarkup.c:540
 msgid ""
 "Entity did not end with a semicolon; most likely you used an ampersand "
 "character without intending to start an entity - escape ampersand as &amp;"
@@ -327,7 +350,7 @@ msgstr ""
 "ドを使ったのではないでしょうか。アンパサンドは &amp; のようにエスケープしてく"
 "ださい"
 
-#: glib/gmarkup.c:573
+#: glib/gmarkup.c:593
 #, c-format
 msgid ""
 "Failed to parse '%-.*s', which should have been a digit inside a character "
@@ -336,16 +359,16 @@ msgstr ""
 "'%-.*s' をパースできません。文字参照には数字が含まれなくてはなりません (例: "
 "&#234;) おそらく数字が大きすぎます"
 
-#: glib/gmarkup.c:598
+#: glib/gmarkup.c:618
 #, c-format
 msgid "Character reference '%-.*s' does not encode a permitted character"
 msgstr "文字参照 '%-.*s' が使用可能な文字をエンコードしていません"
 
-#: glib/gmarkup.c:613
+#: glib/gmarkup.c:633
 msgid "Empty character reference; should include a digit such as &#454;"
 msgstr "空の文字参照です。&#454; のように数字がなくてはなりません"
 
-#: glib/gmarkup.c:623
+#: glib/gmarkup.c:643
 msgid ""
 "Character reference did not end with a semicolon; most likely you used an "
 "ampersand character without intending to start an entity - escape ampersand "
@@ -355,32 +378,32 @@ msgstr ""
 "サンド文字を使っているのかもしれません。アンパサンドは &amp; とエスケープして"
 "ください"
 
-#: glib/gmarkup.c:709
+#: glib/gmarkup.c:729
 msgid "Unfinished entity reference"
 msgstr "中途半端な実体参照です"
 
-#: glib/gmarkup.c:715
+#: glib/gmarkup.c:735
 msgid "Unfinished character reference"
 msgstr "中途半端な文字参照です"
 
-#: glib/gmarkup.c:958
+#: glib/gmarkup.c:978
 msgid "Invalid UTF-8 encoded text - overlong sequence"
 msgstr "UTF-8 として正しくない文字列です (シーケンスが長すぎます)"
 
-#: glib/gmarkup.c:986
+#: glib/gmarkup.c:1006
 msgid "Invalid UTF-8 encoded text - not a start char"
 msgstr "UTF-8 として正しくない文字列です (文字で始まっていません)"
 
-#: glib/gmarkup.c:1022
+#: glib/gmarkup.c:1042
 #, c-format
 msgid "Invalid UTF-8 encoded text - not valid '%s'"
 msgstr "UTF-8 として正しくない文字列です ('%s' は妥当ではありません)"
 
-#: glib/gmarkup.c:1060
+#: glib/gmarkup.c:1080
 msgid "Document must begin with an element (e.g. <book>)"
 msgstr "ドキュメントは要素 (例 <book>) で始まってなくてはなりません"
 
-#: glib/gmarkup.c:1100
+#: glib/gmarkup.c:1120
 #, c-format
 msgid ""
 "'%s' is not a valid character following a '<' character; it may not begin an "
@@ -389,7 +412,7 @@ msgstr ""
 "'%s' は '<' に続く文字としては正しくありません。おそらく要素名の開始になって"
 "いません"
 
-#: glib/gmarkup.c:1164
+#: glib/gmarkup.c:1184
 #, c-format
 msgid ""
 "Odd character '%s', expected a '>' character to end the start tag of element "
@@ -398,13 +421,13 @@ msgstr ""
 "おかしな文字 '%s' があります。要素 '%s' の開始タグの最後は '>' でなくてはなり"
 "ません"
 
-#: glib/gmarkup.c:1253
+#: glib/gmarkup.c:1273
 #, c-format
 msgid ""
 "Odd character '%s', expected a '=' after attribute name '%s' of element '%s'"
 msgstr "おかしな文字 '%s' です。属性名'%s' (要素 '%s') の後には '=' が必要です"
 
-#: glib/gmarkup.c:1295
+#: glib/gmarkup.c:1315
 #, c-format
 msgid ""
 "Odd character '%s', expected a '>' or '/' character to end the start tag of "
@@ -415,7 +438,7 @@ msgstr ""
 "はなりません。あるいは属性になります。おかしな文字を属性名に使ったのかもしれ"
 "ません"
 
-#: glib/gmarkup.c:1384
+#: glib/gmarkup.c:1401
 #, c-format
 msgid ""
 "Odd character '%s', expected an open quote mark after the equals sign when "
@@ -424,7 +447,7 @@ msgstr ""
 "おかしな文字 '%s' です。属性 '%s' (要素 '%s') の値を設定するには等号記号の後"
 "は引用記号で始まってなくてはなりません"
 
-#: glib/gmarkup.c:1529
+#: glib/gmarkup.c:1543
 #, c-format
 msgid ""
 "'%s' is not a valid character following the characters '</'; '%s' may not "
@@ -433,7 +456,7 @@ msgstr ""
 "'%s' は '</' に続く文字としては正しくありません。'%s' では要素名は始まってま"
 "せん"
 
-#: glib/gmarkup.c:1569
+#: glib/gmarkup.c:1583
 #, c-format
 msgid ""
 "'%s' is not a valid character following the close element name '%s'; the "
@@ -442,25 +465,25 @@ msgstr ""
 "'%s' は閉じ要素名 '%s' に続く文字としては正しくありあません。'>' のみが使用で"
 "きます"
 
-#: glib/gmarkup.c:1580
+#: glib/gmarkup.c:1594
 #, c-format
 msgid "Element '%s' was closed, no element is currently open"
 msgstr "要素 '%s' は閉じています。要素は何も開かれてません"
 
-#: glib/gmarkup.c:1589
+#: glib/gmarkup.c:1603
 #, c-format
 msgid "Element '%s' was closed, but the currently open element is '%s'"
 msgstr "要素'%s' が閉ました。しかし現在開いている要素は '%s' です"
 
-#: glib/gmarkup.c:1755
+#: glib/gmarkup.c:1763
 msgid "Document was empty or contained only whitespace"
 msgstr "ドキュメントが空か、空白だけが含まれています"
 
-#: glib/gmarkup.c:1769
+#: glib/gmarkup.c:1777
 msgid "Document ended unexpectedly just after an open angle bracket '<'"
 msgstr "ドキュメントが開きカギカッコ '<' の直後で終了しています"
 
-#: glib/gmarkup.c:1777 glib/gmarkup.c:1822
+#: glib/gmarkup.c:1785 glib/gmarkup.c:1830
 #, c-format
 msgid ""
 "Document ended unexpectedly with elements still open - '%s' was the last "
@@ -469,7 +492,7 @@ msgstr ""
 "ドキュメントが突然終了しています。要素が開きっぱなしです。最後に開いた要素は "
 "'%s' です。"
 
-#: glib/gmarkup.c:1785
+#: glib/gmarkup.c:1793
 #, c-format
 msgid ""
 "Document ended unexpectedly, expected to see a close angle bracket ending "
@@ -478,19 +501,19 @@ msgstr ""
 "ドキュメントはタグ <%s/> で終了しているものと想定していましたが、突然終了して"
 "います。"
 
-#: glib/gmarkup.c:1791
+#: glib/gmarkup.c:1799
 msgid "Document ended unexpectedly inside an element name"
 msgstr "要素名の途中でドキュメントが突然終了しています"
 
-#: glib/gmarkup.c:1797
+#: glib/gmarkup.c:1805
 msgid "Document ended unexpectedly inside an attribute name"
 msgstr "属性名の途中でドキュメントが突然終了しています"
 
-#: glib/gmarkup.c:1802
+#: glib/gmarkup.c:1810
 msgid "Document ended unexpectedly inside an element-opening tag."
 msgstr "要素の開始タグの途中でドキュメントが突然終了しています"
 
-#: glib/gmarkup.c:1808
+#: glib/gmarkup.c:1816
 msgid ""
 "Document ended unexpectedly after the equals sign following an attribute "
 "name; no attribute value"
@@ -498,16 +521,16 @@ msgstr ""
 "属性名の後にある等号記号の次でドキュメントが突然終了しています: 属性値があり"
 "ません"
 
-#: glib/gmarkup.c:1815
+#: glib/gmarkup.c:1823
 msgid "Document ended unexpectedly while inside an attribute value"
 msgstr "ドキュメントが属性値の途中で突然終了しています"
 
-#: glib/gmarkup.c:1831
+#: glib/gmarkup.c:1839
 #, c-format
 msgid "Document ended unexpectedly inside the close tag for element '%s'"
 msgstr "ドキュメントが要素 '%s' の閉じタグの途中で突然終了しています"
 
-#: glib/gmarkup.c:1837
+#: glib/gmarkup.c:1845
 msgid "Document ended unexpectedly inside a comment or processing instruction"
 msgstr ""
 "ドキュメントがコメントあるいはプロセシング指示子の途中で突然終了しています"
@@ -532,7 +555,7 @@ msgstr "バックトラック処理の上限に達しました"
 msgid "the pattern contains items not supported for partial matching"
 msgstr "パターンに含まれているアイテムは部分マッチングをサポートしていません"
 
-#: glib/gregex.c:154
+#: glib/gregex.c:154 gio/glocalfile.c:1963
 msgid "internal error"
 msgstr "内部エラー"
 
@@ -556,245 +579,257 @@ msgstr "改行フラグの連携が間違っています"
 msgid "unknown error"
 msgstr "原因不明のエラー"
 
-#: glib/gregex.c:189
+#: glib/gregex.c:199
 msgid "\\ at end of pattern"
 msgstr "パタンの終端に \\ があります"
 
-#: glib/gregex.c:191
+#: glib/gregex.c:202
 msgid "\\c at end of pattern"
 msgstr "パタンの終端に \\c があります"
 
-#: glib/gregex.c:193
+#: glib/gregex.c:205
 msgid "unrecognized character follows \\"
 msgstr "認識できない文字の後ろに \\ があります"
 
-#: glib/gregex.c:195
-msgid "case changing escapes are not allowed here"
-msgstr "ここに大/小文字の変換を行うエスケープを挿入できません"
+#: glib/gregex.c:212
+msgid "case-changing escapes (\\l, \\L, \\u, \\U) are not allowed here"
+msgstr ""
+"ここに大/小文字の変換を行うエスケープ (\\l、\\L、\\u、\\U) を挿入できません"
 
-#: glib/gregex.c:197
+#: glib/gregex.c:215
 msgid "numbers out of order in {} quantifier"
 msgstr "量指定子 '{}' の中にある数値の順番が間違っています"
 
-#: glib/gregex.c:199
+#: glib/gregex.c:218
 msgid "number too big in {} quantifier"
 msgstr "量指定子 '{}' の中にある数値が大きすぎます"
 
-#: glib/gregex.c:201
+#: glib/gregex.c:221
 msgid "missing terminating ] for character class"
 msgstr "文字クラスを表す終端文字 '] ' がありません"
 
-#: glib/gregex.c:203
+#: glib/gregex.c:224
 msgid "invalid escape sequence in character class"
 msgstr "文字クラスの中に無効なエスケープ・シーケンスがあります"
 
-#: glib/gregex.c:205
+#: glib/gregex.c:227
 msgid "range out of order in character class"
 msgstr "文字クラスで文字の順番が間違っています"
 
-#: glib/gregex.c:207
+#: glib/gregex.c:230
 msgid "nothing to repeat"
 msgstr "繰り返すものがありません"
 
-#: glib/gregex.c:209
+#: glib/gregex.c:233
 msgid "unrecognized character after (?"
 msgstr "'(?' の後ろに認識できない文字があります"
 
-#: glib/gregex.c:211
+#: glib/gregex.c:237
 msgid "unrecognized character after (?<"
 msgstr "'(?<' の後ろに認識できない文字があります"
 
-#: glib/gregex.c:213
+#: glib/gregex.c:241
 msgid "unrecognized character after (?P"
 msgstr "(?P の後ろに認識できない文字があります"
 
-#: glib/gregex.c:215
+#: glib/gregex.c:244
 msgid "POSIX named classes are supported only within a class"
 msgstr "POSIX の名前付きクラスはクラスの内部でのみ利用できます"
 
-#: glib/gregex.c:217
+#: glib/gregex.c:247
+msgid "missing terminating )"
+msgstr "終端文字の ')' がありません"
+
+#: glib/gregex.c:251
+msgid ") without opening ("
+msgstr "開始文字 '(' が無い終端文字 ')'"
+
+#. translators: '(?R' and '(?[+-]digits' are both meant as (groups of)
+#. * sequences here, '(?-54' would be an example for the second group.
+#.
+#: glib/gregex.c:258
 msgid "(?R or (?[+-]digits must be followed by )"
 msgstr "(?R または (?[+-]数値 が続く必要あり )"
 
-#: glib/gregex.c:219
+#: glib/gregex.c:261
 msgid "reference to non-existent subpattern"
 msgstr "存在しないサブパタンへの参照です"
 
-#: glib/gregex.c:221
+#: glib/gregex.c:264
 msgid "missing ) after comment"
 msgstr "コメントの後ろに ')' がありません"
 
-#: glib/gregex.c:223
+#: glib/gregex.c:267
 msgid "regular expression too large"
 msgstr "正規表現が長すぎます"
 
-#: glib/gregex.c:225
+#: glib/gregex.c:270
 msgid "failed to get memory"
 msgstr "メモリの確保に失敗しました"
 
-#: glib/gregex.c:227
+#: glib/gregex.c:273
 msgid "lookbehind assertion is not fixed length"
 msgstr "後読み (lookbehind assertion) が固定長ではありません"
 
-#: glib/gregex.c:229
+#: glib/gregex.c:276
 msgid "malformed number or name after (?("
 msgstr "'(?(' の後ろに不正な形式の数値または名前があります"
 
-#: glib/gregex.c:231
+#: glib/gregex.c:279
 msgid "conditional group contains more than two branches"
 msgstr "条件グループに二つ以上のブランチがあります"
 
-#: glib/gregex.c:233
+#: glib/gregex.c:282
 msgid "assertion expected after (?("
 msgstr "assertion expected after (?("
 
-#: glib/gregex.c:235
+#: glib/gregex.c:285
 msgid "unknown POSIX class name"
 msgstr "不明な POSIX のクラス名"
 
-#: glib/gregex.c:237
+#: glib/gregex.c:288
 msgid "POSIX collating elements are not supported"
 msgstr "POSIX では照合順序の要素はサポートしていません"
 
-#: glib/gregex.c:239
+#: glib/gregex.c:291
 msgid "character value in \\x{...} sequence is too large"
 msgstr "\\x{...} の中にある文字値が大きすぎます"
 
-#: glib/gregex.c:241
+#: glib/gregex.c:294
 msgid "invalid condition (?(0)"
 msgstr "条件の '(?(0)' が間違っています"
 
-#: glib/gregex.c:243
+#: glib/gregex.c:297
 msgid "\\C not allowed in lookbehind assertion"
 msgstr "後読みのアサーションでは \\C を指定できません"
 
-#: glib/gregex.c:245
+#: glib/gregex.c:300
 msgid "recursive call could loop indefinitely"
 msgstr "繰り返しの呼び出しが無限ループになっています"
 
-#: glib/gregex.c:247
+#: glib/gregex.c:303
 msgid "missing terminator in subpattern name"
 msgstr "サブパタンの名前に終端文字がありません"
 
-#: glib/gregex.c:249
+#: glib/gregex.c:306
 msgid "two named subpatterns have the same name"
 msgstr "二つある名前付きサブパタンが同じ名前です"
 
-#: glib/gregex.c:251
+#: glib/gregex.c:309
 msgid "malformed \\P or \\p sequence"
 msgstr "不正な \\P または \\p のシーケンスです"
 
-#: glib/gregex.c:253
+#: glib/gregex.c:312
 msgid "unknown property name after \\P or \\p"
 msgstr "\\P または \\p の後ろにあるプロパティ名が不明です"
 
-#: glib/gregex.c:255
+#: glib/gregex.c:315
 msgid "subpattern name is too long (maximum 32 characters)"
 msgstr "サブパタンの名前が長すぎます (32 文字以下にして下さい)"
 
-#: glib/gregex.c:257
+#: glib/gregex.c:318
 msgid "too many named subpatterns (maximum 10,000)"
 msgstr "名前付きサブパタンが多すぎます (10,000 個以下にして下さい)"
 
-#: glib/gregex.c:259
+#: glib/gregex.c:321
 msgid "octal value is greater than \\377"
 msgstr "８進数値が \\377 よりも大きいです"
 
-#: glib/gregex.c:261
+#: glib/gregex.c:324
 msgid "DEFINE group contains more than one branch"
 msgstr "DEFINE グループに１つ以上のブランチが含まれています"
 
-#: glib/gregex.c:263
+#: glib/gregex.c:327
 msgid "repeating a DEFINE group is not allowed"
 msgstr "DEFINE グループは繰り返せません"
 
-#: glib/gregex.c:265
+#: glib/gregex.c:330
 msgid "inconsistent NEWLINE options"
 msgstr "NEWLINE オプションに矛盾があります"
 
-#: glib/gregex.c:267
+#: glib/gregex.c:333
 msgid ""
 "\\g is not followed by a braced name or an optionally braced non-zero number"
 msgstr ""
 "ブレース名の後ろに \\g が存在していないか、または０以外の数値でブレースしてい"
 "ます"
 
-#: glib/gregex.c:270
+#: glib/gregex.c:338
 msgid "unexpected repeat"
 msgstr "想定外の繰り返しです"
 
-#: glib/gregex.c:272
+#: glib/gregex.c:342
 msgid "code overflow"
 msgstr "コードがオーバーフローしました"
 
-#: glib/gregex.c:274
+#: glib/gregex.c:346
 msgid "overran compiling workspace"
 msgstr "正規表現をコンパイルする領域で上限を超えました"
 
-#: glib/gregex.c:276
+#: glib/gregex.c:350
 msgid "previously-checked referenced subpattern not found"
 msgstr "直前にチェックしたサブパタンのリファレンスが見つかりませんでした"
 
-#: glib/gregex.c:439 glib/gregex.c:1491
+#: glib/gregex.c:526 glib/gregex.c:1593
 #, c-format
 msgid "Error while matching regular expression %s: %s"
 msgstr "正規表現 %s でマッチングしている際にエラー: %s"
 
-#: glib/gregex.c:995
+#: glib/gregex.c:1098
 msgid "PCRE library is compiled without UTF8 support"
 msgstr "お使いの PCRE ライブラリは UTF-8 をサポートしていません"
 
-#: glib/gregex.c:1004
+#: glib/gregex.c:1107
 msgid "PCRE library is compiled without UTF8 properties support"
 msgstr "お使いの PCRE library は UTF-8 のプロパティをサポートしていません"
 
-#: glib/gregex.c:1059
+#: glib/gregex.c:1161
 #, c-format
 msgid "Error while compiling regular expression %s at char %d: %s"
 msgstr "正規表現 %s をコンパイルする際にエラー (%d 文字目): %s"
 
-#: glib/gregex.c:1095
+#: glib/gregex.c:1197
 #, c-format
 msgid "Error while optimizing regular expression %s: %s"
 msgstr "正規表現 %s を最適化する際にエラー: %s"
 
-#: glib/gregex.c:1919
+#: glib/gregex.c:2021
 msgid "hexadecimal digit or '}' expected"
 msgstr "16進数の数値または '}' を想定していました"
 
-#: glib/gregex.c:1935
+#: glib/gregex.c:2037
 msgid "hexadecimal digit expected"
 msgstr "16進数の数値を想定していました"
 
-#: glib/gregex.c:1975
+#: glib/gregex.c:2077
 msgid "missing '<' in symbolic reference"
 msgstr "シンボル参照の中に '<' がありません"
 
-#: glib/gregex.c:1984
+#: glib/gregex.c:2086
 msgid "unfinished symbolic reference"
 msgstr "中途半端なシンボル参照です"
 
-#: glib/gregex.c:1991
+#: glib/gregex.c:2093
 msgid "zero-length symbolic reference"
 msgstr "サイズが０のシンボル参照です"
 
-#: glib/gregex.c:2002
+#: glib/gregex.c:2104
 msgid "digit expected"
 msgstr "数値を想定していました"
 
-#: glib/gregex.c:2020
+#: glib/gregex.c:2122
 msgid "illegal symbolic reference"
 msgstr "シンボル参照が間違っています"
 
-#: glib/gregex.c:2082
+#: glib/gregex.c:2184
 msgid "stray final '\\'"
 msgstr "最後の '\\' に対応するシンボルがありません"
 
-#: glib/gregex.c:2086
+#: glib/gregex.c:2188
 msgid "unknown escape sequence"
 msgstr "不明なエスケープ・シーケンスです"
 
-#: glib/gregex.c:2096
+#: glib/gregex.c:2198
 #, c-format
 msgid "Error while parsing replacement text \"%s\" at char %lu: %s"
 msgstr "代替文字列 \"%s\" の %lu 文字目を解析する際にエラー: %s"
@@ -826,57 +861,57 @@ msgstr "%c に対応する引用記号の前でテキストが終了していま
 msgid "Text was empty (or contained only whitespace)"
 msgstr "テキストが空です (あるいは空白のみ)"
 
-#: glib/gspawn-win32.c:272
+#: glib/gspawn-win32.c:279
 #, c-format
 msgid "Failed to read data from child process"
 msgstr "子プロセスからデータを読み出せません"
 
-#: glib/gspawn-win32.c:287 glib/gspawn.c:1450
+#: glib/gspawn-win32.c:294 glib/gspawn.c:1455
 #, c-format
 msgid "Failed to create pipe for communicating with child process (%s)"
 msgstr "子プロセスとの通信用のパイプを作成できません (%s)"
 
-#: glib/gspawn-win32.c:325 glib/gspawn.c:1114
+#: glib/gspawn-win32.c:332 glib/gspawn-win32.c:340 glib/gspawn.c:1119
 #, c-format
 msgid "Failed to read from child pipe (%s)"
 msgstr "子パイプから読み出せません (%s) "
 
-#: glib/gspawn-win32.c:351 glib/gspawn.c:1319
+#: glib/gspawn-win32.c:363 glib/gspawn.c:1324
 #, c-format
 msgid "Failed to change to directory '%s' (%s)"
 msgstr "'%s' というディレクトリへ移動できません (%s)"
 
-#: glib/gspawn-win32.c:357 glib/gspawn-win32.c:481
+#: glib/gspawn-win32.c:369 glib/gspawn-win32.c:493
 #, c-format
 msgid "Failed to execute child process (%s)"
 msgstr "子プロセスを起動できません (%s)"
 
-#: glib/gspawn-win32.c:428
+#: glib/gspawn-win32.c:440
 #, c-format
 msgid "Invalid program name: %s"
 msgstr "プログラム名が無効です: %s"
 
-#: glib/gspawn-win32.c:438 glib/gspawn-win32.c:678 glib/gspawn-win32.c:1218
+#: glib/gspawn-win32.c:450 glib/gspawn-win32.c:723 glib/gspawn-win32.c:1282
 #, c-format
 msgid "Invalid string in argument vector at %d: %s"
 msgstr "%d の引数ベクタに不正な文字列があります: %s"
 
-#: glib/gspawn-win32.c:449 glib/gspawn-win32.c:692 glib/gspawn-win32.c:1251
+#: glib/gspawn-win32.c:461 glib/gspawn-win32.c:738 glib/gspawn-win32.c:1315
 #, c-format
 msgid "Invalid string in environment: %s"
 msgstr "環境変数に不正な文字列があります: %s"
 
-#: glib/gspawn-win32.c:674 glib/gspawn-win32.c:1199
+#: glib/gspawn-win32.c:719 glib/gspawn-win32.c:1263
 #, c-format
 msgid "Invalid working directory: %s"
 msgstr "作業ディレクトリが不正です: %s"
 
-#: glib/gspawn-win32.c:738
+#: glib/gspawn-win32.c:787
 #, c-format
 msgid "Failed to execute helper program (%s)"
 msgstr "ヘルパー・プログラム (%s) の起動が失敗しました"
 
-#: glib/gspawn-win32.c:938
+#: glib/gspawn-win32.c:1002
 #, c-format
 msgid ""
 "Unexpected error in g_io_channel_win32_poll() reading data from a child "
@@ -889,117 +924,117 @@ msgstr ""
 msgid "Failed to read data from child process (%s)"
 msgstr "子プロセスからデータを読めません (%s)"
 
-#: glib/gspawn.c:312
+#: glib/gspawn.c:317
 #, c-format
 msgid "Unexpected error in select() reading data from a child process (%s)"
 msgstr "子プロセスからデータを読み出す際に select() で想定外のエラー (%s)"
 
-#: glib/gspawn.c:395
+#: glib/gspawn.c:400
 #, c-format
 msgid "Unexpected error in waitpid() (%s)"
 msgstr "waitpid() で想定外のエラー (%s)"
 
-#: glib/gspawn.c:1179
+#: glib/gspawn.c:1184
 #, c-format
 msgid "Failed to fork (%s)"
 msgstr "fork 失敗 (%s)"
 
-#: glib/gspawn.c:1329
+#: glib/gspawn.c:1334
 #, c-format
 msgid "Failed to execute child process \"%s\" (%s)"
 msgstr "子プロセスを起動できません \"%s\" (%s)"
 
-#: glib/gspawn.c:1339
+#: glib/gspawn.c:1344
 #, c-format
 msgid "Failed to redirect output or input of child process (%s)"
 msgstr "子プロセスの出力、または入力をリダイレクトできません (%s)"
 
-#: glib/gspawn.c:1348
+#: glib/gspawn.c:1353
 #, c-format
 msgid "Failed to fork child process (%s)"
 msgstr "子プロセスを fork できません (%s)"
 
-#: glib/gspawn.c:1356
+#: glib/gspawn.c:1361
 #, c-format
 msgid "Unknown error executing child process \"%s\""
 msgstr "子プロセスの実行時に不明なエラー \"%s\""
 
-#: glib/gspawn.c:1378
+#: glib/gspawn.c:1383
 #, c-format
 msgid "Failed to read enough data from child pid pipe (%s)"
 msgstr "子 pid パイプから十分なデータを読めません (%s)"
 
-#: glib/gutf8.c:1024
+#: glib/gutf8.c:1030
 #, c-format
 msgid "Character out of range for UTF-8"
 msgstr "UTF-8 の範囲外の文字です"
 
-#: glib/gutf8.c:1118 glib/gutf8.c:1127 glib/gutf8.c:1259 glib/gutf8.c:1268
-#: glib/gutf8.c:1409 glib/gutf8.c:1505
+#: glib/gutf8.c:1124 glib/gutf8.c:1133 glib/gutf8.c:1265 glib/gutf8.c:1274
+#: glib/gutf8.c:1415 glib/gutf8.c:1511
 #, c-format
 msgid "Invalid sequence in conversion input"
 msgstr "変換する入力で無効なシーケンスがあります"
 
-#: glib/gutf8.c:1420 glib/gutf8.c:1516
+#: glib/gutf8.c:1426 glib/gutf8.c:1522
 #, c-format
 msgid "Character out of range for UTF-16"
 msgstr "UTF-16 の範囲外の文字です"
 
-#: glib/goption.c:573
+#: glib/goption.c:615
 msgid "Usage:"
 msgstr "用法:"
 
-#: glib/goption.c:573
+#: glib/goption.c:615
 msgid "[OPTION...]"
 msgstr "[オプション...]"
 
-#: glib/goption.c:677
+#: glib/goption.c:719
 msgid "Help Options:"
 msgstr "ヘルプのオプション:"
 
-#: glib/goption.c:678
+#: glib/goption.c:720
 msgid "Show help options"
 msgstr "ヘルプのオプションを表示する"
 
-#: glib/goption.c:684
+#: glib/goption.c:726
 msgid "Show all help options"
 msgstr "ヘルプのオプションを全て表示する"
 
-#: glib/goption.c:736
+#: glib/goption.c:788
 msgid "Application Options:"
 msgstr "アプリケーションのオプション:"
 
-#: glib/goption.c:797 glib/goption.c:867
+#: glib/goption.c:849 glib/goption.c:919
 #, c-format
 msgid "Cannot parse integer value '%s' for %s"
 msgstr "%2$s の整数値 '%1$s' を解析できません"
 
-#: glib/goption.c:807 glib/goption.c:875
+#: glib/goption.c:859 glib/goption.c:927
 #, c-format
 msgid "Integer value '%s' for %s out of range"
 msgstr "%2$s の整数値 '%1$s' は範囲外の値です"
 
-#: glib/goption.c:832
+#: glib/goption.c:884
 #, c-format
 msgid "Cannot parse double value '%s' for %s"
 msgstr "%2$s の実数値 '%1$s' を解析できません"
 
-#: glib/goption.c:840
+#: glib/goption.c:892
 #, c-format
 msgid "Double value '%s' for %s out of range"
 msgstr "%2$s の実数値 '%1$s' は範囲外の値です"
 
-#: glib/goption.c:1177
+#: glib/goption.c:1229
 #, c-format
 msgid "Error parsing option %s"
 msgstr "オプション %s の解析中にエラー"
 
-#: glib/goption.c:1208 glib/goption.c:1319
+#: glib/goption.c:1260 glib/goption.c:1371
 #, c-format
 msgid "Missing argument for %s"
 msgstr "%s の引数がありません"
 
-#: glib/goption.c:1714
+#: glib/goption.c:1766
 #, c-format
 msgid "Unknown option %s"
 msgstr "%s は不明なオプションです"
@@ -1019,7 +1054,7 @@ msgstr "通常のファイルではありません"
 msgid "File is empty"
 msgstr "ファイルが空です"
 
-#: glib/gkeyfile.c:760
+#: glib/gkeyfile.c:761
 #, c-format
 msgid ""
 "Key file contains line '%s' which is not a key-value pair, group, or comment"
@@ -1027,49 +1062,49 @@ msgstr ""
 "キー・ファイルの行 '%s' がキー/値のペア、グループ、またはコメントではありませ"
 "ん"
 
-#: glib/gkeyfile.c:820
+#: glib/gkeyfile.c:821
 #, c-format
 msgid "Invalid group name: %s"
 msgstr "グループ名が無効です: %s"
 
-#: glib/gkeyfile.c:842
+#: glib/gkeyfile.c:843
 #, c-format
 msgid "Key file does not start with a group"
 msgstr "キー・ファイルがグループで始まっていません"
 
-#: glib/gkeyfile.c:868
+#: glib/gkeyfile.c:869
 #, c-format
 msgid "Invalid key name: %s"
 msgstr "キーの名前が無効です: %s"
 
-#: glib/gkeyfile.c:895
+#: glib/gkeyfile.c:896
 #, c-format
 msgid "Key file contains unsupported encoding '%s'"
 msgstr "キー・ファイルにサポートしてないエンコーディング '%s' があります"
 
-#: glib/gkeyfile.c:1108 glib/gkeyfile.c:1267 glib/gkeyfile.c:2485
-#: glib/gkeyfile.c:2551 glib/gkeyfile.c:2670 glib/gkeyfile.c:2805
-#: glib/gkeyfile.c:2958 glib/gkeyfile.c:3143 glib/gkeyfile.c:3200
+#: glib/gkeyfile.c:1109 glib/gkeyfile.c:1269 glib/gkeyfile.c:2487
+#: glib/gkeyfile.c:2555 glib/gkeyfile.c:2690 glib/gkeyfile.c:2825
+#: glib/gkeyfile.c:2978 glib/gkeyfile.c:3165 glib/gkeyfile.c:3226
 #, c-format
 msgid "Key file does not have group '%s'"
 msgstr "キー・ファイルにグループ '%s' がありません"
 
-#: glib/gkeyfile.c:1279
+#: glib/gkeyfile.c:1281
 #, c-format
 msgid "Key file does not have key '%s'"
 msgstr "キー・ファイルにキー '%s' がありません"
 
-#: glib/gkeyfile.c:1381 glib/gkeyfile.c:1494
+#: glib/gkeyfile.c:1383 glib/gkeyfile.c:1496
 #, c-format
 msgid "Key file contains key '%s' with value '%s' which is not UTF-8"
 msgstr "キー・ファイルのキー '%s' の値 '%s' が UTF-8 ではありません"
 
-#: glib/gkeyfile.c:1401 glib/gkeyfile.c:1514 glib/gkeyfile.c:1887
+#: glib/gkeyfile.c:1403 glib/gkeyfile.c:1516 glib/gkeyfile.c:1891
 #, c-format
 msgid "Key file contains key '%s' which has value that cannot be interpreted."
 msgstr "キー・ファイルのキー '%s' の値を解釈できませんでした"
 
-#: glib/gkeyfile.c:2102 glib/gkeyfile.c:2314
+#: glib/gkeyfile.c:2106 glib/gkeyfile.c:2318
 #, c-format
 msgid ""
 "Key file contains key '%s' in group '%s' which has value that cannot be "
@@ -1077,37 +1112,648 @@ msgid ""
 msgstr ""
 "キー・ファイルのグループ '%2$s' にあるキー '%1$s' の値を解釈できませんでした"
 
-#: glib/gkeyfile.c:2500 glib/gkeyfile.c:2685 glib/gkeyfile.c:3211
+#: glib/gkeyfile.c:2502 glib/gkeyfile.c:2705 glib/gkeyfile.c:3237
 #, c-format
 msgid "Key file does not have key '%s' in group '%s'"
 msgstr "キー・ファイルにはグループ '%2$s' のキー '%1$s' がありません"
 
-#: glib/gkeyfile.c:3443
+#: glib/gkeyfile.c:3471
 #, c-format
 msgid "Key file contains escape character at end of line"
 msgstr "キー・ファイルの行末にエスケープ文字が含まれています"
 
-#: glib/gkeyfile.c:3465
+#: glib/gkeyfile.c:3493
 #, c-format
 msgid "Key file contains invalid escape sequence '%s'"
 msgstr "キー・ファイルに無効なエスケープ・シーケンス '%s' が含まれています"
 
-#: glib/gkeyfile.c:3607
+#: glib/gkeyfile.c:3635
 #, c-format
 msgid "Value '%s' cannot be interpreted as a number."
 msgstr "値 '%s' を数値として解釈できません"
 
-#: glib/gkeyfile.c:3621
+#: glib/gkeyfile.c:3649
 #, c-format
 msgid "Integer value '%s' out of range"
 msgstr "整数値 '%s' は範囲外の値です"
 
-#: glib/gkeyfile.c:3654
+#: glib/gkeyfile.c:3682
 #, c-format
 msgid "Value '%s' cannot be interpreted as a float number."
 msgstr "値 '%s' を実数値として解釈できません"
 
-#: glib/gkeyfile.c:3678
+#: glib/gkeyfile.c:3706
 #, c-format
 msgid "Value '%s' cannot be interpreted as a boolean."
 msgstr "値 '%s' を論理値として解釈できません"
+
+#: gio/gbufferedinputstream.c:483 gio/ginputstream.c:186
+#: gio/ginputstream.c:318 gio/ginputstream.c:559 gio/ginputstream.c:684
+#: gio/goutputstream.c:193 gio/goutputstream.c:647
+#, c-format
+msgid "Too large count value passed to %s"
+msgstr "%s に引き渡した値が大きすぎます"
+
+#: gio/gbufferedinputstream.c:870 gio/ginputstream.c:894
+#: gio/goutputstream.c:1076
+#, c-format
+msgid "Stream is already closed"
+msgstr "既にストリームは閉じています"
+
+#: gio/gcancellable.c:296 gio/glocalfile.c:1956 gio/gsimpleasyncresult.c:611
+#, c-format
+msgid "Operation was cancelled"
+msgstr "操作がキャンセルされました"
+
+#: gio/gcontenttype.c:159
+msgid "Unknown type"
+msgstr "不明な種類"
+
+#: gio/gcontenttype.c:160
+#, c-format
+msgid "%s filetype"
+msgstr "%s (ファイルの種類)"
+
+#: gio/gcontenttype.c:577
+#, c-format
+msgid "%s type"
+msgstr "%s (種類)"
+
+#: gio/gdatainputstream.c:309
+#, c-format
+msgid "Unexpected early end-of-stream"
+msgstr "想定していたよりも早くストリームの最後に到達しました"
+
+#: gio/gdesktopappinfo.c:411 gio/gwin32appinfo.c:222
+msgid "Unnamed"
+msgstr "名前なし"
+
+#: gio/gdesktopappinfo.c:588
+#, c-format
+msgid "Desktop file didn't specify Exec field"
+msgstr "デスクトップ・ファイルで Exec 項目を指定してませんでした"
+
+#: gio/gdesktopappinfo.c:882
+#, c-format
+msgid "Unable to find terminal required for application"
+msgstr "アプリケーションで必要な端末が見つかりませんでした"
+
+#: gio/gdesktopappinfo.c:1114
+#, c-format
+msgid "Can't create user application configuration folder %s: %s"
+msgstr "ユーザのアプリケーション設定フォルダ %s を生成できません: %s"
+
+#: gio/gdesktopappinfo.c:1118
+#, c-format
+msgid "Can't create user MIME configuration folder %s: %s"
+msgstr "ユーザの MIME 型設定フォルダ %s を生成できません: %s"
+
+#: gio/gdesktopappinfo.c:1457
+#, c-format
+msgid "Can't create user desktop file %s"
+msgstr "ユーザのデスクトップ・ファイル %s を生成できません"
+
+#: gio/gdesktopappinfo.c:1517
+#, c-format
+msgid "Custom definition for %s"
+msgstr "%s に対する独自の設定"
+
+#: gio/gdrive.c:372
+msgid "drive doesn't implement eject"
+msgstr "ドライブ側で取り出しの操作を実装していません"
+
+#: gio/gdrive.c:439
+msgid "drive doesn't implement polling for media"
+msgstr "ドライブ側でポーリングによるメディアの検出を実装していません"
+
+#: gio/gfile.c:812 gio/gfile.c:1002 gio/gfile.c:1135 gio/gfile.c:1366
+#: gio/gfile.c:1419 gio/gfile.c:1475 gio/gfile.c:1556 gio/gfile.c:2613
+#: gio/gfile.c:2658 gio/gfile.c:2708 gio/gfile.c:2748 gio/gfile.c:3072
+#: gio/gfile.c:3474 gio/gfile.c:3557 gio/gfile.c:3640 gio/gfile.c:3720
+#, c-format
+msgid "Operation not supported"
+msgstr "サポートしていない操作です"
+
+#. Translators: This is an error message when trying to find the
+#. * enclosing (user visible) mount of a file, but none exists.
+#. Translators: This is an error message when trying to
+#. * find the enclosing (user visible) mount of a file, but
+#. * none exists.
+#. Translators: This is an error message when trying to find
+#. * the enclosing (user visible) mount of a file, but none
+#. * exists.
+#: gio/gfile.c:1254 gio/glocalfile.c:1046 gio/glocalfile.c:1057
+#: gio/glocalfile.c:1070
+#, c-format
+msgid "Containing mount does not exist"
+msgstr "マウントを含んでいるものはありません"
+
+#: gio/gfile.c:1895 gio/glocalfile.c:2106
+#, c-format
+msgid "Can't copy over directory"
+msgstr "ディレクトリ全体をコピーできません"
+
+#: gio/gfile.c:1955
+#, c-format
+msgid "Can't copy directory over directory"
+msgstr "ディレクトリからディレクトリへコピーできません"
+
+#: gio/gfile.c:1963 gio/glocalfile.c:2115
+#, c-format
+msgid "Target file exists"
+msgstr "対象となるファイルが存在しています"
+
+#: gio/gfile.c:1981
+#, c-format
+msgid "Can't recursively copy directory"
+msgstr "ディレクトリを再帰的にコピーできません"
+
+#: gio/gfile.c:2698
+#, c-format
+msgid "Invalid symlink value given"
+msgstr "指定したシンボリックリンクは間違っています"
+
+#: gio/gfile.c:2791
+#, c-format
+msgid "Trash not supported"
+msgstr "ゴミ箱はサポートしていません"
+
+#: gio/gfile.c:2838
+#, c-format
+msgid "File names cannot contain '%c'"
+msgstr "ファイル名に '%c' を含めることはできません"
+
+#: gio/gfile.c:4771 gio/gvolume.c:357
+msgid "volume doesn't implement mount"
+msgstr "ボリュームはマウントを実装していません"
+
+#: gio/gfile.c:4879
+#, c-format
+msgid "No application is registered as handling this file"
+msgstr "このファイルを扱うアプリケーションが登録されていません"
+
+#: gio/gfileenumerator.c:151
+#, c-format
+msgid "Enumerator is closed"
+msgstr "Enumerator は閉じています"
+
+#: gio/gfileenumerator.c:158 gio/gfileenumerator.c:217
+#: gio/gfileenumerator.c:317 gio/gfileenumerator.c:426
+#, c-format
+msgid "File enumerator has outstanding operation"
+msgstr "File enumerator has outstanding operation"
+
+#: gio/gfileenumerator.c:307 gio/gfileenumerator.c:416
+msgid "File enumerator is already closed"
+msgstr "ファイルの Enumerator は既に閉じています"
+
+#: gio/gfileinputstream.c:154 gio/gfileinputstream.c:421
+#: gio/gfileoutputstream.c:168 gio/gfileoutputstream.c:523
+#, c-format
+msgid "Stream doesn't support query_info"
+msgstr "ストリームは query_info をサポートしていません"
+
+#: gio/gfileinputstream.c:336 gio/gfileoutputstream.c:381
+#, c-format
+msgid "Seek not supported on stream"
+msgstr "ストリームにおけるシークはサポートしていません"
+
+#: gio/gfileinputstream.c:380
+#, c-format
+msgid "Truncate not allowed on input stream"
+msgstr "入力ストリームで切りつめることはできません"
+
+#: gio/gfileoutputstream.c:457
+#, c-format
+msgid "Truncate not supported on stream"
+msgstr "ストリームにおける切りつめはサポートしていません"
+
+#: gio/ginputstream.c:195
+#, c-format
+msgid "Input stream doesn't implement read"
+msgstr "入力ストリームで読み込みを実装していません"
+
+#. Translators: This is an error you get if there is already an
+#. * operation running against this stream when you try to start
+#. * one
+#. Translators: This is an error you get if there is
+#. * already an operation running against this stream when
+#. * you try to start one
+#: gio/ginputstream.c:904 gio/goutputstream.c:1086
+#, c-format
+msgid "Stream has outstanding operation"
+msgstr "Stream has outstanding operation"
+
+#: gio/glocaldirectorymonitor.c:270
+#, c-format
+msgid "Unable to find default local directory monitor type"
+msgstr ""
+"ローカル・ディレクトリを監視するデフォルト・モニタの種類が見つかりません"
+
+#: gio/glocalfile.c:599
+#, c-format
+msgid "Invalid filename %s"
+msgstr "ファイル名が無効です: %s"
+
+#: gio/glocalfile.c:962
+#, c-format
+msgid "Error getting filesystem info: %s"
+msgstr "ファイルシステムの情報を取得する際にエラー: %s"
+
+#: gio/glocalfile.c:1090
+#, c-format
+msgid "Can't rename root directory"
+msgstr "ルート・ディレクトリの名前は変更できません"
+
+#: gio/glocalfile.c:1108
+#, c-format
+msgid "Can't rename file, filename already exist"
+msgstr "ファイル名を変更できません (既に存在しているため)"
+
+#: gio/glocalfile.c:1121 gio/glocalfile.c:1985 gio/glocalfile.c:2014
+#: gio/glocalfile.c:2168 gio/glocalfileoutputstream.c:472
+#: gio/glocalfileoutputstream.c:517 gio/glocalfileoutputstream.c:925
+#, c-format
+msgid "Invalid filename"
+msgstr "無効なファイル名です"
+
+#: gio/glocalfile.c:1125
+#, c-format
+msgid "Error renaming file: %s"
+msgstr "ファイル名を変更する際にエラー: %s"
+
+#: gio/glocalfile.c:1244
+#, c-format
+msgid "Error opening file: %s"
+msgstr "ファイルをオープンする際にエラー: %s"
+
+#: gio/glocalfile.c:1254
+#, c-format
+msgid "Can't open directory"
+msgstr "ディレクトリをオープンできません"
+
+#: gio/glocalfile.c:1314 gio/glocalfile.c:1989
+#, c-format
+msgid "Error removing file: %s"
+msgstr "ファイルを削除する際にエラー: %s"
+
+#: gio/glocalfile.c:1678
+#, c-format
+msgid "Error trashing file: %s"
+msgstr "ファイルをゴミ箱へ移動する際にエラー: %s"
+
+#: gio/glocalfile.c:1701
+#, c-format
+msgid "Unable to create trash dir %s: %s"
+msgstr "ゴミ箱のディレクトリ (%s) の生成に失敗しました: %s"
+
+#: gio/glocalfile.c:1722
+#, c-format
+msgid "Unable to find toplevel directory for trash"
+msgstr "ゴミ箱のトップレベルなディレクトリが見つかりません"
+
+#: gio/glocalfile.c:1801 gio/glocalfile.c:1821
+#, c-format
+msgid "Unable to find or create trash directory"
+msgstr "ゴミ箱ディレクトリが存在しないか生成できません"
+
+#: gio/glocalfile.c:1855
+#, c-format
+msgid "Unable to create trashing info file: %s"
+msgstr "ゴミ箱の情報ファイルを生成できません: %s"
+
+#: gio/glocalfile.c:1880 gio/glocalfile.c:1955 gio/glocalfile.c:1962
+#, c-format
+msgid "Unable to trash file: %s"
+msgstr "ファイルをゴミ箱へ移動できません: %s"
+
+#: gio/glocalfile.c:2018
+#, c-format
+msgid "Error making symbolic link: %s"
+msgstr "シンボリックリンクを生成する際にエラー: %s"
+
+#: gio/glocalfile.c:2078 gio/glocalfile.c:2172
+#, c-format
+msgid "Error moving file: %s"
+msgstr "ファイルを移動する際にエラー: %s"
+
+#: gio/glocalfile.c:2101
+#, c-format
+msgid "Can't move directory over directory"
+msgstr "ディレクトリからディレクトリへ移動できません"
+
+#: gio/glocalfile.c:2128 gio/glocalfileoutputstream.c:777
+#: gio/glocalfileoutputstream.c:791 gio/glocalfileoutputstream.c:806
+#: gio/glocalfileoutputstream.c:822 gio/glocalfileoutputstream.c:836
+#, c-format
+msgid "Backup file creation failed"
+msgstr "バックアップ・ファイルの生成に失敗しました"
+
+#: gio/glocalfile.c:2147
+#, c-format
+msgid "Error removing target file: %s"
+msgstr "対象となるファイルを削除する際にエラー: %s"
+
+#: gio/glocalfile.c:2161
+#, c-format
+msgid "Move between mounts not supported"
+msgstr "マウント間の移動はサポートしていません"
+
+#: gio/glocalfileinfo.c:709
+#, c-format
+msgid "Attribute value must be non-NULL"
+msgstr "属性値を NULL にしないで下さい"
+
+#: gio/glocalfileinfo.c:716
+#, c-format
+msgid "Invalid attribute type (string expected)"
+msgstr "属性の種類が無効です (文字列を想定していた)"
+
+#: gio/glocalfileinfo.c:723
+#, c-format
+msgid "Invalid extended attribute name"
+msgstr "拡張属性の名前が無効です"
+
+#: gio/glocalfileinfo.c:763
+#, c-format
+msgid "Error setting extended attribute '%s': %s"
+msgstr "'%s' という拡張属性をセットする際にエラー: %s"
+
+#: gio/glocalfileinfo.c:1402 gio/glocalfileoutputstream.c:666
+#, c-format
+msgid "Error stating file '%s': %s"
+msgstr "'%s' というファイルの状態を取得する際にエラー: %s"
+
+#: gio/glocalfileinfo.c:1458
+msgid " (invalid encoding)"
+msgstr " (無効なエンコーディング)"
+
+#: gio/glocalfileinfo.c:1618
+#, c-format
+msgid "Error stating file descriptor: %s"
+msgstr "ファイル・ディスクリプタの状態を取得する際にエラー: %s"
+
+#: gio/glocalfileinfo.c:1663
+#, c-format
+msgid "Invalid attribute type (uint32 expected)"
+msgstr "属性の種類が無効です (uint32 型を想定していた)"
+
+#: gio/glocalfileinfo.c:1680
+#, c-format
+msgid "Invalid attribute type (uint64 expected)"
+msgstr "属性の種類が無効です (uint64 型を想定していた)"
+
+#: gio/glocalfileinfo.c:1698
+#, c-format
+msgid "Invalid attribute type (byte string expected)"
+msgstr "属性の種類が無効です (バイト型の文字列を想定していた)"
+
+#: gio/glocalfileinfo.c:1724
+#, c-format
+msgid "Error setting permissions: %s"
+msgstr "アクセス権をセットする際にエラー: %s"
+
+#: gio/glocalfileinfo.c:1775 gio/glocalfileinfo.c:1943
+#, c-format
+msgid "Error setting owner: %s"
+msgstr "所有者をセットする際にエラー: %s"
+
+#: gio/glocalfileinfo.c:1798
+#, c-format
+msgid "symlink must be non-NULL"
+msgstr "シンボリックリンクを NULL にしないで下さい"
+
+#: gio/glocalfileinfo.c:1808 gio/glocalfileinfo.c:1827
+#: gio/glocalfileinfo.c:1838
+#, c-format
+msgid "Error setting symlink: %s"
+msgstr "シンボリックリンクをセットする際にエラー: %s"
+
+#: gio/glocalfileinfo.c:1817
+#, c-format
+msgid "Error setting symlink: file is not a symlink"
+msgstr "シンボリックリンクの指定でエラー: ファイルがリンクではない"
+
+#: gio/glocalfileinfo.c:1998
+#, c-format
+msgid "Setting attribute %s not supported"
+msgstr "%s という属性値はセットできません"
+
+#: gio/glocalfileinputstream.c:160 gio/glocalfileoutputstream.c:570
+#, c-format
+msgid "Error reading from file: %s"
+msgstr "ファイルから読み込む際にエラー: %s"
+
+#: gio/glocalfileinputstream.c:191 gio/glocalfileinputstream.c:203
+#: gio/glocalfileinputstream.c:312 gio/glocalfileoutputstream.c:372
+#: gio/glocalfileoutputstream.c:854
+#, c-format
+msgid "Error seeking in file: %s"
+msgstr "ファイルでシークする際にエラー: %s"
+
+#: gio/glocalfileinputstream.c:233 gio/glocalfileoutputstream.c:279
+#, c-format
+msgid "Error closing file: %s"
+msgstr "ファイルを閉じる際にエラー: %s"
+
+#: gio/glocalfilemonitor.c:197
+#, c-format
+msgid "Unable to find default local file monitor type"
+msgstr "ローカル・ファイルを監視するデフォルト・モニタの種類が見つかりません"
+
+#: gio/glocalfileoutputstream.c:172 gio/glocalfileoutputstream.c:591
+#, c-format
+msgid "Error writing to file: %s"
+msgstr "ファイルに書き込む際ににエラー: %s"
+
+#: gio/glocalfileoutputstream.c:213
+#, c-format
+msgid "Error removing old backup link: %s"
+msgstr "古いバックアップのリンクを削除する際にエラー: %s"
+
+#: gio/glocalfileoutputstream.c:227 gio/glocalfileoutputstream.c:240
+#, c-format
+msgid "Error creating backup copy: %s"
+msgstr "バックアップのコピーを生成する際にエラー: %s"
+
+#: gio/glocalfileoutputstream.c:258
+#, c-format
+msgid "Error renaming temporary file: %s"
+msgstr "作業用のファイル名を変更する際にエラー: %s"
+
+#: gio/glocalfileoutputstream.c:418 gio/glocalfileoutputstream.c:871
+#, c-format
+msgid "Error truncating file: %s"
+msgstr "ファイルを切りつめる際にエラー: %s"
+
+#: gio/glocalfileoutputstream.c:478 gio/glocalfileoutputstream.c:523
+#: gio/glocalfileoutputstream.c:654 gio/glocalfileoutputstream.c:931
+#, c-format
+msgid "Error opening file '%s': %s"
+msgstr "'%s' というファイルをオープンする際にエラー: %s"
+
+#: gio/glocalfileoutputstream.c:679
+#, c-format
+msgid "Target file is a directory"
+msgstr "対象となるファイルはディレクトリです"
+
+#: gio/glocalfileoutputstream.c:684
+#, c-format
+msgid "Target file is not a regular file"
+msgstr "対象となるファイルは通常のファイルではありません"
+
+#: gio/glocalfileoutputstream.c:696
+#, c-format
+msgid "The file was externally modified"
+msgstr "ファイルが外部で変更されました"
+
+#: gio/gmemoryinputstream.c:487 gio/gmemoryoutputstream.c:526
+#, c-format
+msgid "Invalid GSeekType supplied"
+msgstr "不正な GSeekType が指定されました"
+
+#: gio/gmemoryinputstream.c:497 gio/gmemoryoutputstream.c:536
+#, c-format
+msgid "Invalid seek request"
+msgstr "無効なシークの要求です"
+
+#: gio/gmemoryinputstream.c:521
+#, c-format
+msgid "Cannot truncate GMemoryInputStream"
+msgstr "GMemoryInputStream を切りつめることはできません"
+
+#: gio/gmemoryoutputstream.c:269
+#, c-format
+msgid "Reached maximum data array limit"
+msgstr "データ配列の上限に到達しました"
+
+#: gio/gmemoryoutputstream.c:304
+#, c-format
+msgid "Memory output stream not resizable"
+msgstr "メモリ出力ストリームの大きさは変更できません"
+
+#: gio/gmemoryoutputstream.c:320
+#, c-format
+msgid "Failed to resize memory output stream"
+msgstr "メモリ出力ストリームの大きさを変更できませんでした"
+
+#. Translators: This is an error
+#. * message for mount objects that
+#. * don't implement unmount.
+#: gio/gmount.c:344
+msgid "mount doesn't implement unmount"
+msgstr "マウントはアンマウントを実装していません"
+
+#. Translators: This is an error
+#. * message for mount objects that
+#. * don't implement eject.
+#: gio/gmount.c:419
+msgid "mount doesn't implement eject"
+msgstr "マウントは取り出しを実装していません"
+
+#. Translators: This is an error
+#. * message for mount objects that
+#. * don't implement remount.
+#: gio/gmount.c:501
+msgid "mount doesn't implement remount"
+msgstr "マウントは再マウントを実装していません"
+
+#: gio/goutputstream.c:202 gio/goutputstream.c:403
+#, c-format
+msgid "Output stream doesn't implement write"
+msgstr "出力ストリームは書き込みを実装していません"
+
+#: gio/goutputstream.c:363 gio/goutputstream.c:771
+#, c-format
+msgid "Source stream is already closed"
+msgstr "ソース・ストリームは既に閉じています"
+
+#: gio/gthemedicon.c:206
+msgid "name"
+msgstr "名前"
+
+#: gio/gthemedicon.c:207
+msgid "The name of the icon"
+msgstr "アイコンの名前です"
+
+#: gio/gthemedicon.c:218
+msgid "names"
+msgstr "名前の集合"
+
+#: gio/gthemedicon.c:219
+msgid "An array containing the icon names"
+msgstr "アイコンの名前を格納した配列です"
+
+#: gio/gthemedicon.c:244
+msgid "use default fallbacks"
+msgstr "デフォルトのフォールバックを使用する"
+
+#: gio/gthemedicon.c:245
+msgid ""
+"Whether to use default fallbacks found by shortening the name at '-' "
+"characters. Ignores names after the first if multiple names are given."
+msgstr ""
+"'-' という代替え文字で名前を省略するデフォルトのフォールバックを使用するかど"
+"うかです (複数の名前を指定すると一番最初の名前より後ろの名前を全て無視します)"
+
+#: gio/gunixinputstream.c:202 gio/gunixinputstream.c:222
+#: gio/gunixinputstream.c:300 gio/gunixoutputstream.c:289
+#, c-format
+msgid "Error reading from unix: %s"
+msgstr "unix から読み込む際にエラー: %s"
+
+#: gio/gunixinputstream.c:255 gio/gunixinputstream.c:437
+#: gio/gunixoutputstream.c:244 gio/gunixoutputstream.c:395
+#, c-format
+msgid "Error closing unix: %s"
+msgstr "unix を閉じる際にエラー: %s"
+
+#: gio/gunixmounts.c:1779 gio/gunixmounts.c:1816
+msgid "Filesystem root"
+msgstr "ファイルシステムのルート"
+
+#: gio/gunixoutputstream.c:190 gio/gunixoutputstream.c:211
+#, c-format
+msgid "Error writing to unix: %s"
+msgstr "unix に書き込む際にエラー: %s"
+
+#: gio/gvolume.c:423
+msgid "volume doesn't implement eject"
+msgstr "ボリュームは取り出しを実装していません"
+
+#: gio/gwin32appinfo.c:277
+#, c-format
+msgid "Can't find application"
+msgstr "アプリケーションが見つかりません"
+
+#: gio/gwin32appinfo.c:312
+#, c-format
+msgid "Error launching application: %s"
+msgstr "アプリケーションを起動する際にエラー: %s"
+
+#: gio/gwin32appinfo.c:349
+#, c-format
+msgid "URIs not supported"
+msgstr "URI はサポートしていません"
+
+#: gio/gwin32appinfo.c:371
+#, c-format
+msgid "association changes not supported on win32"
+msgstr "win32 で組み合わせの変更はサポートしていません"
+
+#: gio/gwin32appinfo.c:383
+#, c-format
+msgid "Association creation not supported on win32"
+msgstr "win32 で組み合わせの生成はサポートしていません"
+
+#: tests/gio-ls.c:27
+msgid "do not hide entries"
+msgstr "エントリを隠さない"
+
+#: tests/gio-ls.c:29
+msgid "use a long listing format"
+msgstr "長い形式で一覧表示する"
+
+#: tests/gio-ls.c:37
+msgid "[FILE...]"
+msgstr "[ファイル...]"

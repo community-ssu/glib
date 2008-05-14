@@ -30,7 +30,7 @@
  *   before starting the child process. (There might be several threads
  *   running, and the current directory is common for all threads.)
  *
- * Thus, we must in most cases use a helper program to handle closing
+ * Thus, we must in many cases use a helper program to handle closing
  * of (inherited) file descriptors and changing of directory. The
  * helper process is also needed if the standard input, standard
  * output, or standard error of the process to be run are supposed to
@@ -59,14 +59,7 @@
 #include <io.h>
 #include <process.h>
 #include <direct.h>
-
-#ifdef __MINGW32__
-/* Mingw doesn't have prototypes for these */
-int _wspawnvpe (int, const wchar_t *, const wchar_t **, const wchar_t **);
-int _wspawnvp (int, const wchar_t *, const wchar_t **);
-int _wspawnve (int, const wchar_t *, const wchar_t **, const wchar_t **);
-int _wspawnv (int, const wchar_t *, const wchar_t **);
-#endif
+#include <wchar.h>
 
 #ifdef G_SPAWN_WIN32_DEBUG
   static int debug = 1;
@@ -96,6 +89,7 @@ enum
 
 enum {
   ARG_CHILD_ERR_REPORT = 1,
+  ARG_HELPER_SYNC,
   ARG_STDIN,
   ARG_STDOUT,
   ARG_STDERR,
@@ -106,6 +100,19 @@ enum {
   ARG_PROGRAM,
   ARG_COUNT = ARG_PROGRAM
 };
+
+static int
+dup_noninherited (int fd,
+		  int mode)
+{
+  HANDLE filehandle;
+
+  DuplicateHandle (GetCurrentProcess (), (LPHANDLE) _get_osfhandle (fd),
+		   GetCurrentProcess (), &filehandle,
+		   0, FALSE, DUPLICATE_SAME_ACCESS);
+  close (fd);
+  return _open_osfhandle ((long) filehandle, mode | _O_NOINHERIT);
+}
 
 #ifndef GSPAWN_HELPER
 
@@ -328,7 +335,12 @@ read_helper_report (int      fd,
           return FALSE;
         }
       else if (chunk == 0)
-        break; /* EOF */
+	{
+	  g_set_error (error, G_SPAWN_ERROR, G_SPAWN_ERROR_FAILED,
+		       _("Failed to read from child pipe (%s)"),
+		       "EOF");
+	  break; /* EOF */
+	}
       else
 	bytes += chunk;
     }
@@ -527,6 +539,7 @@ do_spawn_with_pipes (gint                 *exit_status,
   int stdout_pipe[2] = { -1, -1 };
   int stderr_pipe[2] = { -1, -1 };
   int child_err_report_pipe[2] = { -1, -1 };
+  int helper_sync_pipe[2] = { -1, -1 };
   int helper_report[2];
   static gboolean warned_about_child_setup = FALSE;
   GError *conv_error = NULL;
@@ -534,8 +547,8 @@ do_spawn_with_pipes (gint                 *exit_status,
   gchar *helper_process;
   CONSOLE_CURSOR_INFO cursor_info;
   wchar_t *whelper, **wargv, **wenvp;
-  
-  SETUP_DEBUG();
+  extern gchar *_glib_get_installation_directory (void);
+  gchar *glib_top;
 
   if (child_setup && !warned_about_child_setup)
     {
@@ -574,15 +587,36 @@ do_spawn_with_pipes (gint                 *exit_status,
   if (!make_pipe (child_err_report_pipe, error))
     goto cleanup_and_fail;
   
+  if (!make_pipe (helper_sync_pipe, error))
+    goto cleanup_and_fail;
+  
   new_argv = g_new (char *, argc + 1 + ARG_COUNT);
   if (GetConsoleCursorInfo (GetStdHandle (STD_OUTPUT_HANDLE), &cursor_info))
     helper_process = HELPER_PROCESS "-console.exe";
   else
     helper_process = HELPER_PROCESS ".exe";
-  new_argv[0] = helper_process;
+  
+  glib_top = _glib_get_installation_directory ();
+  if (glib_top != NULL)
+    {
+      helper_process = g_build_filename (glib_top, "bin", helper_process, NULL);
+      g_free (glib_top);
+    }
+  else
+    helper_process = g_strdup (helper_process);
+
+  new_argv[0] = protect_argv_string (helper_process);
+
   _g_sprintf (args[ARG_CHILD_ERR_REPORT], "%d", child_err_report_pipe[1]);
   new_argv[ARG_CHILD_ERR_REPORT] = args[ARG_CHILD_ERR_REPORT];
   
+  /* Make the read end of the child error report pipe
+   * noninherited. Otherwise it will needlessly be inherited by the
+   * helper process, and the started actual user process. As such that
+   * shouldn't harm, but it is unnecessary.
+   */
+  child_err_report_pipe[0] = dup_noninherited (child_err_report_pipe[0], _O_RDONLY);
+
   if (flags & G_SPAWN_FILE_AND_ARGV_ZERO)
     {
       /* Overload ARG_CHILD_ERR_REPORT to also encode the
@@ -591,6 +625,17 @@ do_spawn_with_pipes (gint                 *exit_status,
       strcat (args[ARG_CHILD_ERR_REPORT], "#");
     }
   
+  _g_sprintf (args[ARG_HELPER_SYNC], "%d", helper_sync_pipe[0]);
+  new_argv[ARG_HELPER_SYNC] = args[ARG_HELPER_SYNC];
+  
+  /* Make the write end of the sync pipe noninherited. Otherwise the
+   * helper process will inherit it, and thus if this process happens
+   * to crash before writing the sync byte to the pipe, the helper
+   * process won't read but won't get any EOF either, as it has the
+   * write end open itself.
+   */
+  helper_sync_pipe[1] = dup_noninherited (helper_sync_pipe[1], _O_WRONLY);
+
   if (standard_input)
     {
       _g_sprintf (args[ARG_STDIN], "%d", stdin_pipe[0]);
@@ -658,14 +703,14 @@ do_spawn_with_pipes (gint                 *exit_status,
   for (i = 0; i <= argc; i++)
     new_argv[ARG_PROGRAM + i] = protected_argv[i];
 
+  SETUP_DEBUG();
+
   if (debug)
     {
       g_print ("calling %s with argv:\n", helper_process);
       for (i = 0; i < argc + 1 + ARG_COUNT; i++)
 	g_print ("argv[%d]: %s\n", i, (new_argv[i] ? new_argv[i] : "NULL"));
     }
-
-  whelper = g_utf8_to_utf16 (helper_process, -1, NULL, NULL, NULL);
 
   if (!utf8_charv_to_wcharv (new_argv, &wargv, &conv_error_index, &conv_error))
     {
@@ -679,11 +724,12 @@ do_spawn_with_pipes (gint                 *exit_status,
 		     conv_error_index - ARG_PROGRAM, conv_error->message);
       g_error_free (conv_error);
       g_strfreev (protected_argv);
+      g_free (new_argv[0]);
       g_free (new_argv[ARG_WORKING_DIRECTORY]);
       g_free (new_argv);
-      g_free (whelper);
+      g_free (helper_process);
 
-      return FALSE;
+      goto cleanup_and_fail;
     }
 
   if (!utf8_charv_to_wcharv (envp, &wenvp, NULL, &conv_error))
@@ -693,21 +739,22 @@ do_spawn_with_pipes (gint                 *exit_status,
 		   conv_error->message);
       g_error_free (conv_error);
       g_strfreev (protected_argv);
+      g_free (new_argv[0]);
       g_free (new_argv[ARG_WORKING_DIRECTORY]);
       g_free (new_argv);
-      g_free (whelper);
+      g_free (helper_process);
       g_strfreev ((gchar **) wargv);
  
-      return FALSE;
+      goto cleanup_and_fail;
     }
 
   if (child_setup)
     (* child_setup) (user_data);
 
+  whelper = g_utf8_to_utf16 (helper_process, -1, NULL, NULL, NULL);
+  g_free (helper_process);
+
   if (wenvp != NULL)
-    /* Let's hope envp hasn't mucked with PATH so that
-     * gspawn-win32-helper.exe isn't found.
-     */
     rc = _wspawnvpe (P_NOWAIT, whelper, (const wchar_t **) wargv, (const wchar_t **) wenvp);
   else
     rc = _wspawnvp (P_NOWAIT, whelper, (const wchar_t **) wargv);
@@ -722,12 +769,14 @@ do_spawn_with_pipes (gint                 *exit_status,
    * otherwise the reader will never get EOF.
    */
   close_and_invalidate (&child_err_report_pipe[1]);
+  close_and_invalidate (&helper_sync_pipe[0]);
   close_and_invalidate (&stdin_pipe[0]);
   close_and_invalidate (&stdout_pipe[1]);
   close_and_invalidate (&stderr_pipe[1]);
 
   g_strfreev (protected_argv);
 
+  g_free (new_argv[0]);
   g_free (new_argv[ARG_WORKING_DIRECTORY]);
   g_free (new_argv);
 
@@ -748,6 +797,8 @@ do_spawn_with_pipes (gint                 *exit_status,
        */
       g_assert (err_report != NULL);
       *err_report = child_err_report_pipe[0];
+      write (helper_sync_pipe[1], " ", 1);
+      close_and_invalidate (&helper_sync_pipe[1]);
     }
   else
     {
@@ -755,7 +806,7 @@ do_spawn_with_pipes (gint                 *exit_status,
       if (!read_helper_report (child_err_report_pipe[0], helper_report, error))
 	goto cleanup_and_fail;
         
-      close (child_err_report_pipe[0]);
+      close_and_invalidate (&child_err_report_pipe[0]);
 
       switch (helper_report[0])
 	{
@@ -769,13 +820,21 @@ do_spawn_with_pipes (gint                 *exit_status,
 	      if (!DuplicateHandle ((HANDLE) rc, (HANDLE) helper_report[1],
 				    GetCurrentProcess (), (LPHANDLE) child_handle,
 				    0, TRUE, DUPLICATE_SAME_ACCESS))
-		*child_handle = 0;
+		{
+		  char *emsg = g_win32_error_message (GetLastError ());
+		  g_print("%s\n", emsg);
+		  *child_handle = 0;
+		}
 	    }
 	  else if (child_handle)
 	    *child_handle = 0;
+	  write (helper_sync_pipe[1], " ", 1);
+	  close_and_invalidate (&helper_sync_pipe[1]);
 	  break;
 	  
 	default:
+	  write (helper_sync_pipe[1], " ", 1);
+	  close_and_invalidate (&helper_sync_pipe[1]);
 	  set_child_error (helper_report, working_directory, error);
 	  goto cleanup_and_fail;
 	}
@@ -795,12 +854,17 @@ do_spawn_with_pipes (gint                 *exit_status,
   return TRUE;
 
  cleanup_and_fail:
+
   if (rc != -1)
     CloseHandle ((HANDLE) rc);
   if (child_err_report_pipe[0] != -1)
     close (child_err_report_pipe[0]);
   if (child_err_report_pipe[1] != -1)
     close (child_err_report_pipe[1]);
+  if (helper_sync_pipe[0] != -1)
+    close (helper_sync_pipe[0]);
+  if (helper_sync_pipe[1] != -1)
+    close (helper_sync_pipe[1]);
   if (stdin_pipe[0] != -1)
     close (stdin_pipe[0]);
   if (stdin_pipe[1] != -1)

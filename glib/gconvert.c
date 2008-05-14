@@ -22,16 +22,23 @@
 
 #include "config.h"
 
+#include "glib.h"
+
+#ifndef G_OS_WIN32
 #include <iconv.h>
+#endif
 #include <errno.h>
 #include <stdio.h>
 #include <string.h>
 #include <stdlib.h>
 
-#include "glib.h"
 #include "gprintfint.h"
 #include "gthreadprivate.h"
 #include "gunicode.h"
+
+#ifdef G_OS_WIN32
+#include "win_iconv.c"
+#endif
 
 #ifdef G_PLATFORM_WIN32
 #define STRICT
@@ -776,7 +783,7 @@ g_convert (const gchar *str,
  * including fallback sequences for characters not representable
  * in the output. Note that it is not guaranteed that the specification
  * for the fallback sequences in @fallback will be honored. Some
- * systems may do a approximate conversion from @from_codeset
+ * systems may do an approximate conversion from @from_codeset
  * to @to_codeset in their iconv() functions, 
  * in which case GLib will simply return that approximate conversion.
  *
@@ -1091,7 +1098,8 @@ g_locale_to_utf8 (const gchar  *opsysstring,
  * 
  * Converts a string from UTF-8 to the encoding used for strings by
  * the C runtime (usually the same as that used by the operating
- * system) in the <link linkend="setlocale">current locale</link>.
+ * system) in the <link linkend="setlocale">current locale</link>. On
+ * Windows this means the system codepage.
  * 
  * Return value: The converted string, or %NULL on an error.
  **/

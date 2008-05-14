@@ -1,18 +1,89 @@
-2008-02-06  Matthias Clasen  <mclasen@redhat.com>
+2008-04-08  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.14.6 ===
+	* === Released 2.16.3 ===
 
-2008-01-07  Matthias Clasen  <mclasen@redhat.com>
+2008-03-31  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.14.5 ===
+	* === Released 2.16.2 ===
 
-2007-11-24  Matthias Clasen  <mclasen@redhat.com>
+2008-03-10  Matthias Clasen  <mclasen@redhat.com>
+	
+	* === Released 2.16.1 ===
 
-	* === Released 2.14.4 ===
+2008-03-10  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.16.0 ===
+
+2008-02-25  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.6 ===
+
+2008-02-11  Matthias Clasen <mclasen@redhat.com>
+
+	* === Released 2.15.5 ===
+
+2008-02-06  Benjamin Otte  <otte@gnome.org>
+
+	* gparamspecs.c: (param_gtype_set_default), (param_gtype_validate):
+	make GParamGType require the set type during construction instead of
+	using G_TYPE_NONE, which causes issues when setting.
+	Bug 513073 - g_param_spec_gtype breaks with G_PARAM_CONSTRUCT
+
+2008-02-05 18:52:07  Tim Janik  <timj@imendio.com>
+
+	* gtype.c: added recursive mutex to protect class initialization,
+	default interface initialization and per-class interface construction.
+	a lock to this recursive mutex is held during user callback invocations
+	such as initializers or finalizers, effectively allowing only one thread
+	to run class/interface initializers/finalizers at a time.
+	also made misc fixups. this fixes:
+	Bug 64764 - Class initialization isn't thread safe.
+
+2008-02-05 18:41:22  Tim Janik  <timj@imendio.com>
+
+	* Makefile.am: integrate tests/.
+
+	* tests/: new directory for libgobject tests.
+
+	* tests/Makefile.am: build and run threadtests.
+
+	* tests/threadtests.c: test multi-threaded initializers for
+	object classes and interfaces.
+
+2008-01-28  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.4 ===
+
+2008-01-21  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.3 ===
+
+2008-01-14  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.2 ===
+
+008-01-07  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.1 ===
+
+2007-12-26  Behdad Esfahbod  <behdad@gnome.org>
+
+	* gclosure.h (G_CCLOSURE_SWAP_DATA): Fix macro argument.
+	(#505674, Areg Beketovski)
+
+2007-12-20  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.15.0 ===
+
+2007-11-11  Mathias Hasselmann  <mathias@openismus.com>
+
+	Always exit with non-zero error code when printing warnings.
+
+	* gobject/glib-genmarshal.c: Add global exit_status variable, and use
+	it in pad() and process_signature() to return with non-zero error code
+	when printing warnings. (#495294)
 
 2007-11-08  Matthias Clasen <mclasen@redhat.com>
-
-	Merge from trunk:
 
 	* glib-mkenums.in: Don't shift ARGV[0] to undefined. 
 	(#466557, Aidan Delaney)

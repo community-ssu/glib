@@ -28,10 +28,8 @@
  * MT safe
  */
 
-#include <config.h>
-#include "gmoduleconf.h"
-#include "gstdio.h"
-#include "gmodule.h"
+#include "config.h"
+#include "glibconfig.h"
 
 #include <errno.h>
 #include <string.h>
@@ -41,10 +39,13 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
-#if defined (G_OS_WIN32)
+#ifdef G_OS_WIN32
 #include <io.h>		/* For open() and close() prototypes. */
 #endif
 
+#include "gmoduleconf.h"
+#include "gstdio.h"
+#include "gmodule.h"
 
 /* We maintain a list of modules, so we can reference count them.
  * That's needed because some platforms don't support refernce counts on
@@ -427,8 +428,8 @@ g_module_open (const gchar    *file_name,
 	  gchar *real_name = parse_libtool_archive (name);
 
 	  /* real_name might be NULL, but then module error is already set */
-          if (real_name)
-            {
+	  if (real_name)
+	    {
 	      g_free (name);
 	      name = real_name;
             }

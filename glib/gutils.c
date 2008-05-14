@@ -60,6 +60,7 @@
 #include "glib.h"
 #include "gprintfint.h"
 #include "gthreadprivate.h"
+#include "glibintl.h"
 #include "galias.h"
 
 #ifdef	MAXPATHLEN
@@ -99,6 +100,9 @@
 #  ifndef CSIDL_COMMON_APPDATA
 #    define CSIDL_COMMON_APPDATA 35
 #  endif
+#  ifndef CSIDL_MYPICTURES
+#    define CSIDL_MYPICTURES 0x27
+#  endif
 #  ifndef CSIDL_COMMON_DOCUMENTS
 #    define CSIDL_COMMON_DOCUMENTS 46
 #  endif
@@ -128,7 +132,35 @@ const guint glib_binary_age = GLIB_BINARY_AGE;
 
 #ifdef G_PLATFORM_WIN32
 
-G_WIN32_DLLMAIN_FOR_DLL_NAME (static, dll_name)
+static HMODULE glib_dll = NULL;
+
+#ifdef DLL_EXPORT
+
+BOOL WINAPI
+DllMain (HINSTANCE hinstDLL,
+	 DWORD     fdwReason,
+	 LPVOID    lpvReserved)
+{
+  if (fdwReason == DLL_PROCESS_ATTACH)
+      glib_dll = hinstDLL;
+
+  return TRUE;
+}
+
+#endif
+
+gchar *
+_glib_get_installation_directory (void)
+{
+#ifdef DLL_EXPORT
+  if (glib_dll == NULL)
+    return NULL;
+#endif
+  /* In a static build of GLib just use the application's .exe file's
+   * installation directory...
+   */
+  return g_win32_get_package_installation_directory_of_module (glib_dll);
+}
 
 #endif
 
@@ -563,7 +595,7 @@ debug_key_matches (const gchar *key,
 /**
  * g_parse_debug_string:
  * @string: a list of debug options separated by colons, spaces, or
- * commas; or the string "all" to set all flags.
+ * commas; or the string "all" to set all flags, or %NULL.
  * @keys: pointer to an array of #GDebugKey which associate 
  *     strings with bit flags.
  * @nkeys: the number of #GDebugKey<!-- -->s in the array.
@@ -583,7 +615,8 @@ g_parse_debug_string  (const gchar     *string,
   guint i;
   guint result = 0;
   
-  g_return_val_if_fail (string != NULL, 0);
+  if (string == NULL)
+    return 0;
 
   /* this function is used by gmem.c/gslice.c initialization code,
    * so introducing malloc dependencies here would require adaptions
@@ -1781,11 +1814,11 @@ g_get_real_name (void)
  * g_get_homedir() not pay attention to <envar>HOME</envar> and to 
  * return the real home directory for the user. If applications
  * want to pay attention to <envar>HOME</envar>, they can do:
- * <informalexample><programlisting>
+ * |[
  *  const char *homedir = g_getenv ("HOME");
  *   if (!homedir)
  *      homedir = g_get_homedir (<!-- -->);
- * </programlisting></informalexample>
+ * ]|
  *
  * Returns: the current user's home directory
  */
@@ -1958,6 +1991,7 @@ g_get_application_name (void)
  * The application name will be used in contexts such as error messages,
  * or when displaying an application's name in the task list.
  * 
+ * Since: 2.2
  **/
 void
 g_set_application_name (const gchar *application_name)
@@ -2421,7 +2455,7 @@ get_module_for_address (gconstpointer address)
   static gboolean beenhere = FALSE;
   typedef BOOL (WINAPI *t_GetModuleHandleExA) (DWORD, LPCTSTR, HMODULE *);
   static t_GetModuleHandleExA p_GetModuleHandleExA = NULL;
-  HMODULE hmodule;
+  HMODULE hmodule = NULL;
 
   if (!address)
     return NULL;
@@ -2451,27 +2485,14 @@ static gchar *
 get_module_share_dir (gconstpointer address)
 {
   HMODULE hmodule;
-  gchar *filename = NULL;
-  gchar *p, *retval;
-  wchar_t wfilename[MAX_PATH];
+  gchar *filename;
+  gchar *retval;
 
   hmodule = get_module_for_address (address);
   if (hmodule == NULL)
     return NULL;
 
-  if (GetModuleFileNameW (hmodule, wfilename, G_N_ELEMENTS (wfilename)))
-    filename = g_utf16_to_utf8 (wfilename, -1, NULL, NULL, NULL);
-
-  if (filename == NULL)
-    return NULL;
-
-  if ((p = strrchr (filename, G_DIR_SEPARATOR)) != NULL)
-    *p = '\0';
-
-  p = strrchr (filename, G_DIR_SEPARATOR);
-  if (p && (g_ascii_strcasecmp (p + 1, "bin") == 0))
-    *p = '\0';
-
+  filename = g_win32_get_package_installation_directory_of_module (hmodule);
   retval = g_build_filename (filename, "share", NULL);
   g_free (filename);
 
@@ -2486,6 +2507,7 @@ g_win32_get_system_data_dirs_for_module (gconstpointer address)
   static GHashTable *per_module_data_dirs = NULL;
   gchar **retval;
   gchar *p;
+  gchar *exe_root;
       
   if (address)
     {
@@ -2546,13 +2568,20 @@ g_win32_get_system_data_dirs_for_module (gconstpointer address)
   if (p)
     g_array_append_val (data_dirs, p);
     
-  p = g_win32_get_package_installation_subdirectory (NULL, dll_name, "share");
-  if (p)
-    g_array_append_val (data_dirs, p);
+  if (glib_dll != NULL)
+    {
+      gchar *glib_root = g_win32_get_package_installation_directory_of_module (glib_dll);
+      p = g_build_filename (glib_root, "share", NULL);
+      if (p)
+	g_array_append_val (data_dirs, p);
+      g_free (glib_root);
+    }
   
-  p = g_win32_get_package_installation_subdirectory (NULL, NULL, "share");
+  exe_root = g_win32_get_package_installation_directory_of_module (NULL);
+  p = g_build_filename (exe_root, "share", NULL);
   if (p)
     g_array_append_val (data_dirs, p);
+  g_free (exe_root);
 
   retval = (gchar **) g_array_free (data_dirs, FALSE);
 
@@ -3129,10 +3158,6 @@ _g_utils_thread_init (void)
   g_get_language_names ();
 }
 
-#ifdef ENABLE_NLS
-
-#include <libintl.h>
-
 #ifdef G_OS_WIN32
 
 /**
@@ -3146,10 +3171,11 @@ _g_utils_thread_init (void)
 static gchar *
 _glib_get_locale_dir (void)
 {
-  gchar *install_dir, *locale_dir;
+  gchar *install_dir = NULL, *locale_dir;
   gchar *retval = NULL;
 
-  install_dir = g_win32_get_package_installation_directory (GETTEXT_PACKAGE, dll_name);
+  if (glib_dll != NULL)
+    install_dir = g_win32_get_package_installation_directory_of_module (glib_dll);
 
   if (install_dir)
     {
@@ -3181,19 +3207,29 @@ _glib_get_locale_dir (void)
 
 #endif /* G_OS_WIN32 */
 
+/**
+ * glib_gettext:
+ * @str: The string to be translated
+ *
+ * Returns the translated string from the glib translations.
+ * This is an internal function and should only be used by
+ * the internals of glib (such as libgio).
+ *
+ * Returns: the transation of @str to the current locale
+ */
 G_CONST_RETURN gchar *
-_glib_gettext (const gchar *str)
+glib_gettext (const gchar *str)
 {
   static gboolean _glib_gettext_initialized = FALSE;
 
   if (!_glib_gettext_initialized)
     {
 #ifdef G_OS_WIN32
-      gchar *tmp = _glib_get_locale_dir();
-      bindtextdomain(GETTEXT_PACKAGE, tmp);
-      g_free(tmp);
+      gchar *tmp = _glib_get_locale_dir ();
+      bindtextdomain (GETTEXT_PACKAGE, tmp);
+      g_free (tmp);
 #else
-      bindtextdomain(GETTEXT_PACKAGE, GLIB_LOCALE_DIR);
+      bindtextdomain (GETTEXT_PACKAGE, GLIB_LOCALE_DIR);
 #endif
 #    ifdef HAVE_BIND_TEXTDOMAIN_CODESET
       bind_textdomain_codeset (GETTEXT_PACKAGE, "UTF-8");
@@ -3203,8 +3239,6 @@ _glib_gettext (const gchar *str)
   
   return dgettext (GETTEXT_PACKAGE, str);
 }
-
-#endif /* ENABLE_NLS */
 
 #ifdef G_OS_WIN32
 

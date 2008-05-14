@@ -59,7 +59,7 @@ apiver=2.0
 soname=0
 gtkver=2.0
 shver=2.14.6-1osso1
-libpath=$(BUILD_DEB_DIR)/glib/.libs:$(BUILD_DEB_DIR)/gmodule/.libs:$(BUILD_DEB_DIR)/gobject/.libs:$(BUILD_DEB_DIR)/gthread/.libs
+libpath=$(BUILD_DEB_DIR)/glib/.libs:$(BUILD_DEB_DIR)/gmodule/.libs:$(BUILD_DEB_DIR)/gobject/.libs:$(BUILD_DEB_DIR)/gthread/.libs:$(BUILD_DEB_DIR)/gio/.libs
 
 _echo_cfiles = for f in ${1}; do if [ -f $$f ]; then echo $$f; fi; done
 cfiles := $(shell $(call _echo_cfiles, $(wildcard debian/libglib$(apiver)-@SONAME@.*)))
@@ -120,7 +120,7 @@ clean: debian/control
 	-$(MAKE) maintainer-clean
 	rm -f gobject/gmarshal.strings
 	rm -f configure config.guess ltmain.sh config.sub aclocal.m4
-	rm -f depcomp mkinstalldirs missing install-sh config.h.in
+	rm -f depcomp missing install-sh config.h.in
 	find -name Makefile.in | xargs --no-run-if-empty rm
 
 	dh_clean $(SOURCE_DIR)/install-test-stamp $(BUILD_DEB_DIR)/build-stamp debian/shlibs.local
@@ -168,7 +168,7 @@ binary-indep: build install
 		usr/share/doc/libglib$(apiver)-doc/gtk
 
 	# create the symlinks on /usr/share/gtk-doc/html
-	for i in glib gobject; do				\
+	for i in glib gobject gio; do				\
 		dh_link -plibglib$(apiver)-doc			\
 			usr/share/doc/libglib$(apiver)-doc/$$i	\
 			usr/share/gtk-doc/html/$$i;		\

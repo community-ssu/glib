@@ -42,6 +42,7 @@ POSSIBILITY OF SUCH DAMAGE.
 /* The current PCRE version information. */
 
 #define PCRE_MAJOR          7
+
 #define PCRE_MINOR          6
 #define PCRE_PRERELEASE     
 #define PCRE_DATE           2008-01-28

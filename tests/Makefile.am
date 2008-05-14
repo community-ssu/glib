@@ -1,3 +1,5 @@
+include $(top_srcdir)/Makefile.decl
+
 SUBDIRS=gobject refcount
 
 if ENABLE_REGEX
@@ -6,7 +8,14 @@ else
 enable_regex =
 endif
 
-INCLUDES = -g -I$(top_srcdir) -I$(top_srcdir)/glib -I$(top_srcdir)/gmodule $(GLIB_DEBUG_FLAGS) $(enable_regex)
+AM_CPPFLAGS = 				\
+	-I$(top_srcdir) 		\
+	-I$(top_srcdir)/glib 		\
+	-I$(top_srcdir)/gmodule 	\
+	$(GLIB_DEBUG_FLAGS) 		\
+	$(enable_regex)
+
+AM_CFLAGS = -g
 
 EFENCE=
 
@@ -31,7 +40,7 @@ spawn_test_win32_gui_LDFLAGS = -mwindows
 
 endif
 
-EXTRA_DIST =					\
+EXTRA_DIST +=					\
 	$(test_scripts)				\
 	makefile.msc.in				\
 	casefold.txt				\
@@ -56,8 +65,24 @@ endif
 if ENABLE_TIMELOOP
 timeloop = timeloop timeloop-closure
 endif
-noinst_PROGRAMS = testglib testgdate testgdateparser unicode-normalize unicode-collate $(timeloop) errorcheck-mutex-test
-testglib_LDADD = $(libglib)
+noinst_PROGRAMS = $(TEST_PROGS)	\
+	testgdate 		\
+	testgdateparser 	\
+	unicode-normalize 	\
+	unicode-collate 	\
+	$(timeloop) 		\
+	errorcheck-mutex-test
+
+TEST_PROGS              += scannerapi
+scannerapi_SOURCES       = scannerapi.c
+scannerapi_LDADD         = $(progs_ldadd)
+TEST_PROGS		+= testglib
+testglib_LDADD		 = $(libglib)
+TEST_PROGS              += testingbase64
+testingbase64_SOURCES    = testingbase64.c
+testingbase64_LDADD      = $(progs_ldadd)
+
+
 patterntest_LDADD = $(libglib)
 testgdate_LDADD = $(libglib)
 testgdateparser_LDADD = $(libglib)
@@ -74,6 +99,7 @@ test_programs =					\
 	base64-test				\
 	bit-test				\
 	$(CXX_TEST)				\
+	checksum-test				\
 	child-test				\
 	completion-test				\
 	convert-test				\
@@ -88,6 +114,7 @@ test_programs =					\
 	list-test				\
 	mainloop-test				\
 	mapping-test				\
+	markup-collect				\
 	markup-escape-test			\
 	module-test				\
 	node-test				\
@@ -145,6 +172,7 @@ array_test_LDADD = $(progs_ldadd)
 base64_test_LDADD = $(progs_ldadd)
 bit_test_LDADD = $(progs_ldadd)
 bookmarkfile_test_LDADD = $(progs_ldadd)
+checksum_test_LDADD = $(progs_ldadd)
 child_test_LDADD = $(thread_ldadd)
 completion_test_LDADD = $(progs_ldadd)
 convert_test_LDADD = $(progs_ldadd)
@@ -199,6 +227,7 @@ utf8_validate_LDADD = $(progs_ldadd)
 utf8_pointer_LDADD = $(progs_ldadd)
 uri_test_LDADD = $(progs_ldadd)
 regex_test_LDADD = $(progs_ldadd)
+markup_collect_LDADD = $(progs_ldadd)
 
 lib_LTLIBRARIES = libmoduletestplugin_a.la libmoduletestplugin_b.la
 
@@ -215,22 +244,23 @@ libmoduletestplugin_b_la_LDFLAGS = $(G_MODULE_LDFLAGS) -avoid-version -module $(
 libmoduletestplugin_b_la_LIBADD = $(G_MODULE_LIBS) $(libadd_libgmodule) $(libadd_libglib)
 
 dist-hook: $(BUILT_EXTRA_DIST)
-	files='$(BUILT_EXTRA_DIST)'; \
-	for f in $$files; do \
-	  if test -f $$f; then d=.; else d=$(srcdir); fi; \
+	files='$(BUILT_EXTRA_DIST)'; 				\
+	for f in $$files; do 					\
+	  if test -f $$f; then d=.; else d=$(srcdir); fi; 	\
 	  cp $$d/$$f $(distdir) || exit 1; done
-	mkdir $(distdir)/markups;          \
-	for f in $(srcdir)/markups/* ; do  \
+	mkdir $(distdir)/markups;          			\
+	for f in $(srcdir)/markups/* ; do  			\
 	  cp $$f $(distdir)/markups; done 
-	mkdir $(distdir)/collate;          \
-	for f in $(srcdir)/collate/* ; do  \
+	mkdir $(distdir)/collate;          			\
+	for f in $(srcdir)/collate/* ; do  			\
           if test -f $$f; then cp $$f $(distdir)/collate; fi; done
-	mkdir $(distdir)/bookmarks;          \
-	for f in $(srcdir)/bookmarks/* ; do  \
+	mkdir $(distdir)/bookmarks;          			\
+	for f in $(srcdir)/bookmarks/* ; do  			\
 	  cp $$f $(distdir)/bookmarks; done 
 
-DISTCLEANFILES = iochannel-test-outfile \
-		file-test-get-contents \
-		maptest \
-		mapchild \
-		collate.out
+DISTCLEANFILES =		\
+	iochannel-test-outfile 	\
+	file-test-get-contents 	\
+	maptest 		\
+	mapchild 		\
+	collate.out

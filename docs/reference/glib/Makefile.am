@@ -1,4 +1,5 @@
 ## Process this file with automake to produce Makefile.in
+include $(top_srcdir)/Makefile.decl
 AUTOMAKE_OPTIONS = 1.6
 
 # The name of the module.
@@ -21,6 +22,7 @@ CFILE_GLOB=$(top_srcdir)/glib/*.c $(top_srcdir)/gmodule/*.c
 IGNORE_HFILES=			\
 	build			\
 	gobject 		\
+	gio			\
 	config.h 		\
 	gdatasetprivate.h	\
 	glibintl.h		\

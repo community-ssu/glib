@@ -328,7 +328,6 @@ g_poll (GPollFD *fds,
   GPollFD *f;
   DWORD ready;
   MSG msg;
-  UINT timer;
   gint nhandles = 0;
 
   for (f = fds; f < &fds[nfds]; ++f)
@@ -365,102 +364,47 @@ g_poll (GPollFD *fds,
 	ready = WAIT_OBJECT_0 + nhandles;
       else
 	{
-	  if (nhandles == 0)
-	    {
-	      /* Waiting just for messages */
-	      if (timeout == INFINITE)
-		{
-		  /* Infinite timeout
-		   * -> WaitMessage
-		   */
+	  /* Wait for either message or event
+	   * -> Use MsgWaitForMultipleObjectsEx
+	   */
 #ifdef G_MAIN_POLL_DEBUG
-		  g_print ("WaitMessage\n");
+	  g_print ("MsgWaitForMultipleObjectsEx(%d, %d)\n", nhandles, timeout);
 #endif
-		  if (!WaitMessage ())
-		    {
-		      gchar *emsg = g_win32_error_message (GetLastError ());
-		      g_warning (G_STRLOC ": WaitMessage() failed: %s", emsg);
-		      g_free (emsg);
-		    }
-		  ready = WAIT_OBJECT_0 + nhandles;
-		}
-	      else if (timeout == 0)
-		{
-		  /* Waiting just for messages, zero timeout.
-		   * If we got here, there was no message
-		   */
-		  ready = WAIT_TIMEOUT;
-		}
-	      else
-		{
-		  /* Waiting just for messages, some timeout
-		   * -> Set a timer, wait for message,
-		   * kill timer, use PeekMessage
-		   */
-		  timer = SetTimer (NULL, 0, timeout, NULL);
-		  if (timer == 0)
-		    {
-		      gchar *emsg = g_win32_error_message (GetLastError ());
-		      g_warning (G_STRLOC ": SetTimer() failed: %s", emsg);
-		      g_free (emsg);
-		      ready = WAIT_TIMEOUT;
-		    }
-		  else
-		    {
-#ifdef G_MAIN_POLL_DEBUG
-		      g_print ("WaitMessage\n");
-#endif
-		      WaitMessage ();
-		      KillTimer (NULL, timer);
-#ifdef G_MAIN_POLL_DEBUG
-		      g_print ("PeekMessage\n");
-#endif
-		      if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE)
-			  && msg.message != WM_TIMER)
-			ready = WAIT_OBJECT_0;
-		      else
-			ready = WAIT_TIMEOUT;
-		    }
-		}
-	    }
-	  else
-	    {
-	      /* Wait for either message or event
-	       * -> Use MsgWaitForMultipleObjects
-	       */
-#ifdef G_MAIN_POLL_DEBUG
-	      g_print ("MsgWaitForMultipleObjects(%d, %d)\n", nhandles, timeout);
-#endif
-	      ready = MsgWaitForMultipleObjects (nhandles, handles, FALSE,
-						 timeout, QS_ALLINPUT);
+	  ready = MsgWaitForMultipleObjectsEx (nhandles, handles, timeout,
+					       QS_ALLINPUT, MWMO_ALERTABLE);
 
-	      if (ready == WAIT_FAILED)
-		{
-		  gchar *emsg = g_win32_error_message (GetLastError ());
-		  g_warning (G_STRLOC ": MsgWaitForMultipleObjects() failed: %s", emsg);
-		  g_free (emsg);
-		}
+	  if (ready == WAIT_FAILED)
+	    {
+	      gchar *emsg = g_win32_error_message (GetLastError ());
+	      g_warning (G_STRLOC ": MsgWaitForMultipleObjectsEx() failed: %s", emsg);
+	      g_free (emsg);
 	    }
 	}
     }
   else if (nhandles == 0)
     {
-      /* Wait for nothing (huh?) */
-      return 0;
+      /* No handles to wait for, just the timeout */
+      if (timeout == INFINITE)
+	ready = WAIT_FAILED;
+      else
+	{
+	  SleepEx (timeout, TRUE);
+	  ready = WAIT_TIMEOUT;
+	}
     }
   else
     {
       /* Wait for just events
-       * -> Use WaitForMultipleObjects
+       * -> Use WaitForMultipleObjectsEx
        */
 #ifdef G_MAIN_POLL_DEBUG
-      g_print ("WaitForMultipleObjects(%d, %d)\n", nhandles, timeout);
+      g_print ("WaitForMultipleObjectsEx(%d, %d)\n", nhandles, timeout);
 #endif
-      ready = WaitForMultipleObjects (nhandles, handles, FALSE, timeout);
+      ready = WaitForMultipleObjectsEx (nhandles, handles, FALSE, timeout, TRUE);
       if (ready == WAIT_FAILED)
 	{
 	  gchar *emsg = g_win32_error_message (GetLastError ());
-	  g_warning (G_STRLOC ": WaitForMultipleObjects() failed: %s", emsg);
+	  g_warning (G_STRLOC ": WaitForMultipleObjectsEx() failed: %s", emsg);
 	  g_free (emsg);
 	}
     }
@@ -477,7 +421,8 @@ g_poll (GPollFD *fds,
 
   if (ready == WAIT_FAILED)
     return -1;
-  else if (ready == WAIT_TIMEOUT)
+  else if (ready == WAIT_TIMEOUT ||
+	   ready == WAIT_IO_COMPLETION)
     return 0;
   else if (poll_msgs && ready == WAIT_OBJECT_0 + nhandles)
     {
@@ -665,6 +610,9 @@ g_main_context_unref (GMainContext *context)
   else
     main_contexts_without_pipe = g_slist_remove (main_contexts_without_pipe, 
 						 context);
+
+  if (context->cond != NULL)
+    g_cond_free (context->cond);
 #endif
   
   g_free (context);
@@ -716,7 +664,7 @@ _g_main_thread_init (void)
 /**
  * g_main_context_new:
  * 
- * Creates a new #GMainContext strcuture
+ * Creates a new #GMainContext structure.
  * 
  * Return value: the new #GMainContext
  **/
@@ -1894,7 +1842,7 @@ g_main_current_source (void)
  * from within idle handlers, but may have freed the object 
  * before the dispatch of your idle handler.
  *
- * <informalexample><programlisting>
+ * |[
  * static gboolean 
  * idle_callback (gpointer data)
  * {
@@ -1924,7 +1872,7 @@ g_main_current_source (void)
  *    
  *   G_OBJECT_CLASS (parent_class)->finalize (object);
  * }
- * </programlisting></informalexample>
+ * ]|
  *
  * This will fail in a multi-threaded application if the 
  * widget is destroyed before the idle handler fires due 
@@ -1932,7 +1880,7 @@ g_main_current_source (void)
  * this particular problem, is to check to if the source
  * has already been destroy within the callback.
  *
- * <informalexample><programlisting>
+ * |[
  * static gboolean 
  * idle_callback (gpointer data)
  * {
@@ -1947,7 +1895,7 @@ g_main_current_source (void)
  *   
  *   return FALSE;
  * }
- * </programlisting></informalexample>
+ * ]|
  *
  * Return value: %TRUE if the source has been destroyed
  *
@@ -2122,7 +2070,7 @@ next_valid_source (GMainContext *context,
  * @context: a #GMainContext
  * 
  * Tries to become the owner of the specified context.
- * If some other context is the owner of the context,
+ * If some other thread is the owner of the context,
  * returns %FALSE immediately. Ownership is properly
  * recursive: the owner can require ownership again
  * and will release ownership when g_main_context_release()
@@ -2173,7 +2121,7 @@ g_main_context_acquire (GMainContext *context)
  * 
  * Releases ownership of a context previously acquired by this thread
  * with g_main_context_acquire(). If the context was acquired multiple
- * times, the only release ownership when g_main_context_release()
+ * times, the ownership will be released only when g_main_context_release()
  * is called as many times as it was acquired.
  **/
 void
@@ -2734,10 +2682,14 @@ g_main_context_pending (GMainContext *context)
  * checking to see if any event sources are ready to be processed,
  * then if no events sources are ready and @may_block is %TRUE, waiting
  * for a source to become ready, then dispatching the highest priority
- * events sources that are ready. Note that even when @may_block is %TRUE,
- * it is still possible for g_main_context_iteration() to return
- * %FALSE, since the the wait may be interrupted for other
- * reasons than an event source becoming ready.
+ * events sources that are ready. Otherwise, if @may_block is %FALSE 
+ * sources are not waited to become ready, only those highest priority 
+ * events sources will be dispatched (if any), that are ready at this 
+ * given moment without further waiting.
+ *
+ * Note that even when @may_block is %TRUE, it is still possible for 
+ * g_main_context_iteration() to return %FALSE, since the the wait may 
+ * be interrupted for other reasons than an event source becoming ready.
  * 
  * Return value: %TRUE if events were dispatched.
  **/
@@ -2911,7 +2863,10 @@ g_main_loop_run (GMainLoop *loop)
  * @loop: a #GMainLoop
  * 
  * Stops a #GMainLoop from running. Any calls to g_main_loop_run()
- * for the loop will return.
+ * for the loop will return. 
+ *
+ * Note that sources that have already been dispatched when 
+ * g_main_loop_quit() is called will still be executed.
  **/
 void 
 g_main_loop_quit (GMainLoop *loop)
@@ -3365,7 +3320,7 @@ g_timeout_set_expiration (GTimeoutSource *timeout_source,
       if (!session_bus_address)
         session_bus_address = g_getenv ("HOSTNAME");
       if (session_bus_address)
-        timer_perturb = g_str_hash (session_bus_address);
+        timer_perturb = ABS ((gint) g_str_hash (session_bus_address));
       else
         timer_perturb = 0;
     }

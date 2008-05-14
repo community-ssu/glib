@@ -140,9 +140,15 @@ void    g_thread_init_with_errorcheck_mutexes (GThreadFunctions* vtable);
 /* internal function for fallback static mutex implementation */
 GMutex* g_static_mutex_get_mutex_impl   (GMutex **mutex);
 
+#ifdef __cplusplus
 #define g_static_mutex_get_mutex_impl_shortcut(mutex) \
   (g_atomic_pointer_get ((gpointer*)(void*)mutex) ? *(mutex) : \
    g_static_mutex_get_mutex_impl (mutex))
+#else
+#define g_static_mutex_get_mutex_impl_shortcut(mutex) \
+  (g_atomic_pointer_get (mutex) ? *(mutex) : \
+   g_static_mutex_get_mutex_impl (mutex))
+#endif
 
 /* shorthands for conditional and unconditional function calls */
 
@@ -360,21 +366,21 @@ extern void glib_dummy_decl (void);
 #    define G_LOCK(name)                G_STMT_START{             \
         g_log (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,                   \
                "file %s: line %d (%s): locking: %s ",             \
-               __FILE__,        __LINE__, G_GNUC_PRETTY_FUNCTION, \
+               __FILE__,        __LINE__, G_STRFUNC,              \
                #name);                                            \
         g_static_mutex_lock (&G_LOCK_NAME (name));                \
      }G_STMT_END
 #    define G_UNLOCK(name)              G_STMT_START{             \
         g_log (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,                   \
                "file %s: line %d (%s): unlocking: %s ",           \
-               __FILE__,        __LINE__, G_GNUC_PRETTY_FUNCTION, \
+               __FILE__,        __LINE__, G_STRFUNC,              \
                #name);                                            \
        g_static_mutex_unlock (&G_LOCK_NAME (name));               \
      }G_STMT_END
 #    define G_TRYLOCK(name)                                       \
         (g_log (G_LOG_DOMAIN, G_LOG_LEVEL_DEBUG,                  \
                "file %s: line %d (%s): try locking: %s ",         \
-               __FILE__,        __LINE__, G_GNUC_PRETTY_FUNCTION, \
+               __FILE__,        __LINE__, G_STRFUNC,              \
                #name), g_static_mutex_trylock (&G_LOCK_NAME (name)))
 #  else  /* !G_DEBUG_LOCKS */
 #    define G_LOCK(name) g_static_mutex_lock       (&G_LOCK_NAME (name))

@@ -132,13 +132,15 @@ test_new (const gchar        *pattern,
 
 static gboolean
 test_new_fail (const gchar        *pattern,
-	       GRegexCompileFlags  compile_opts)
+	       GRegexCompileFlags  compile_opts,
+	       GRegexError         expected_error)
 {
   GRegex *regex;
+  GError *error = NULL;
   
   verbose ("compiling \"%s\" (expected a failure) \t", pattern);
 
-  regex = g_regex_new (pattern, compile_opts, 0, NULL);
+  regex = g_regex_new (pattern, compile_opts, 0, &error);
 
   if (regex != NULL)
     {
@@ -148,13 +150,22 @@ test_new_fail (const gchar        *pattern,
       return FALSE;
     }
 
+  if (error->code != expected_error)
+    {
+      g_print ("failed \t(pattern: \"%s\", compile: %d, got error: %d, "
+	       "expected error: %d)\n",
+	       pattern, compile_opts, error->code, expected_error);
+      g_error_free (error);
+      return FALSE;
+    }
+
   verbose ("passed\n");
   return TRUE;
 }
 
-#define TEST_NEW_FAIL(pattern, compile_opts) { \
+#define TEST_NEW_FAIL(pattern, compile_opts, expected_error) { \
   total++; \
-  if (test_new_fail (pattern, compile_opts)) \
+  if (test_new_fail (pattern, compile_opts, expected_error)) \
     PASS; \
   else \
     FAIL; \
@@ -1600,13 +1611,13 @@ main (int argc, char *argv[])
   /* This gives "internal error: code overflow" with pcre 6.0 */
   TEST_NEW("(?i)(?-i)", 0, 0);
 
-  /* TEST_NEW_FAIL(pattern, compile_opts) */
-  TEST_NEW_FAIL("(", 0);
-  TEST_NEW_FAIL(")", 0);
-  TEST_NEW_FAIL("[", 0);
-  TEST_NEW_FAIL("*", 0);
-  TEST_NEW_FAIL("?", 0);
-  TEST_NEW_FAIL("(?P<A>x)|(?P<A>y)", 0);
+  /* TEST_NEW_FAIL(pattern, compile_opts, expected_error) */
+  TEST_NEW_FAIL("(", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL(")", 0, G_REGEX_ERROR_UNMATCHED_PARENTHESIS);
+  TEST_NEW_FAIL("[", 0, G_REGEX_ERROR_UNTERMINATED_CHARACTER_CLASS);
+  TEST_NEW_FAIL("*", 0, G_REGEX_ERROR_NOTHING_TO_REPEAT);
+  TEST_NEW_FAIL("?", 0, G_REGEX_ERROR_NOTHING_TO_REPEAT);
+  TEST_NEW_FAIL("(?P<A>x)|(?P<A>y)", 0, G_REGEX_ERROR_DUPLICATE_SUBPATTERN_NAME);
 
   /* TEST_MATCH_SIMPLE(pattern, string, compile_opts, match_opts, expected) */
   TEST_MATCH_SIMPLE("a", "", 0, 0, FALSE);
@@ -1775,6 +1786,7 @@ main (int argc, char *argv[])
   TEST_MATCH_NEXT3("a", "aaxa", -1, 0, "a", 0, 1, "a", 1, 2, "a", 3, 4);
   TEST_MATCH_NEXT3("a", "aa" OGRAVE "a", -1, 0, "a", 0, 1, "a", 1, 2, "a", 4, 5);
   TEST_MATCH_NEXT3("a*", "aax", -1, 0, "aa", 0, 2, "", 2, 2, "", 3, 3);
+  TEST_MATCH_NEXT3("(?=[A-Z0-9])", "RegExTest", -1, 0, "", 0, 0, "", 3, 3, "", 5, 5);
   TEST_MATCH_NEXT4("a*", "aaxa", -1, 0, "aa", 0, 2, "", 2, 2, "a", 3, 4, "", 4, 4);
 
   /* TEST_MATCH_COUNT(pattern, string, start_position, match_opts, expected_count) */
@@ -2036,6 +2048,8 @@ main (int argc, char *argv[])
   TEST_REPLACE_LIT("[^-]", "-" EURO "-" AGRAVE "-" HSTROKE, 0, "a", "-a-a-a");
   TEST_REPLACE_LIT("[^-]", "-" EURO "-" AGRAVE, 0, "a\\g<0>a", "-a\\g<0>a-a\\g<0>a");
   TEST_REPLACE_LIT("-", "-" EURO "-" AGRAVE "-" HSTROKE, 0, "", EURO AGRAVE HSTROKE);
+  TEST_REPLACE_LIT("(?=[A-Z0-9])", "RegExTest", 0, "_", "_Reg_Ex_Test");
+  TEST_REPLACE_LIT("(?=[A-Z0-9])", "RegExTest", 1, "_", "Reg_Ex_Test");
 
   /* TEST_GET_STRING_NUMBER(pattern, name, expected_num) */
   TEST_GET_STRING_NUMBER("", "A", -1);

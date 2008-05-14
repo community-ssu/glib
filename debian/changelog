@@ -1,3 +1,9 @@
+glib2.0 (2.16.3-1osso1) unstable; urgency=low
+
+  * Upgrade to GLIB 2.16.3
+
+ -- Michael Natterer <mitch@imendio.com>  Tue, 14 May 2008 13:13:00 +0100
+
 glib2.0 (2.14.6-1osso1) unstable; urgency=low
 
   * Upgrade to GLIB 2.14.6
