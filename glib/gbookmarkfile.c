@@ -47,6 +47,7 @@
 #include "gmarkup.h"
 #include "gmem.h"
 #include "gmessages.h"
+#include "gshell.h"
 #include "gslice.h"
 #include "gstdio.h"
 #include "gstring.h"
@@ -237,11 +238,8 @@ bookmark_app_info_free (BookmarkAppInfo *app_info)
   if (!app_info)
     return;
   
-  if (app_info->name)
-    g_free (app_info->name);
-  
-  if (app_info->exec)
-    g_free (app_info->exec);
+  g_free (app_info->name);
+  g_free (app_info->exec);
   
   g_slice_free (BookmarkAppInfo, app_info);
 }
@@ -311,8 +309,7 @@ bookmark_metadata_free (BookmarkMetadata *metadata)
   if (!metadata)
     return;
   
-  if (metadata->mime_type)
-    g_free (metadata->mime_type);
+  g_free (metadata->mime_type);
     
   if (metadata->groups)
     {
@@ -332,11 +329,8 @@ bookmark_metadata_free (BookmarkMetadata *metadata)
       g_hash_table_destroy (metadata->apps_by_name);
     }
   
-  if (metadata->icon_href)
-    g_free (metadata->icon_href);
-  
-  if (metadata->icon_mime)
-    g_free (metadata->icon_mime);
+  g_free (metadata->icon_href);
+  g_free (metadata->icon_mime);
   
   g_slice_free (BookmarkMetadata, metadata);
 }
@@ -491,14 +485,9 @@ bookmark_item_free (BookmarkItem *item)
   if (!item)
     return;
 
-  if (item->uri)
-    g_free (item->uri);
-  
-  if (item->title)
-    g_free (item->title);
-  
-  if (item->description)
-    g_free (item->description);
+  g_free (item->uri);
+  g_free (item->title);
+  g_free (item->description);
   
   if (item->metadata)
     bookmark_metadata_free (item->metadata);
@@ -2319,8 +2308,7 @@ g_bookmark_file_set_mime_type (GBookmarkFile *bookmark,
   if (!item->metadata)
     item->metadata = bookmark_metadata_new ();
   
-  if (item->metadata->mime_type != NULL)
-    g_free (item->metadata->mime_type);
+  g_free (item->metadata->mime_type);
   
   item->metadata->mime_type = g_strdup (mime_type);
   item->modified = time (NULL);
@@ -3270,7 +3258,7 @@ g_bookmark_file_set_app_info (GBookmarkFile  *bookmark,
   if (exec && exec[0] != '\0')
     {
       g_free (ai->exec);
-      ai->exec = g_strdup (exec);
+      ai->exec = g_shell_quote (exec);
     }
   
   item->modified = time (NULL);
@@ -3300,9 +3288,11 @@ expand_exec_line (const gchar *exec_fmt,
        {
        case '\0':
 	 goto out;
+       case 'U':
        case 'u':
          g_string_append (exec, uri);
          break;
+       case 'F':
        case 'f':
          {
 	   gchar *file = g_filename_from_uri (uri, NULL, NULL);
@@ -3349,7 +3339,9 @@ expand_exec_line (const gchar *exec_fmt,
  * @error is set to #G_BOOKMARK_FILE_ERROR_URI_NOT_FOUND.  In the
  * event that no application with name @app_name has registered a bookmark
  * for @uri,  %FALSE is returned and error is set to
- * #G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED.
+ * #G_BOOKMARK_FILE_ERROR_APP_NOT_REGISTERED. In the event that unquoting
+ * the command line fails, an error of the #G_SHELL_ERROR domain is
+ * set and %FALSE is returned.
  *
  * Return value: %TRUE on success.
  *
@@ -3394,15 +3386,29 @@ g_bookmark_file_get_app_info (GBookmarkFile  *bookmark,
   
   if (exec)
     {
-      *exec = expand_exec_line (ai->exec, uri);
+      GError *unquote_error = NULL;
+      gchar *command_line;
+      
+      command_line = g_shell_unquote (ai->exec, &unquote_error);
+      if (unquote_error)
+        {
+          g_propagate_error (error, unquote_error);
+          return FALSE;
+        }
+
+      *exec = expand_exec_line (command_line, uri);
       if (!*exec)
         {
           g_set_error (error, G_BOOKMARK_FILE_ERROR,
 		       G_BOOKMARK_FILE_ERROR_INVALID_URI,
 		       _("Failed to expand exec line '%s' with URI '%s'"),
 		     ai->exec, uri);
+          g_free (command_line);
+
           return FALSE;
         }
+      else
+        g_free (command_line);
     } 
 
   if (count)

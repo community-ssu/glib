@@ -1,8 +1,27 @@
+2006-03-23  Matthias Clasen <mclasen@redhat.com> 
+
+	Retroactively branch for 2.10 before the last commit.
+
+	* glib/gtimer.c: Change to "Since 2.12".
+
+2006-03-23  Emmanuele Bassi  <ebassi@cvs.gnome.org>
+
+	* configure.in: Check for timegm.
+	
+	* glib/gtimer.h:
+	* glib/gtimer.c:
+	* glib/glib.symbols:
+	* docs/reference/glib/glib-sections.txt: Added g_time_val_to_iso8601
+	and g_time_val_from_iso8601, to convert a GTimeVal to and from an
+	ISO 8601 encoded date.
+
+	* tests/testglib.c: Added test cases for g_time_val_to_iso8601()
+	and g_time_val_from_iso8601() functions.
+
 2006-03-20  Vladimer Sichinava  <vlsichinava@gmail.com>
 
         * configure.in: Added "ka" (Georgian) to ALL_LINGUAS
 
-=======
 2006-03-20  Matthias Clasen  <mclasen@redhat.com>
 
 	* glib/gmem.c (profiler_log): use standard_calloc to allocate
@@ -23,7 +42,6 @@
 
 	* MAINTAINERS: Add this, at the request of the GNOME sysadmin team.
 
->>>>>>> 1.2267
 2006-03-15  Matthias Clasen  <mclasen@redhat.com>
 
 	* glib/goption.c (g_option_context_parse): Only set the prgname

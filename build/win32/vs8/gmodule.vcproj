@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="gmodule"
 	ProjectGUID="{4214047C-F5C1-40B3-8369-5DCED8C32770}"
 	RootNamespace="gmodule"
@@ -17,8 +17,8 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\bin"
+			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\obj"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../../glib"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GMODULE_EXPORTS"
+				AdditionalIncludeDirectories="../../../glib;../../.."
+				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GMODULE_EXPORTS;HAVE_CONFIG_H;G_LOG_DOMAIN=\&quot;GModule\&quot;"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -50,6 +50,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
+				ForcedIncludeFiles="msvc_recommended_pragmas.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -67,7 +68,7 @@
 				ModuleDefinitionFile="../../../gmodule/gmodule.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(TargetDir)$(ProjectName)-2.0.lib"
+				ImportLibrary="$(TargetDir)$(ProjectName)-2.0-vs8.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -97,8 +98,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\bin"
+			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\obj"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -121,13 +122,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../../glib"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GMODULE_EXPORTS"
+				AdditionalIncludeDirectories="../../../glib;../../.."
+				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GMODULE_EXPORTS;HAVE_CONFIG_H;G_LOG_DOMAIN=\&quot;GModule\&quot;"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				ForcedIncludeFiles="msvc_recommended_pragmas.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -147,7 +149,7 @@
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(TargetDir)$(ProjectName)-2.0.lib"
+				ImportLibrary="$(TargetDir)$(ProjectName)-2.0-vs8.lib"
 				TargetMachine="1"
 			/>
 			<Tool

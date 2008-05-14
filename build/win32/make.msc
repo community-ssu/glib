@@ -1,8 +1,6 @@
 # Common makefile definitions for building GLib, GTk+, and various
 # software that use these libraries with msvc on Win32
 
-# For more detailed information see make.mingw in this same directory
-
 # Debug builds shoud link with msvcrtd release build with msvcrt.
 !IFNDEF DEBUG
 # Full optimization:

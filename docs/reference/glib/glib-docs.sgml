@@ -36,6 +36,7 @@
 <!ENTITY glib-Doubly-Linked-Lists SYSTEM "xml/linked_lists_double.xml">
 <!ENTITY glib-Singly-Linked-Lists SYSTEM "xml/linked_lists_single.xml">
 <!ENTITY glib-Double-ended-Queues SYSTEM "xml/queue.xml">
+<!ENTITY glib-Sequences SYSTEM "xml/sequence.xml">
 <!ENTITY glib-Trash-Stacks SYSTEM "xml/trash_stack.xml">
 <!ENTITY glib-Hash-Tables SYSTEM "xml/hash_tables.xml">
 <!ENTITY glib-Strings SYSTEM "xml/strings.xml">
@@ -60,6 +61,7 @@
 <!ENTITY glib-Bookmarkfile SYSTEM "xml/bookmarkfile.xml">
 <!ENTITY glib-Base64 SYSTEM "xml/base64.xml">
 <!ENTITY glib-i18n SYSTEM "xml/i18n.xml">
+<!ENTITY glib-Regex SYSTEM "xml/gregex.xml">
 <!ENTITY glib-Version SYSTEM "xml/version.xml">
 
 <!ENTITY glib-Compiling SYSTEM "compiling.sgml">
@@ -68,6 +70,7 @@
 <!ENTITY glib-Running SYSTEM "running.sgml">
 <!ENTITY glib-Resources SYSTEM "resources.sgml">
 <!ENTITY glib-Changes SYSTEM "changes.sgml">
+<!ENTITY glib-RegexSyntax SYSTEM "regex-syntax.sgml">
 
 <!ENTITY glib-gettextize SYSTEM "glib-gettextize.xml">
 
@@ -100,6 +103,7 @@ synchronize their operation.
     &glib-Compiling;
     &glib-Running;
     &glib-Changes;
+    &glib-RegexSyntax;
     &glib-Resources;
  
   </chapter> 
@@ -150,6 +154,7 @@ synchronize their operation.
     &glib-Shell;
     &glib-Option;
     &glib-Pattern-Matching;
+    &glib-Regex;
     &glib-Markup;
     &glib-Keyfile;
     &glib-Bookmarkfile;
@@ -163,6 +168,7 @@ synchronize their operation.
     &glib-Doubly-Linked-Lists;
     &glib-Singly-Linked-Lists;
     &glib-Double-ended-Queues;
+    &glib-Sequences;
     &glib-Trash-Stacks;
     &glib-Hash-Tables;
     &glib-Strings;
@@ -209,6 +215,9 @@ synchronize their operation.
   </index>  
   <index role="2.12">
     <title>Index of new symbols in 2.12</title>
+  </index>  
+  <index role="2.14">
+    <title>Index of new symbols in 2.14</title>
   </index>  
   <index role="maemo">
     <title>Index of new symbols in Maemo</title>

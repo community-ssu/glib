@@ -2,7 +2,7 @@
 The Main Event Loop
 
 <!-- ##### SECTION Short_Description ##### -->
-manages all available sources of events.
+manages all available sources of events
 
 <!-- ##### SECTION Long_Description ##### -->
   <para>
@@ -554,6 +554,15 @@ for the default main context.
 @Returns: 
 
 
+<!-- ##### FUNCTION g_timeout_source_new_seconds ##### -->
+<para>
+
+</para>
+
+@interval: 
+@Returns: 
+
+
 <!-- ##### FUNCTION g_timeout_add ##### -->
 <para>
 </para>
@@ -566,6 +575,30 @@ for the default main context.
 
 <!-- ##### FUNCTION g_timeout_add_full ##### -->
 <para>
+</para>
+
+@priority: 
+@interval: 
+@function: 
+@data: 
+@notify: 
+@Returns: 
+
+
+<!-- ##### FUNCTION g_timeout_add_seconds ##### -->
+<para>
+
+</para>
+
+@interval: 
+@function: 
+@data: 
+@Returns: 
+
+
+<!-- ##### FUNCTION g_timeout_add_seconds_full ##### -->
+<para>
+
 </para>
 
 @priority: 
@@ -696,6 +729,7 @@ you would use %G_IO_IN | %G_IO_HUP | %G_IO_ERR, and for writing you would use
 
 </para>
 
+@fd: 
 @fd: 
 @events: 
 @revents: 

@@ -356,6 +356,8 @@ g_hash_table_find
 g_hash_table_foreach
 g_hash_table_foreach_remove
 g_hash_table_foreach_steal
+g_hash_table_get_keys
+g_hash_table_get_values
 g_hash_table_insert
 g_hash_table_lookup
 g_hash_table_lookup_extended
@@ -490,6 +492,7 @@ g_key_file_get_string_list G_GNUC_MALLOC
 g_key_file_get_value G_GNUC_MALLOC
 g_key_file_has_group
 g_key_file_has_key
+g_key_file_load_from_dirs
 g_key_file_load_from_data
 g_key_file_load_from_data_dirs
 g_key_file_load_from_file
@@ -617,8 +620,11 @@ g_idle_add_full
 g_idle_remove_by_data
 g_idle_source_new
 g_timeout_add
+g_timeout_add_seconds
 g_timeout_add_full
+g_timeout_add_seconds_full
 g_timeout_source_new
+g_timeout_source_new_seconds
 #endif
 #endif
 
@@ -685,6 +691,11 @@ g_slice_free_chain_with_offset
 g_slice_set_config
 g_slice_get_config
 g_slice_get_config_state
+#ifdef G_ENABLE_DEBUG
+#ifdef INCLUDE_INTERNAL_SYMBOLS
+g_slice_debug_tree_statistics
+#endif
+#endif
 #endif
 #endif
 
@@ -765,6 +776,7 @@ g_option_context_set_main_group
 g_option_context_set_summary
 g_option_context_set_translate_func
 g_option_context_set_translation_domain
+g_option_context_get_help
 g_option_group_add_entries
 g_option_group_free
 g_option_group_new
@@ -819,6 +831,7 @@ g_qsort_with_data
 
 #if IN_HEADER(__G_QUEUE_H__)
 #if IN_FILE(__G_QUEUE_C__)
+g_queue_clear
 g_queue_copy
 g_queue_delete_link
 g_queue_find
@@ -827,6 +840,7 @@ g_queue_foreach
 g_queue_free
 g_queue_get_length
 g_queue_index
+g_queue_init
 g_queue_insert_after
 g_queue_insert_before
 g_queue_insert_sorted
@@ -919,6 +933,46 @@ g_scanner_set_scope
 g_scanner_sync_file_offset
 g_scanner_unexp_token
 g_scanner_warn G_GNUC_PRINTF(2,3)
+#endif
+#endif
+
+#if IN_HEADER(__G_SEQUENCE_H__)
+#if IN_FILE(__G_SEQUENCE_C__)
+g_sequence_new
+g_sequence_free
+g_sequence_get_length
+g_sequence_foreach
+g_sequence_foreach_range
+g_sequence_sort
+g_sequence_sort_iter
+g_sequence_get_begin_iter
+g_sequence_get_end_iter
+g_sequence_get_iter_at_pos
+g_sequence_append
+g_sequence_prepend
+g_sequence_insert_before
+g_sequence_move
+g_sequence_swap
+g_sequence_insert_sorted
+g_sequence_insert_sorted_iter
+g_sequence_sort_changed
+g_sequence_sort_changed_iter
+g_sequence_remove
+g_sequence_remove_range
+g_sequence_move_range
+g_sequence_search
+g_sequence_search_iter
+g_sequence_get
+g_sequence_set
+g_sequence_iter_is_begin
+g_sequence_iter_is_end
+g_sequence_iter_next
+g_sequence_iter_prev
+g_sequence_iter_get_position
+g_sequence_iter_move
+g_sequence_iter_get_sequence
+g_sequence_iter_compare
+g_sequence_range_get_midpoint
 #endif
 #endif
 
@@ -1073,10 +1127,12 @@ g_string_append
 g_string_append_len
 g_string_append_printf G_GNUC_PRINTF(2,3)
 g_string_append_unichar
+g_string_append_vprintf
 g_string_ascii_down
 g_string_ascii_up
 g_string_assign
 g_string_chunk_free
+g_string_chunk_clear
 g_string_chunk_insert
 g_string_chunk_insert_const
 g_string_chunk_insert_len
@@ -1091,6 +1147,8 @@ g_string_insert_len
 g_string_insert_unichar
 g_string_new
 g_string_new_len
+g_string_overwrite
+g_string_overwrite_len
 g_string_prepend
 g_string_prepend_c
 g_string_prepend_len
@@ -1103,6 +1161,7 @@ g_string_truncate
 g_string_down
 g_string_up
 #endif
+g_string_vprintf
 #ifdef INCLUDE_INTERNAL_SYMBOLS
  /* these are not internal, but we don't want to alias them */
 g_string_append_c
@@ -1115,8 +1174,11 @@ g_str_hash
 #if IN_HEADER(__G_THREAD_H__)
 #if IN_FILE(__G_THREAD_C__)
 g_once_impl
+g_once_init_enter_impl
+g_once_init_leave
 #ifdef INCLUDE_INTERNAL_SYMBOLS
 g_thread_init_glib
+g_once_init_enter
 #endif
 #ifdef INCLUDE_VARIABLES
 g_thread_functions_for_glib_use
@@ -1231,6 +1293,7 @@ g_utf8_collate_key_for_filename G_GNUC_MALLOC
 #if IN_FILE(__G_UNIDECOMP_C__)
 g_unicode_canonical_decomposition G_GNUC_MALLOC
 g_unicode_canonical_ordering
+g_unichar_combining_class G_GNUC_CONST
 g_utf8_normalize
 #endif
 #endif
@@ -1252,10 +1315,13 @@ g_unichar_isupper G_GNUC_CONST
 g_unichar_iswide G_GNUC_CONST
 g_unichar_iswide_cjk G_GNUC_CONST
 g_unichar_isxdigit G_GNUC_CONST
+g_unichar_iszerowidth G_GNUC_CONST
 g_unichar_tolower G_GNUC_CONST
 g_unichar_totitle G_GNUC_CONST
 g_unichar_toupper G_GNUC_CONST
+g_unichar_ismark G_GNUC_CONST
 g_unichar_get_mirror_char
+g_unichar_get_script
 g_unichar_digit_value G_GNUC_CONST
 g_unichar_xdigit_value G_GNUC_CONST
 g_unichar_type G_GNUC_CONST
@@ -1343,6 +1409,7 @@ g_get_tmp_dir_utf8
 g_get_user_cache_dir
 g_get_user_config_dir
 g_get_user_data_dir
+g_get_user_special_dir
 g_get_user_name PRIVATE
 #ifdef G_OS_WIN32
 g_get_user_name_utf8
@@ -1366,6 +1433,45 @@ g_trash_stack_pop
 g_trash_stack_push
 g_get_codeset
 #endif
+#endif
+#endif
+
+#if IN_HEADER(__G_REGEX_H__)
+#if IN_FILE(__G_REGEX_C__)
+g_regex_error_quark
+g_regex_new
+g_regex_ref
+g_regex_unref
+g_regex_get_pattern
+g_regex_get_max_backref
+g_regex_get_capture_count
+g_regex_get_string_number
+g_regex_escape_string
+g_regex_match_simple
+g_regex_match
+g_regex_match_full
+g_regex_match_all
+g_regex_match_all_full
+g_regex_split_simple
+g_regex_split
+g_regex_split_full
+g_regex_replace
+g_regex_replace_literal
+g_regex_replace_eval
+g_regex_check_replacement
+g_match_info_get_regex
+g_match_info_get_string
+g_match_info_free
+g_match_info_next
+g_match_info_matches
+g_match_info_get_match_count
+g_match_info_is_partial_match
+g_match_info_expand_references
+g_match_info_fetch
+g_match_info_fetch_pos
+g_match_info_fetch_named
+g_match_info_fetch_named_pos
+g_match_info_fetch_all
 #endif
 #endif
 

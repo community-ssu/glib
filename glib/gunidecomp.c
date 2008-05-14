@@ -47,8 +47,18 @@
       ? CC_PART2 (((Char) - 0xe0000) >> 8, (Char) & 0xff) \
       : 0))
 
+/**
+ * g_unichar_combining_class:
+ * @uc: a Unicode character
+ * 
+ * Determines the canonical combining class of a Unicode character.
+ * 
+ * Return value: the combining class of the character
+ *
+ * Since: 2.14
+ **/
 gint
-_g_unichar_combining_class (gunichar uc)
+g_unichar_combining_class (gunichar uc)
 {
   return COMBINING_CLASS (uc);
 }
@@ -259,7 +269,7 @@ g_unicode_canonical_decomposition (gunichar ch,
  * storing the result in @out if it is large enough. If @out is
  * too small, FALSE is returned and the function should be called
  * again with a buffer of size @result_len.
- * 
+ *
  * Return value: TRUE if @out was large enough
  *
  * Since: maemo
@@ -291,7 +301,7 @@ g_unicode_canonical_decomposition_to_buffer (gunichar  ch,
     {
       /* Found it.  */
       int i;
-      
+
       *result_len = g_utf8_strlen (decomp, -1);
 
       if (*result_len <= out_len)
@@ -308,7 +318,7 @@ g_unicode_canonical_decomposition_to_buffer (gunichar  ch,
     {
       /* Not in our table.  */
       *result_len = 1;
-      
+
       if (out_len >= 1)
         {
           *out = ch;

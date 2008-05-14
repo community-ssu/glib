@@ -3,7 +3,7 @@ Hash Tables
 
 <!-- ##### SECTION Short_Description ##### -->
 associations between keys and values so that given a key the value
-can be found quickly.
+can be found quickly
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -260,6 +260,24 @@ which is passed to g_hash_table_foreach().
 </para>
 
 @hash_table: 
+
+
+<!-- ##### FUNCTION g_hash_table_get_keys ##### -->
+<para>
+
+</para>
+
+@hash_table: 
+@Returns: 
+
+
+<!-- ##### FUNCTION g_hash_table_get_values ##### -->
+<para>
+
+</para>
+
+@hash_table: 
+@Returns: 
 
 
 <!-- ##### USER_FUNCTION GHRFunc ##### -->

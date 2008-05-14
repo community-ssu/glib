@@ -29,6 +29,7 @@
  */
 
 #define MAEMO_SYSLOG_ENABLED	/* Maemo builds will temporary use syslog for logging */
+
 #include "config.h"
 
 #include <stdlib.h>
@@ -149,7 +150,7 @@ g_messages_prefixed_init (void)
       
       if (val)
 	{
-	  static const GDebugKey keys[] = {
+	  const GDebugKey keys[] = {
 	    { "error", G_LOG_LEVEL_ERROR },
 	    { "critical", G_LOG_LEVEL_CRITICAL },
 	    { "warning", G_LOG_LEVEL_WARNING },
@@ -490,8 +491,8 @@ g_logv (const gchar   *log_domain,
 			  MB_ICONERROR|MB_SETFOREGROUND);
 	      if (IsDebuggerPresent () && !(test_level & G_LOG_FLAG_RECURSION))
 		G_BREAKPOINT ();
-
-	      abort ();
+	      else
+		abort ();
 #else
 #if defined (G_ENABLE_DEBUG) && defined (SIGTRAP)
 	      if (!(test_level & G_LOG_FLAG_RECURSION))
@@ -898,7 +899,7 @@ void g_log_default_handler (
 
 	gchar *output_level;
 	int level;
-	
+
 	/* Check first that logging facility is initialized */
 	if ( !initialized )
 	{
@@ -1204,7 +1205,7 @@ _g_debug_init (void)
   val = g_getenv ("G_DEBUG");
   if (val != NULL)
     {
-      static const GDebugKey keys[] = {
+      const GDebugKey keys[] = {
 	{"fatal_warnings", G_DEBUG_FATAL_WARNINGS},
 	{"fatal_criticals", G_DEBUG_FATAL_CRITICALS}
       };

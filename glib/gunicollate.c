@@ -32,10 +32,10 @@
 
 #ifdef _MSC_VER
 /* Workaround for bug in MSVCR80.DLL */
-static size_t
+static gsize
 msc_strxfrm_wrapper (char       *string1,
 		     const char *string2,
-		     size_t      count)
+		     gsize       count)
 {
   if (!string1 || count <= 0)
     {
@@ -54,11 +54,11 @@ msc_strxfrm_wrapper (char       *string1,
  * @str2: a UTF-8 encoded string
  * 
  * Compares two strings for ordering using the linguistically
- * correct rules for the current locale. When sorting a large
- * number of strings, it will be significantly faster to
- * obtain collation keys with g_utf8_collate_key() and 
- * compare the keys with strcmp() when 
- * sorting instead of sorting the original strings.
+ * correct rules for the <link linkend="setlocale">current locale</link>. 
+ * When sorting a large number of strings, it will be significantly 
+ * faster to obtain collation keys with g_utf8_collate_key() and 
+ * compare the keys with strcmp() when sorting instead of sorting 
+ * the original strings.
  * 
  * Return value: &lt; 0 if @str1 compares before @str2, 
  *   0 if they compare equal, &gt; 0 if @str1 compares after @str2.
@@ -184,9 +184,13 @@ utf8_encode (char *buf, wchar_t val)
  * Converts a string into a collation key that can be compared
  * with other collation keys produced by the same function using 
  * strcmp(). 
+ *
  * The results of comparing the collation keys of two strings 
- * with strcmp() will always be the same as 
- * comparing the two original keys with g_utf8_collate().
+ * with strcmp() will always be the same as comparing the two 
+ * original keys with g_utf8_collate().
+ * 
+ * Note that this function depends on the 
+ * <link linkend="setlocale">current locale</link>.
  * 
  * Return value: a newly allocated string. This string should
  *   be freed with g_free() when you are done with it.
@@ -196,14 +200,14 @@ g_utf8_collate_key (const gchar *str,
 		    gssize       len)
 {
   gchar *result;
-  size_t xfrm_len;
+  gsize xfrm_len;
   
 #ifdef __STDC_ISO_10646__
 
   gunichar *str_norm;
   wchar_t *result_wc;
-  size_t i;
-  size_t result_len = 0;
+  gsize i;
+  gsize result_len = 0;
 
   g_return_val_if_fail (str != NULL, NULL);
 
@@ -213,12 +217,12 @@ g_utf8_collate_key (const gchar *str,
   result_wc = g_new (wchar_t, xfrm_len + 1);
   wcsxfrm (result_wc, (wchar_t *)str_norm, xfrm_len + 1);
 
-  for (i = 0; i < xfrm_len; i++)
+  for (i=0; i < xfrm_len; i++)
     result_len += utf8_encode (NULL, result_wc[i]);
 
   result = g_malloc (result_len + 1);
   result_len = 0;
-  for (i = 0; i < xfrm_len; i++)
+  for (i=0; i < xfrm_len; i++)
     result_len += utf8_encode (result + result_len, result_wc[i]);
 
   result[result_len] = '\0';
@@ -300,6 +304,9 @@ g_utf8_collate_key (const gchar *str,
  * "event.h" instead of "event.c" "event.h" "eventgenerator.c". Also, we
  * would like to treat numbers intelligently so that "file1" "file10" "file5"
  * is sorted as "file1" "file5" "file10".
+ * 
+ * Note that this function depends on the 
+ * <link linkend="setlocale">current locale</link>.
  *
  * Return value: a newly allocated string. This string should
  *   be freed with g_free() when you are done with it.

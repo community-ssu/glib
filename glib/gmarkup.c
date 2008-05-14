@@ -955,7 +955,7 @@ g_markup_parse_context_parse (GMarkupParseContext *context,
               set_error (context,
                          error,
                          G_MARKUP_ERROR_BAD_UTF8,
-                         _("Invalid UTF-8 encoded text"));
+                         _("Invalid UTF-8 encoded text - overlong sequence"));
             }
           
           goto finished;
@@ -983,7 +983,7 @@ g_markup_parse_context_parse (GMarkupParseContext *context,
       set_error (context,
                  error,
                  G_MARKUP_ERROR_BAD_UTF8,
-                 _("Invalid UTF-8 encoded text"));
+                 _("Invalid UTF-8 encoded text - not a start char"));
       goto finished;
     }
 
@@ -1019,7 +1019,9 @@ g_markup_parse_context_parse (GMarkupParseContext *context,
       set_error (context,
                  error,
                  G_MARKUP_ERROR_BAD_UTF8,
-                 _("Invalid UTF-8 encoded text"));
+                 _("Invalid UTF-8 encoded text - not valid '%s'"),
+                 g_strndup (context->current_text,
+                            context->current_text_len));
       goto finished;
     }
 
@@ -1790,6 +1792,7 @@ g_markup_parse_context_end_parse (GMarkupParseContext *context,
       break;
 
     case STATE_INSIDE_ATTRIBUTE_NAME:
+    case STATE_AFTER_ATTRIBUTE_NAME:
       set_error (context, error, G_MARKUP_ERROR_PARSE,
                  _("Document ended unexpectedly inside an attribute name"));
       break;
@@ -1823,6 +1826,7 @@ g_markup_parse_context_end_parse (GMarkupParseContext *context,
 
     case STATE_AFTER_CLOSE_TAG_SLASH:
     case STATE_INSIDE_CLOSE_TAG_NAME:
+    case STATE_AFTER_CLOSE_TAG_NAME:
       set_error (context, error, G_MARKUP_ERROR_PARSE,
                  _("Document ended unexpectedly inside the close tag for "
                    "element '%s'"), current_element (context));
@@ -1898,6 +1902,7 @@ append_escaped_text (GString     *str,
 {
   const gchar *p;
   const gchar *end;
+  gunichar c;
 
   p = text;
   end = text + length;
@@ -1930,7 +1935,15 @@ append_escaped_text (GString     *str,
           break;
 
         default:
-          g_string_append_len (str, p, next - p);
+          c = g_utf8_get_char (p);
+          if ((0x1 <= c && c <= 0x8) ||
+              (0xb <= c && c  <= 0xc) ||
+              (0xe <= c && c <= 0x1f) ||
+              (0x7f <= c && c <= 0x84) ||
+              (0x86 <= c && c <= 0x9f))
+            g_string_append_printf (str, "&#x%x;", c);
+          else
+            g_string_append_len (str, p, next - p);
           break;
         }
 

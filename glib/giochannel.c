@@ -122,8 +122,7 @@ g_io_channel_unref (GIOChannel *channel)
         g_iconv_close (channel->read_cd);
       if (channel->write_cd != (GIConv) -1)
         g_iconv_close (channel->write_cd);
-      if (channel->line_term)
-        g_free (channel->line_term);
+      g_free (channel->line_term);
       if (channel->read_buf)
         g_string_free (channel->read_buf, TRUE);
       if (channel->write_buf)
@@ -691,8 +690,7 @@ g_io_channel_set_line_term (GIOChannel	*channel,
   else if (length < 0)
     length = strlen (line_term);
 
-  if (channel->line_term)
-    g_free (channel->line_term);
+  g_free (channel->line_term);
   channel->line_term = line_term ? g_memdup (line_term, length) : NULL;
   channel->line_term_len = length;
 }
@@ -1263,7 +1261,7 @@ g_io_channel_fill_buffer (GIOChannel *channel,
 
   if (channel->do_encode)
     {
-      size_t errnum, inbytes_left, outbytes_left;
+      gsize errnum, inbytes_left, outbytes_left;
       gchar *inbuf, *outbuf;
       int errval;
 
@@ -1297,7 +1295,7 @@ reencode:
       g_string_truncate (channel->encoded_read_buf,
 			 channel->encoded_read_buf->len - outbytes_left);
 
-      if (errnum == (size_t) -1)
+      if (errnum == (gsize) -1)
         {
           switch (errval)
             {
@@ -2055,7 +2053,7 @@ g_io_channel_write_chars (GIOChannel	*channel,
         {
           const gchar *from_buf;
           gsize from_buf_len, from_buf_old_len, left_len;
-          size_t err;
+          gsize err;
           gint errnum;
 
           if (channel->partial_write_buf[0] != '\0')
@@ -2102,29 +2100,29 @@ reconvert:
                         if (try_len == from_buf_len)
                           {
                             errnum = EINVAL;
-                            err = (size_t) -1;
+                            err = (gsize) -1;
                           }
                         else
                           {
                             errnum = 0;
-                            err = (size_t) 0;
+                            err = (gsize) 0;
                           }
                         break;
                       case -1:
                         g_warning ("Invalid UTF-8 passed to g_io_channel_write_chars().");
                         /* FIXME bail here? */
                         errnum = EILSEQ;
-                        err = (size_t) -1;
+                        err = (gsize) -1;
                         break;
                       default:
                         g_assert_not_reached ();
-                        err = (size_t) -1;
+                        err = (gsize) -1;
                         errnum = 0; /* Don't confunse the compiler */
                     }
                 }
               else
                 {
-                  err = (size_t) 0;
+                  err = (gsize) 0;
                   errnum = 0;
                   left_len = from_buf_len - try_len;
                 }
@@ -2149,7 +2147,7 @@ reconvert:
                                   - space_in_buf);
             }
 
-          if (err == (size_t) -1)
+          if (err == (gsize) -1)
             {
               switch (errnum)
         	{

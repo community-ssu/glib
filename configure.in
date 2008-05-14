@@ -7,9 +7,9 @@ dnl *** include special GLib macros ***
 dnl ***********************************
 
 m4_define(glib_configure_in)
-m4_include(acglib.m4)dnl
-m4_include(glib/libcharset/codeset.m4)dnl
-m4_include(glib/libcharset/glibc21.m4)dnl
+m4_include(acglib.m4)dnl 	 
+m4_include(glib/libcharset/codeset.m4)dnl 	 
+m4_include(glib/libcharset/glibc21.m4)dnl 	 
 m4_include(m4macros/glib-gettext.m4)dnl
 
 #
@@ -26,9 +26,9 @@ m4_include(m4macros/glib-gettext.m4)dnl
 # set glib_binary_age _and_ glib_interface_age to 0.
 #
 m4_define([glib_major_version], [2])
-m4_define([glib_minor_version], [12])
-m4_define([glib_micro_version], [12])
-m4_define([glib_interface_age], [12])
+m4_define([glib_minor_version], [14])
+m4_define([glib_micro_version], [6])
+m4_define([glib_interface_age], [6])
 m4_define([glib_binary_age],
           [m4_eval(100 * glib_minor_version + glib_micro_version)])
 m4_define([glib_version],
@@ -148,11 +148,21 @@ case $host in
     ;;
 esac
 
-
 AC_MSG_RESULT([$glib_native_win32])
+
+glib_have_carbon=no
+AC_MSG_CHECKING([for Mac OS X Carbon support])
+AC_TRY_CPP([
+#include <Carbon/Carbon.h>
+#include <CoreServices/CoreServices.h>
+], glib_have_carbon=yes)
+
+AC_MSG_RESULT([$glib_have_carbon])
+
 AM_CONDITIONAL(OS_WIN32, [test "$glib_native_win32" = "yes"])
 AM_CONDITIONAL(OS_UNIX, [test "$glib_native_win32" != "yes"])
 AM_CONDITIONAL(OS_LINUX, [test "$glib_os_linux" = "yes"])
+AM_CONDITIONAL(OS_CARBON, [test "$glib_have_carbon" = "yes"])
 AC_SUBST(GLIB_DEF)
 AC_SUBST(GMODULE_DEF)
 AC_SUBST(GOBJECT_DEF)
@@ -182,6 +192,12 @@ else
     LIBTOOL_EXPORT_OPTIONS=
 fi
 AC_SUBST(LIBTOOL_EXPORT_OPTIONS)
+
+if test "x$glib_have_carbon" = "xyes"; then
+  AC_DEFINE(HAVE_CARBON, 1, [define to 1 if Carbon is available])
+  LDFLAGS="$LDFLAGS -framework Carbon"
+fi
+
 
 dnl declare --enable-* args and collect ac_help strings
 AC_ARG_ENABLE(debug,
@@ -214,9 +230,6 @@ AC_ARG_ENABLE(visibility,
 if test "x$enable_threads" != "xyes"; then
   enable_threads=no
 fi
-
-AC_DEFINE_UNQUOTED(G_COMPILED_WITH_DEBUGGING, ["${enable_debug}"],
-	[Whether glib was compiled with debugging enabled])
 
 AC_MSG_CHECKING([whether to enable garbage collector friendliness])
 if test "x$enable_gc_friendly" = "xyes"; then
@@ -270,10 +283,10 @@ if test x$PKG_CONFIG = xno ; then
   AC_MSG_ERROR([*** pkg-config not found. See http://www.freedesktop.org/software/pkgconfig/])
 fi
 
-if $PKG_CONFIG --atleast-pkgconfig-version 0.14 ; then
+if $PKG_CONFIG --atleast-pkgconfig-version 0.16 ; then
   :
 else
-  AC_MSG_ERROR([*** pkg-config too old; version 0.14 or better required.])
+  AC_MSG_ERROR([*** pkg-config too old; version 0.16 or better required.])
 fi
 
 if test "x$enable_debug" = "xyes"; then
@@ -353,7 +366,8 @@ AC_SUBST(REBUILD)
 #
 if test "x$PERL" != x ; then
   AC_PATH_PROG(PERL_PATH, [$PERL])
-else
+fi
+if test "x$PERL_PATH" = x ; then
   PERL_PATH="/usr/bin/env perl"
 fi
 AC_SUBST(PERL_PATH)
@@ -430,7 +444,7 @@ dnl
 dnl gettext support
 dnl
 
-ALL_LINGUAS="am ar az be be@latin bg bn bn_IN bs ca cs cy da de dz el en_CA en_GB eo es et eu fa fi fr ga gl gu he hi hr hu hy id is it ja ka ko ku lt lv mk ml mn ms nb ne nl nn or pa pl pt pt_BR ro ru rw sk sl sq sr sr@Latn sr@ije sv ta te th tl tr tt uk vi wa xh yi zh_CN zh_HK zh_TW"
+ALL_LINGUAS="am ar as az be be@latin bg bn bn_IN bs ca cs cy da de dz el en_CA en_GB eo es et eu fa fi fr ga gl gu he hi hr hu hy id is it ja ka kn ko ku lt lv mg mk ml mn ms nb ne nl nn oc or pa pl pt pt_BR ro ru rw sk sl sq sr sr@Latn sr@ije sv ta te th tl tr tt uk vi wa xh yi zh_CN zh_HK zh_TW"
 GLIB_GNU_GETTEXT
 
 if test "$gt_cv_have_gettext" != "yes" ; then
@@ -789,11 +803,20 @@ int main (int argc, char **argv)
 AC_MSG_RESULT($g_have_gnuc_visibility)
 AM_CONDITIONAL(HAVE_GNUC_VISIBILITY, [test x$g_have_gnuc_visibility = xyes])
 
+AC_MSG_CHECKING([whether using Sun Studio C compiler])
+AC_COMPILE_IFELSE([AC_LANG_PROGRAM([[#if defined(__SUNPRO_C) || (__SUNPRO_C >= 0x550)
+#else
+# include "error: this is not Sun Studio."
+#endif
+]], [[]])], [ g_have_sunstudio_visibility=yes ], [ g_have_sunstudio_visibility=no ])
+AC_MSG_RESULT($g_have_sunstudio_visibility)
+AM_CONDITIONAL(HAVE_SUNSTUDIO_VISIBILITY, [test x$g_have_sunstudio_visibility = xyes])
+
 # check for bytesex stuff
 AC_C_BIGENDIAN
 
 # check for header files
-AC_CHECK_HEADERS([dirent.h float.h limits.h pwd.h sys/param.h sys/poll.h])
+AC_CHECK_HEADERS([dirent.h float.h limits.h pwd.h sys/param.h sys/poll.h sys/resource.h])
 AC_CHECK_HEADERS([sys/time.h sys/times.h sys/wait.h unistd.h values.h])
 AC_CHECK_HEADERS([sys/select.h sys/types.h stdint.h sched.h malloc.h])
 
@@ -1017,10 +1040,10 @@ fi
 
 dnl Check for nl_langinfo and CODESET
 AC_CACHE_CHECK([for nl_langinfo (CODESET)],glib_cv_langinfo_codeset,[
-	AC_TRY_COMPILE([#include <langinfo.h>],
-		[char *codeset = nl_langinfo (CODESET);],
-   		[glib_cv_langinfo_codeset=yes],
-   		[glib_cv_langinfo_codeset=no])])
+        AC_TRY_COMPILE([#include <langinfo.h>],
+                [char *codeset = nl_langinfo (CODESET);],
+                [glib_cv_langinfo_codeset=yes],
+                [glib_cv_langinfo_codeset=no])])
 if test x$glib_cv_langinfo_codeset = xyes; then
   AC_DEFINE(HAVE_CODESET,1,[Have nl_langinfo (CODESET)])
 fi
@@ -1144,7 +1167,7 @@ fi
 
 AC_CACHE_CHECK([whether va_lists can be copied by value],glib_cv_va_val_copy,[
 	AC_TRY_RUN([#include <stdarg.h>
-#include <stdlib.h>
+#include <stdlib.h> 
 	void f (int i, ...) {
 	va_list args1, args2;
 	va_start (args1, i);
@@ -1315,28 +1338,17 @@ else
 fi
 
 AC_MSG_CHECKING(for the suffix of shared libraries)
-case "$host_os" in
-  hpux9* | hpux10* | hpux11*)  # taken from ltconfig
-    case "$host_cpu" in
-      hppa*)
-	glib_gmodule_suffix='sl'
-	;;
-      ia64*)
-	glib_gmodule_suffix='so'
-	;;
-    esac
-    ;;
-  cygwin* | mingw*)
-    glib_gmodule_suffix='dll'
-    ;;
-  aix*)
-    glib_gmodule_suffix='a'
-    ;;
-  *)
-    glib_gmodule_suffix='so'    
-    ;;
-esac
+export SED
+shrext_cmds=`./libtool --config | grep '^shrext_cmds='`
+eval $shrext_cmds
+module=yes eval std_shrext=$shrext_cmds
+# chop the initial dot
+glib_gmodule_suffix=`echo $std_shrext | sed 's/^\.//'`
 AC_MSG_RESULT(.$glib_gmodule_suffix)
+# any reason it may fail?
+if test "x$glib_gmodule_suffix" = x; then
+	AC_MSG_ERROR(Cannot determine shared library suffix from libtool)
+fi
  
 AC_SUBST(G_MODULE_SUPPORTED)
 AC_SUBST(G_MODULE_IMPL)
@@ -1952,9 +1964,10 @@ fi
 # 
 #  a) GCC < 3.3 for Linux doesn't include -lpthread when
 #     building shared libraries with linux.
+#  b) FreeBSD doesn't do this either.
 #
 case $host in
-  *-*-linux*)
+  *-*-freebsd*|*-*-linux*)
     G_THREAD_LIBS_FOR_GTHREAD="`echo $G_THREAD_LIBS | sed s/-pthread/-lpthread/`"
     ;;
   *) 	 
@@ -2006,10 +2019,8 @@ AC_CHECK_FUNCS(clock_gettime, [], [
 AC_CACHE_CHECK(for monotonic clocks,
     glib_cv_monotonic_clock,AC_COMPILE_IFELSE([AC_LANG_SOURCE([[
 #include <time.h>
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>
-#endif
-int main (int argc, char *argv[]) {
+int main() {
 #if !(defined(_POSIX_MONOTONIC_CLOCK) && _POSIX_MONOTONIC_CLOCK >= 0 && defined(CLOCK_MONOTONIC))
         #error No monotonic clock
 #endif
@@ -2019,6 +2030,7 @@ int main (int argc, char *argv[]) {
 if test "$glib_cv_monotonic_clock" = "yes"; then
   AC_DEFINE(HAVE_MONOTONIC_CLOCK,1,[Have a monotonic clock])
 fi
+
 
 dnl ********************************
 dnl *** g_atomic_* tests for gcc ***
@@ -2076,6 +2088,17 @@ if test x"$GCC" = xyes; then
       AC_DEFINE_UNQUOTED(G_ATOMIC_POWERPC, 1,
 		   	 [powerpc atomic implementation])
       glib_memory_barrier_needed=yes
+      AC_MSG_CHECKING([whether asm supports numbered local labels])
+      AC_TRY_COMPILE(
+		,[ 
+			__asm__ __volatile__ ("1:       nop\n"
+					      "         bne-    1b")
+		],[
+			AC_DEFINE_UNQUOTED(ASM_NUMERIC_LABELS, 1, [define if asm blocks can use numeric local labels])
+			AC_MSG_RESULT([yes])
+		],[
+			AC_MSG_RESULT([no])
+		])
       ;;	
     ia64)
       AC_MSG_RESULT([ia64])
@@ -2180,6 +2203,80 @@ AC_RUN_IFELSE([AC_LANG_SOURCE([[
    AC_DEFINE(BROKEN_POLL,1,[poll doesn't work on devices])],
   [broken_poll="no (cross compiling)"])
 AC_MSG_RESULT($broken_poll)
+
+dnl *********************
+dnl *** GRegex checks ***
+dnl *********************
+PCRE_REQUIRED_VERSION=7.2
+
+# Check if we should compile GRegex
+AC_ARG_ENABLE(regex, AC_HELP_STRING([--disable-regex],
+              [disable the compilation of GRegex]),
+[case "${enableval}" in
+  yes) enable_regex=true ;;
+  no)  enable_regex=false ;;
+  *) AC_MSG_ERROR(bad value ${enableval} for --enable-regex) ;;
+esac],
+[enable_regex=true])
+
+AM_CONDITIONAL(ENABLE_REGEX, $enable_regex)
+
+if test x$enable_regex = xtrue; then
+  # Check if we should use the internal or the system-supplied pcre
+  AC_ARG_WITH(pcre,
+             [AC_HELP_STRING([--with-pcre=@<:@internal/system@:>@],
+                             [specify whether to use the internal or the
+                              system-supplied PCRE library])])
+
+  AM_CONDITIONAL(USE_SYSTEM_PCRE, [test "x$with_pcre" = xsystem])
+
+  if test "x$with_pcre" = xsystem; then
+    PKG_CHECK_MODULES(PCRE,
+                      libpcre >= $PCRE_REQUIRED_VERSION)
+    AC_CACHE_CHECK([for Unicode support in PCRE],glib_cv_pcre_has_unicode,[
+                   glib_save_CFLAGS="$CFLAGS"
+                   glib_save_LDFLAGS="$LDFLAGS"
+                   CFLAGS="$CFLAGS $PCRE_CFLAGS" LDFLAGS="$LDFLAGS $PCRE_LIBS"
+                   AC_TRY_RUN([#include <pcre.h>
+                               int main () {
+                                 int support;
+                                 pcre_config (PCRE_CONFIG_UTF8, &support);
+                                 if (!support)
+                                   return 1;
+                                 pcre_config (PCRE_CONFIG_UNICODE_PROPERTIES, &support);
+                                 if (!support)
+                                   return 1;
+                                 return 0;
+                               }],
+                   glib_cv_pcre_has_unicode=yes,
+                   glib_cv_pcre_has_unicode=no,
+                   glib_cv_pcre_has_unicode=yes)
+                   CFLAGS="$glib_save_CFLAGS"
+                   LDFLAGS="$glib_save_LDFLAGS"
+	])
+    if test "$glib_cv_pcre_has_unicode" = "no"; then
+      AC_MSG_ERROR([*** The system-supplied PCRE does not support Unicode properties or UTF-8.])
+    fi
+    AC_SUBST(PCRE_CFLAGS)
+    AC_SUBST(PCRE_LIBS)
+    AC_DEFINE(USE_SYSTEM_PCRE, [], [using the system-supplied PCRE library])
+    PCRE_REQUIRES=libpcre
+    AC_SUBST(PCRE_REQUIRES)
+  else
+    # If using gcc 4 pass -Wno-pointer-sign when compiling the internal PCRE
+    if test x"$GCC" = xyes; then
+      AC_MSG_CHECKING([whether compiler understands -Wno-pointer-sign])
+      save_CFLAGS="$CFLAGS"
+      CFLAGS="$CFLAGS -Wno-pointer-sign"
+      AC_TRY_COMPILE([],[],[PCRE_WARN_CFLAGS="$PCRE_WARN_CFLAGS -Wno-pointer-sign"
+			    AC_MSG_RESULT(yes)],[AC_MSG_RESULT(no)])
+      CFLAGS="$save_CFLAGS"
+    fi
+  fi
+  AC_SUBST(PCRE_WARN_CFLAGS)
+else
+  AM_CONDITIONAL(USE_SYSTEM_PCRE, false])
+fi
 
 dnl **********************
 dnl *** Win32 API libs ***
@@ -2379,6 +2476,13 @@ typedef unsigned $glib_size_type_define gsize;
 #define G_GSIZE_FORMAT $gsize_format
 
 #define G_MAXSIZE	G_MAXU$glib_msize_type
+#define G_MINSSIZE	G_MIN$glib_msize_type
+#define G_MAXSSIZE	G_MAX$glib_msize_type
+
+typedef gint64 goffset;
+#define G_MINOFFSET	G_MININT64
+#define G_MAXOFFSET	G_MAXINT64
+
 _______EOF
 
 	if test -z "$glib_unknown_void_p"; then
@@ -2475,20 +2579,20 @@ _______EOF
 
 	fi
 
-	if test x$g_have_gnuc_visibility = xyes ; then
+	if test x$g_have_gnuc_visibility = xyes; then
 		cat >>$outfile <<_______EOF
-#if __GNUC__ == 2 && __GNUC_MINOR__ == 95
-#define G_GNUC_INTERNAL
-#else
 #define G_HAVE_GNUC_VISIBILITY 1
-#define G_GNUC_INTERNAL __attribute__((visibility("hidden")))
-#endif
-_______EOF
-	else
-		cat >>$outfile <<_______EOF
-#define G_GNUC_INTERNAL
 _______EOF
 	fi
+		cat >>$outfile <<_______EOF
+#if defined(__SUNPRO_C) && (__SUNPRO_C >= 0x550)
+#define G_GNUC_INTERNAL __hidden
+#elif defined (__GNUC__) && defined (G_HAVE_GNUC_VISIBILITY)
+#define G_GNUC_INTERNAL __attribute__((visibility("hidden")))
+#else
+#define G_GNUC_INTERNAL
+#endif
+_______EOF
 
 
 	echo >>$outfile
@@ -2813,6 +2917,7 @@ g_have_iso_cxx_varargs=$g_have_iso_cxx_varargs
 
 g_can_inline=$g_can_inline
 g_have_gnuc_visibility=$g_have_gnuc_visibility
+g_have_sunstudio_visibility=$g_have_sunstudio_visibility
 
 case xyes in
 x$ac_cv_c_bigendian)
@@ -2896,6 +3001,8 @@ build/win32/vs8/Makefile
 glib/Makefile
 glib/libcharset/Makefile
 glib/gnulib/Makefile
+glib/pcre/Makefile
+glib/update-pcre/Makefile
 gmodule/Makefile
 gmodule/gmoduleconf.h
 gobject/Makefile

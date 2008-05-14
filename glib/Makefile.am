@@ -6,12 +6,25 @@ PRINTF_SUBDIR = gnulib
 printf_la = gnulib/libgnulib.la
 endif 
 
-SUBDIRS = libcharset $(PRINTF_SUBDIR)
+if ENABLE_REGEX
+if USE_SYSTEM_PCRE
+else
+MAYBE_PCRE = pcre 
+endif
+gregex_c = gregex.c
+gregex_h = gregex.h
+else
+gregex_c =
+gregex_h =
+endif
 
-DIST_SUBDIRS = libcharset gnulib
+SUBDIRS = libcharset $(PRINTF_SUBDIR) $(MAYBE_PCRE) update-pcre
 
-INCLUDES = -I$(top_srcdir) -DG_LOG_DOMAIN=\"GLib\" \
-	$(GLIB_DEBUG_FLAGS) -DG_DISABLE_DEPRECATED -DGLIB_COMPILATION 
+DIST_SUBDIRS = libcharset gnulib pcre update-pcre
+
+INCLUDES = -I$(top_srcdir) $(pcre_inc) -DG_LOG_DOMAIN=\"GLib\" \
+	$(GLIB_DEBUG_FLAGS) -DG_DISABLE_DEPRECATED -DGLIB_COMPILATION \
+	-DPCRE_STATIC
 
 glib.def: glib.symbols
 	(echo -e EXPORTS; $(CPP) -P -DINCLUDE_VARIABLES -DINCLUDE_INTERNAL_SYMBOLS -DG_OS_WIN32 -DALL_FILES - <$(srcdir)/glib.symbols | sed -e '/^$$/d' -e 's/^/	/' -e 's/G_GNUC_[^ ]*//g') > glib.def
@@ -24,6 +37,7 @@ galiasdef.c: glib.symbols
 
 if OS_LINUX
 if HAVE_GNUC_VISIBILITY
+TESTS_ENVIRONMENT = GLIB_DEBUG_FLAGS="$(GLIB_DEBUG_FLAGS)"
 TESTS = abicheck.sh pltcheck.sh
 endif
 endif
@@ -36,14 +50,19 @@ MIRRORING_TAB_SOURCES = 			\
 	glib-mirroring-tab/packtab.h		\
 	glib-mirroring-tab/packtab.c
 
+# The compilation of GRegex can be disabled, but the source files must
+# be distributed.
 EXTRA_DIST = 			\
 	makefile.msc.in		\
 	glib.rc.in		\
 	gen-unicode-tables.pl	\
+	gen-script-table.pl	\
 	makegalias.pl		\
 	abicheck.sh		\
 	pltcheck.sh		\
 	glib.symbols		\
+	gregex.c		\
+	gregex.h		\
 	$(MIRRORING_TAB_SOURCES)
 
 # These may be in the builddir too
@@ -105,7 +124,10 @@ libglib_2_0_la_SOURCES = 	\
 	gqueue.c		\
 	grel.c			\
 	grand.c			\
+	$(gregex_c)		\
 	gscanner.c		\
+	gscripttable.h		\
+	gsequence.c		\
 	gshell.c		\
 	gslice.c		\
 	gslist.c		\
@@ -137,7 +159,6 @@ $(GMESSAGES).o $(GMESSAGES).obj $(GMESSAGES).lo: $(GMESSAGES).c
 	$(MAKE) $(AM_MAKEFLAGS) \
 		AM_CFLAGS='$(AM_CLFAGS) -fno-omit-frame-pointer' \
 		GMESSAGES=dummy '$@'
-
 
 EXTRA_libglib_2_0_la_SOURCES = \
 	giounix.c	\
@@ -189,8 +210,10 @@ glibsubinclude_HEADERS =   \
 	gquark.h	\
 	gqueue.h	\
 	grand.h		\
+	$(gregex_h)	\
 	grel.h		\
 	gscanner.h	\
+	gsequence.h	\
 	gshell.h	\
 	gslice.h	\
 	gslist.h	\
@@ -242,7 +265,20 @@ glib_win32_res = glib-win32-res.o
 glib_win32_res_ldflag = -Wl,$(glib_win32_res)
 endif
 
-libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ 
+if ENABLE_REGEX
+if USE_SYSTEM_PCRE
+pcre_lib = $(PCRE_LIBS)
+pcre_inc = $(PCRE_CFLAGS)
+else
+pcre_lib = pcre/libpcre.la
+pcre_inc =
+endif
+else
+pcre_lib =
+pcre_inc =
+endif
+
+libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ $(pcre_lib)
 libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ $(glib_win32_res) @GLIB_DEF@
 
 libglib_2_0_la_LDFLAGS = \

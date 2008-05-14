@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="windows-1251"?>
 <VisualStudioProject
 	ProjectType="Visual C++"
-	Version="8,00"
+	Version="8.00"
 	Name="glib"
 	ProjectGUID="{12BCA020-EABF-429E-876A-A476BC9C10C0}"
 	RootNamespace="glib"
@@ -17,14 +17,14 @@
 	<Configurations>
 		<Configuration
 			Name="Debug|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\bin"
+			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\obj"
 			ConfigurationType="2"
 			CharacterSet="2"
 			>
 			<Tool
 				Name="VCPreBuildEventTool"
-				CommandLine="if exist ..\..\..\config.h goto GLIB_CONFIG&#x0D;&#x0A;copy ..\..\..\config.h.win32 ..\..\..\config.h&#x0D;&#x0A;:GLIB_CONFIG&#x0D;&#x0A;if exist ..\..\..\glibconfig.h\ goto END&#x0D;&#x0A;copy ..\..\..\glibconfig.h.win32 ..\..\..\glibconfig.h&#x0D;&#x0A;:END&#x0D;&#x0A;"
+				CommandLine="if exist ..\..\..\config.h goto GLIB_CONFIG&#x0D;&#x0A;copy ..\..\..\config.h.win32 ..\..\..\config.h&#x0D;&#x0A;:GLIB_CONFIG&#x0D;&#x0A;if exist ..\..\..\glibconfig.h goto CHARSET&#x0D;&#x0A;copy ..\..\..\glibconfig.h.win32 ..\..\..\glibconfig.h&#x0D;&#x0A;:CHARSET&#x0D;&#x0A;if exist ..\..\..\glib\localcharset.c goto END&#x0D;&#x0A;copy ..\..\..\glib\libcharset\localcharset.c ..\..\..\glib\localcharset.c&#x0D;&#x0A;:END&#x0D;&#x0A;"
 			/>
 			<Tool
 				Name="VCCustomBuildTool"
@@ -41,8 +41,8 @@
 			<Tool
 				Name="VCCLCompilerTool"
 				Optimization="0"
-				AdditionalIncludeDirectories="../../..,../dirent"
-				PreprocessorDefinitions="WIN32;_DEBUG;_WINDOWS;_USRDLL;GLIB_EXPORTS;HAVE_CONFIG_H"
+				AdditionalIncludeDirectories="../../..;../dirent;../../../glib;&quot;../../../../dependencies/proxy-libintl-20080418/include&quot;"
+				PreprocessorDefinitions="_DEBUG;_WINDOWS;_USRDLL;WIN32;HAVE_CONFIG_H;GLIB_COMPILATION;GLIB_EXPORTS;G_LOG_DOMAIN=\&quot;Glib\&quot;;G_ENABLE_DEBUG;LINK_SIZE=2;MAX_NAME_SIZE=32;MAX_NAME_COUNT=10000;NEWLINE=-1;POSIX_MALLOC_THRESHOLD=10;MATCH_LIMIT=10000000;MATCH_LIMIT_RECURSION=10000000"
 				MinimalRebuild="true"
 				BasicRuntimeChecks="3"
 				RuntimeLibrary="3"
@@ -50,6 +50,7 @@
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="4"
+				ForcedIncludeFiles="msvc_recommended_pragmas.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -62,13 +63,14 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="intl.lib iconv.lib Ws2_32.lib"
+				AdditionalDependencies="intl.lib Ws2_32.lib"
 				OutputFile="$(OutDir)\lib$(ProjectName)-2.0-0-vs8.dll"
 				LinkIncremental="2"
+				AdditionalLibraryDirectories="&quot;../../../../dependencies/proxy-libintl-20080418/lib&quot;"
 				ModuleDefinitionFile="../../../glib/glib.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
-				ImportLibrary="$(TargetDir)$(ProjectName)-2.0.lib"
+				ImportLibrary="$(TargetDir)$(ProjectName)-2.0-vs8.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -98,8 +100,8 @@
 		</Configuration>
 		<Configuration
 			Name="Release|Win32"
-			OutputDirectory="$(SolutionDir)$(ConfigurationName)"
-			IntermediateDirectory="$(ConfigurationName)"
+			OutputDirectory="$(SolutionDir)$(ConfigurationName)\bin"
+			IntermediateDirectory="$(SolutionDir)$(ConfigurationName)\obj"
 			ConfigurationType="2"
 			CharacterSet="2"
 			WholeProgramOptimization="1"
@@ -122,13 +124,14 @@
 			/>
 			<Tool
 				Name="VCCLCompilerTool"
-				AdditionalIncludeDirectories="../../..,../dirent"
-				PreprocessorDefinitions="WIN32;NDEBUG;_WINDOWS;_USRDLL;GLIB_EXPORTS;HAVE_CONFIG_H"
+				AdditionalIncludeDirectories="../../..;../dirent;../../../glib;&quot;../../../../dependencies/proxy-libintl-20080418/include&quot;"
+				PreprocessorDefinitions="_WINDOWS;_USRDLL;WIN32;NDEBUG;GLIB_EXPORTS;GLIB_COMPILATION;HAVE_CONFIG_H;G_LOG_DOMAIN=\&quot;Glib\&quot;;LINK_SIZE=2;MAX_NAME_SIZE=32;MAX_NAME_COUNT=10000;NEWLINE=-1;POSIX_MALLOC_THRESHOLD=10;MATCH_LIMIT=10000000;MATCH_LIMIT_RECURSION=10000000"
 				RuntimeLibrary="2"
 				UsePrecompiledHeader="0"
 				WarningLevel="3"
 				Detect64BitPortabilityProblems="true"
 				DebugInformationFormat="3"
+				ForcedIncludeFiles="msvc_recommended_pragmas.h"
 			/>
 			<Tool
 				Name="VCManagedResourceCompilerTool"
@@ -141,15 +144,16 @@
 			/>
 			<Tool
 				Name="VCLinkerTool"
-				AdditionalDependencies="intl.lib iconv.lib Ws2_32.lib"
+				AdditionalDependencies="intl.lib Ws2_32.lib"
 				OutputFile="$(OutDir)\lib$(ProjectName)-2.0-0-vs8.dll"
 				LinkIncremental="1"
+				AdditionalLibraryDirectories="&quot;../../../../dependencies/proxy-libintl-20080418/lib&quot;"
 				ModuleDefinitionFile="../../../glib/glib.def"
 				GenerateDebugInformation="true"
 				SubSystem="2"
 				OptimizeReferences="2"
 				EnableCOMDATFolding="2"
-				ImportLibrary="$(TargetDir)$(ProjectName)-2.0.lib"
+				ImportLibrary="$(TargetDir)$(ProjectName)-2.0-vs8.lib"
 				TargetMachine="1"
 			/>
 			<Tool
@@ -203,7 +207,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\glib\gbase64.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\glib\gbookmarkfile.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\glib\gcache.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\glib\gchecksum.c"
 				>
 			</File>
 			<File
@@ -311,11 +327,19 @@
 				>
 			</File>
 			<File
+				RelativePath="..\..\..\glib\gregex.c"
+				>
+			</File>
+			<File
 				RelativePath="..\..\..\glib\grel.c"
 				>
 			</File>
 			<File
 				RelativePath="..\..\..\glib\gscanner.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\glib\gsequence.c"
 				>
 			</File>
 			<File
@@ -344,6 +368,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\glib\gstring.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\glib\gtestutils.c"
 				>
 			</File>
 			<File
@@ -376,6 +404,10 @@
 			</File>
 			<File
 				RelativePath="..\..\..\glib\guniprop.c"
+				>
+			</File>
+			<File
+				RelativePath="..\..\..\glib\gurifuncs.c"
 				>
 			</File>
 			<File
@@ -434,6 +466,90 @@
 					>
 				</File>
 			</Filter>
+			<Filter
+				Name="pcre"
+				>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_chartables.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_compile.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_config.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_dfa_exec.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_exec.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_fullinfo.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_get.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_globals.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_info.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_maketables.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_newline.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_ord2utf8.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_refcount.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_study.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_tables.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_try_flipped.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_ucp_searchfuncs.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_valid_utf8.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_version.c"
+					>
+				</File>
+				<File
+					RelativePath="..\..\..\glib\pcre\pcre_xclass.c"
+					>
+				</File>
+			</Filter>
 		</Filter>
 		<Filter
 			Name="Header Files"
@@ -453,6 +569,20 @@
 			<File
 				RelativePath="..\..\..\glib\glib.rc"
 				>
+			</File>
+			<File
+				RelativePath="..\..\..\glib\glib.symbols"
+				>
+				<FileConfiguration
+					Name="Debug|Win32"
+					>
+					<Tool
+						Name="VCCustomBuildTool"
+						Description="Generating glib.def"
+						CommandLine="echo EXPORTS &gt; $(InputDir)/glib.def &amp;&amp; cl /EP -DINCLUDE_VARIABLES -DG_OS_WIN32 -DINCLUDE_INTERNAL_SYMBOLS -DALL_FILES -DG_GNUC_MALLOC= -DG_GNUC_CONST= -DG_GNUC_NULL_TERMINATED= -DG_GNUC_NORETURN= -DG_GNUC_PRINTF=;G_GNUC_PRINTF $(InputPath) &gt;&gt; $(InputDir)/glib.def"
+						Outputs="$(InputDir)/glib.def"
+					/>
+				</FileConfiguration>
 			</File>
 		</Filter>
 	</Files>

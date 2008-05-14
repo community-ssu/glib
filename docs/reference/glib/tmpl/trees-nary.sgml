@@ -2,7 +2,7 @@
 N-ary Trees
 
 <!-- ##### SECTION Short_Description ##### -->
-trees of data with any number of branches.
+trees of data with any number of branches
 
 <!-- ##### SECTION Long_Description ##### -->
 <para>
@@ -56,22 +56,18 @@ g_node_destroy().
 <para>
 The <structname>GNode</structname> struct represents one node in a
 <link linkend="glib-N-ary-Trees">N-ary Tree</link>.
-The <structfield>data</structfield> field contains the actual data of the node.
-The <structfield>next</structfield> and <structfield>prev</structfield>
-fields point to the node's siblings (a sibling is another <structname>GNode</structname> with the
-same parent).
-The <structfield>parent</structfield> field points to the parent of the <structname>GNode</structname>,
-or is %NULL if the <structname>GNode</structname> is the root of the tree.
-The <structfield>children</structfield> field points to the first child of the
-<structname>GNode</structname>. The other children are accessed by using the
-<structfield>next</structfield> pointer of each child.
+fields 
 </para>
 
-@data: 
-@next: 
-@prev: 
-@parent: 
-@children: 
+@data: contains the actual data of the node.
+@next: points to the node's next sibling (a sibling is another 
+  <structname>GNode</structname> with the same parent).
+@prev: points to the node's previous sibling.
+@parent: points to the parent of the <structname>GNode</structname>,
+  or is %NULL if the <structname>GNode</structname> is the root of the tree.
+@children: The <structfield>children</structfield> field points to the first 
+  child of the <structname>GNode</structname>. The other children are accessed 
+  by using the <structfield>next</structfield> pointer of each child.
 
 <!-- ##### FUNCTION g_node_new ##### -->
 <para>
@@ -255,9 +251,9 @@ including g_node_traverse() and g_node_find().
 @G_TRAVERSE_NON_LEAVES: only non-leaf nodes should be visited. This name 
   has been introduced in 2.6, for older version use %G_TRAVERSE_NON_LEAFS.
 @G_TRAVERSE_ALL: all nodes should be visited.
-@G_TRAVERSE_MASK: 
-@G_TRAVERSE_LEAFS: identical to %G_TRAVERSE_LEAVES
-@G_TRAVERSE_NON_LEAFS: identical to %G_TRAVERSE_NON_LEAVES
+@G_TRAVERSE_MASK: a mask of all traverse flags.
+@G_TRAVERSE_LEAFS: identical to %G_TRAVERSE_LEAVES.
+@G_TRAVERSE_NON_LEAFS: identical to %G_TRAVERSE_NON_LEAVES.
 
 <!-- ##### USER_FUNCTION GNodeTraverseFunc ##### -->
 <para>
@@ -360,7 +356,7 @@ Gets the first child of a #GNode.
 </para>
 
 @node: a #GNode.
-@Returns: the last child of @node, or %NULL if @node is %NULL or has no children.
+@Returns: the first child of @node, or %NULL if @node is %NULL or has no children.
 
 
 <!-- ##### FUNCTION g_node_last_child ##### -->

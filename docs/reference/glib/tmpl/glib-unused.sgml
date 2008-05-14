@@ -280,7 +280,7 @@ in any UNIX manual.
 
 <!-- ##### MACRO ftruncate ##### -->
 <para>
-Provided for UNIX emulation on Windows; see documentation for <function>ftruncate()</function>
+Provided for UNIX emulation on Windows; see documentation for ftruncate()
 in any UNIX manual.
 </para>
 
@@ -712,6 +712,20 @@ To use this function you must configure glib with the flag
 
 @mem: the memory to check.
 
+<!-- ##### FUNCTION g_regex_error_quark ##### -->
+<para>
+
+</para>
+
+@Returns: 
+
+<!-- ##### FUNCTION g_regex_free ##### -->
+<para>
+
+</para>
+
+@regex: 
+
 <!-- ##### FUNCTION g_scanner_stat_mode ##### -->
 <para>
 Gets the file attributes.
@@ -860,6 +874,14 @@ in any UNIX manual.
 
 </para>
 
+
+<!-- ##### MACRO pipe ##### -->
+<para>
+Provided for UNIX emulation on Windows; see documentation for pipe()
+in any UNIX manual.
+</para>
+
+@phandles: file descriptors, the first one for reading, the second one for writing.
 
 <!-- ##### MACRO popen ##### -->
 <para>

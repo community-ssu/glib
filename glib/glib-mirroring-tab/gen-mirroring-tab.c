@@ -1,11 +1,11 @@
 /* gen-mirroring-tab.c - generate gmirroringtable.h for glib
  * copied from FriBidi.
  *
- * $Id: gen-mirroring-tab.c,v 1.2 2006/04/05 14:43:33 behdad Exp $
+ * $Id: gen-mirroring-tab.c 4708 2006-04-05 14:43:33Z behdad $
  * $Author: behdad $
- * $Date: 2006/04/05 14:43:33 $
- * $Revision: 1.2 $
- * $Source: /cvs/gnome/glib/glib/glib-mirroring-tab/gen-mirroring-tab.c,v $
+ * $Date: 2006-04-05 16:43:33 +0200 (Wed, 05 Apr 2006) $
+ * $Revision: 4708 $
+ * $Source$
  *
  * Author:
  *   Behdad Esfahbod, 2001, 2002, 2004

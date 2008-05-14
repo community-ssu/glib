@@ -191,29 +191,14 @@ g_file_test (const gchar *filename,
 #    define FILE_ATTRIBUTE_DEVICE 64
 #  endif
   int attributes;
+  wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
 
-  if (G_WIN32_HAVE_WIDECHAR_API ())
-    {
-      wchar_t *wfilename = g_utf8_to_utf16 (filename, -1, NULL, NULL, NULL);
+  if (wfilename == NULL)
+    return FALSE;
 
-      if (wfilename == NULL)
-	return FALSE;
+  attributes = GetFileAttributesW (wfilename);
 
-      attributes = GetFileAttributesW (wfilename);
-
-      g_free (wfilename);
-    }
-  else
-    {
-      gchar *cpfilename = g_locale_from_utf8 (filename, -1, NULL, NULL, NULL);
-
-      if (cpfilename == NULL)
-	return FALSE;
-      
-      attributes = GetFileAttributesA (cpfilename);
-      
-      g_free (cpfilename);
-    }
+  g_free (wfilename);
 
   if (attributes == INVALID_FILE_ATTRIBUTES)
     return FALSE;
@@ -540,10 +525,10 @@ get_contents_stdio (const gchar *display_filename,
                     GError     **error)
 {
   gchar buf[4096];
-  size_t bytes;
+  gsize bytes;
   gchar *str = NULL;
-  size_t total_bytes = 0;
-  size_t total_allocated = 0;
+  gsize total_bytes = 0;
+  gsize total_allocated = 0;
   gchar *tmp;
 
   g_assert (f != NULL);
@@ -628,9 +613,9 @@ get_contents_regfile (const gchar *display_filename,
                       GError     **error)
 {
   gchar *buf;
-  size_t bytes_read;
-  size_t size;
-  size_t alloc_size;
+  gsize bytes_read;
+  gsize size;
+  gsize alloc_size;
   
   size = stat_buf->st_size;
 
@@ -935,11 +920,12 @@ write_to_temp_file (const gchar *contents,
 
   errno = 0;
   fd = create_temp_file (tmp_name, 0666);
+  save_errno = errno;
+
   display_name = g_filename_display_name (tmp_name);
       
   if (fd == -1)
     {
-      save_errno = errno;
       g_set_error (err,
 		   G_FILE_ERROR,
 		   g_file_error_from_errno (save_errno),
@@ -969,7 +955,7 @@ write_to_temp_file (const gchar *contents,
 
   if (length > 0)
     {
-      size_t n_written;
+      gsize n_written;
       
       errno = 0;
 
