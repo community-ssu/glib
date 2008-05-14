@@ -397,6 +397,18 @@ See <ulink url="http://www.unicode.org/unicode/reports/tr14/"
 @Returns: 
 
 
+<!-- ##### FUNCTION g_unicode_canonical_decomposition_to_buffer ##### -->
+<para>
+
+</para>
+
+@ch: 
+@out: 
+@out_len: 
+@result_len: 
+@Returns: 
+
+
 <!-- ##### FUNCTION g_unichar_get_mirror_char ##### -->
 <para>
 
