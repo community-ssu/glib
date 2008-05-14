@@ -1,3 +1,14 @@
+2008-05-14  Michael Natterer  <mitch@imendio.com>
+
+	* m4macros/glib-2.0.m4: revert to upstream. Was apparently
+	forgotten to upgrade since 2.10. Bumps pkg-config requirement to
+	0.16, but that's what configure requires anyway so it's installed
+	on the platform.
+
+2008-05-14  Michael Natterer  <mitch@imendio.com>
+
+	* === Start Maemo-GLib 2.16.3 ===
+
 2008-04-08  Matthias Clasen  <mclasen@redhat.com>
 
 	* === Released 2.16.3 ===
