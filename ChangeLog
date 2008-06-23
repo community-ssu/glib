@@ -1,3 +1,10 @@
+2008-06-23  Kristian Rietveld  <kris@imendio.com>
+
+	* gobject/glib-mkenums.in: introduce an ENUMPREFIX substitution.
+
+	* gio/gioenumtypes.h.template: use @ENUMPREFIX@ instead of
+	hard coding "G" as prefix.
+
 2008-05-14  Michael Natterer  <mitch@imendio.com>
 
 	* m4macros/glib-2.0.m4: revert to upstream. Was apparently
