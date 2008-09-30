@@ -1,3 +1,10 @@
+glib2.0 (2.16.6-1maemo1) unstable; urgency=low
+
+  * Upgrade to GLIB 2.16.6
+  * Switch the debian versioning schema to use 'maemo' instead of 'osso'.
+
+ -- Michael Natterer <mitch@imendio.com>  Tue, 30 Sep 2008 11:11:11 +0200
+
 glib2.0 (2.16.3-1osso2) unstable; urgency=low
 
   * gobject/glib-mkenums.in: introduce an ENUMPREFIX substitution.

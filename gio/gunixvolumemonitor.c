@@ -149,9 +149,14 @@ get_mount_for_mount_path (const char *mount_path,
   GUnixMount *mount;
 
   mount_entry = g_unix_mount_at (mount_path, NULL);
-  
+
+  if (!mount_entry)
+    return NULL;
+
   /* TODO: Set mountable volume? */
   mount = _g_unix_mount_new (NULL, mount_entry, NULL);
+
+  g_unix_mount_free (mount_entry);
 
   return G_MOUNT (mount);
 }

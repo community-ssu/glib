@@ -1,7 +1,14 @@
-2008-05-14  Michael Natterer  <mitch@imendio.com>
+2008-09-12  Matthias Clasen  <mclasen@redhat.com>
+ 
+	* === Released 2.16.6 ===
 
-	* glib/tmpl/unicode.sgml
-	* glib/tmpl/scanner.sgml: regenerated.
+2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.16.5 === 
+
+2008-07-01  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.16.4 ===
 
 2008-04-08  Matthias Clasen  <mclasen@redhat.com>
 

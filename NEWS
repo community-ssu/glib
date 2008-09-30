@@ -1,3 +1,77 @@
+Overview of Changes from GLib 2.16.5 to GLib 2.16.6
+===================================================
+
+* GBookmarkFile: Make the parser less strict about unknown attributes
+
+* Bugs fixed:
+ 547832 gtk+-2.12.11 fails to build - AC_PROG_MMAP too strict, and unnecessary
+ 548321 <string.h> is not included in gi18n-lib.h
+ 535124 umask 002 not being applied for new directories, new files get the correct umask
+ 544140 fam-helper 64-bit issue
+ 545157 wrong/no list of "open with" applications for .cc and .cpp files
+ 545457 gdmsetup crashed with SIGSEGV in g_unix_mount_guess_should_display
+ 546079 leak in xdgmime
+ 546017 Don't copy attributes when copying a symlink
+ 547080 g_file_copy leaks expected errors
+ 542156 zfs mount in home directory shown on nautilus desktop
+ 551149 xdgmime mem leak
+ 550647 synchronous pipe I/O when reading mount reply
+
+
+Overview of Changes from GLib 2.16.4 to GLib 2.16.5
+===================================================
+
+* Work around AC_C_BIGENDIAN breakage in autoconf 2.61
+
+* Bugs fixed:
+ 528317 GRegex does not allow recursion limit
+ 540616 mem leak in filechooser button
+ 543040 async reading on dummy file will crash on GIO_USE_VFS=local
+ 543504 crash in Epiphany Web Browser: Opening local file
+
+* Updated translations:
+ Traditional Chinese (zh_HK)
+ Traditional Chinese (zh_TW)
+
+
+Overview of Changes from GLib 2.16.3 to GLib 2.16.4
+===================================================
+
+* Update to PCRE 7.7
+ - fix a heap-based buffer overflow in PCRE (CVE-2008-2371)
+
+* Bug fixes: 
+ 528752 Win32 build and SSL not working
+ 539074 Cannot get exit status with g_spawn_command_line_sync()
+ 316221 G_LOCK warns about breaking strict-aliasing rules
+ 519137 g_slice_dup macro needs cast for 64-bit platform
+ 536158 also bump GHashTable version when a node is removed via
+        g_hash_table_iter_remove()/g_hash_table_iter_steal()
+ 529321 make check fails in glib/pcre
+ 314453 Nautilus crashes in Solaris when browsing the attached
+        file
+ 502511 g_assert_cmphex prints invalid message
+ 538119 glib's mainloop leaks a pipe to sub-processes
+ 540459 there are no way of getting the real number of bytes
+        written in GMemoryOutputStream
+ 540423 unrecoverable error after g_seekable_truncate(seekable,0,...)
+ 530196 _g_local_file_has_trash_dir() doesn't handle st_dev == 0
+ 528600 g_dummy_file_get_parent("scheme://example.com/")
+ 536641 Filesystem querying in gio does not list AFS and autofs
+        file systems
+ 537392 Additional colon in xattr name
+ 528433 gdesktopappinfo snafu ...
+ 526320 should not list mounts that the user doesn't have permiss...
+ 527132 nautilus crash when making ftp connection
+ 532852 totem_pl_parser_parse_with_base: assertion `... 
+ 459905 Bug in wcwidth data
+ 534085 g_unichar_iswide_cjk() has a totally wrong table
+
+* Updated translations:
+ Bulgarian (bg)
+ German (de)
+
+
 Overview of Changes from GLib 2.16.2 to GLib 2.16.3
 ===================================================
 

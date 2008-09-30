@@ -1,3 +1,266 @@
+2008-09-12  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.16.6 ===
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	* gunixmount.c (eject_unmount_read_error), (eject_unmount_do):
+	* gunixvolume.c (eject_mount_read_error), (eject_mount_do):
+	Use non-blocking pipe for mount helper I/O. Fixes #550647.
+	Patch by Christian Neumair
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 551149 – xdgmime mem leak
+
+	* xdgmime/xdgmime.c (xdg_mime_init_from_directory): Plug
+	a memory leak. Patch by Christian Persch
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	* gunixmounts.c: Add zfs to ignore_fs array in guess_system_internal:
+	Fix for #542156. Patch by Padraig O'Briain
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 547080 – g_file_copy leaks expected errors
+
+	* gfile.c: (g_file_copy): Clear G_IO_ERROR_NOT_SUPPORTED
+	errors before trying the next fallback routine. Patch by
+	Felix Riemann
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 546017 – Don't copy attributes when copying a symlink
+
+	* gfile.c (g_file_copy_attributes): Specify
+	G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS in the call to
+	g_file_set_attributes_from_info. Patch by Christian Kellner
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 546079 – leak in xdgmime
+
+	* xdgmime/xdgmime.c (xdg_mime_shutdown): Fix memory leak.
+	Patch by Carlos Garcia Campos
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 545457 – gdmsetup crashed with SIGSEGV in
+	g_unix_mount_guess_should_display()
+
+	* gunixvolumemonitor.c (get_mount_for_mount_path): Don't
+	crash if no mount is found.
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 545157 – wrong/no list of "open with" applications for .cc and
+	.cpp files
+
+	* gdesktopappinfo.c (get_all_desktop_entries_for_mime_type):
+	Collect all ancestors, not just direct parents. Pointed
+	out by Bastien Nocera
+
+2008-09-11  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk
+
+	Bug 544140 - fam-helper 64-bit issue?
+
+	* fam/fam-helper.c: Added missing include so compiler doesn't complain.
+	Patch by Priit Laes
+
+2008-08-08  Loïc Minier  <lool@dooz.org>
+
+	Bug 535124 – umask 002 not being applied for new directories, new
+	files get the correct umask
+
+	* glocalfile.c: (g_local_file_make_directory): Use 0777 instead of
+	0755 as umask
+
+2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.16.5 === 
+
+2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+
+	* gfile.c: Make it compile.
+
+2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk:
+
+	543504 – crash in Epiphany Web Browser: Opening local file
+
+	* gappinfo.c:
+	* gasyncresult.c:
+	* gdesktopappinfo.c:
+	* gdrive.c:
+	* gfile.c:
+	* gicon.c:
+	* gloadableicon.c:
+	* gmount.c:
+	* gseekable.c:
+	* gvolume.c: Register types thread-safely. 
+	Patch by Christian Persch
+
+2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk:
+
+	Bug 543040 – async reading on dummy file will crash on
+	GIO_USE_VFS=local
+
+	* gfile.c (open_read_async_thread): Cope with read_fn being
+	NULL. Reported by Lin Ma.
+
+2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+
+	Merge from trunk:
+
+	Bug 540616 – mem leak in filechooser button
+
+	* gunixvolumemonitor.c (get_mount_for_mount_path): Free
+	the mount entry. Reported by Chrisitan Persch
+
+2008-07-01  Matthias Clasen  <mclasen@redhat.com>
+	
+	* === Released 2.16.4 ===
+
+2008-06-30  Matthias Clasen  <mclasen@redhat.com>
+
+	Backported from trunk:
+
+	Bug 537392 – Additional colon in xattr name
+
+	* glocalfileinfo.c (set_xattr): Skip the second colon of the prefix,
+	too. Reported by  Alessandro Morandi
+
+2008-06-30  Matthias Clasen  <mclasen@redhat.com>
+
+	Backported from trunk:
+
+	Bug 536641 – Filesystem querying in gio does not list AFS and autofs
+	file systems
+
+	* glocalfile.c (get_fs_type): Add afs and autofs.
+	Patch by Danny Baumann.
+
+2008-06-30  Matthias Clasen  <mclasen@redhat.com>
+
+	Backported from trunk:
+
+	Bug 528600 – g_dummy_file_get_parent("scheme://example.com/")
+
+	* gdummyfile.c (g_dummy_file_get_parent): Return NULL if there
+	is no parent.  (Owen Taylor, patch by Christian Neumair)
+
+2008-06-30  Matthias Clasen  <mclasen@redhat.com>
+
+	Backported from trunk:
+
+	* gfile.c (g_file_replace_contents): do not leak the output stream.
+
+2008-06-30  Matthias Clasen  <mclasen@redhat.com>
+
+	Backported from trunk:
+
+	Bug 530196 – _g_local_file_has_trash_dir() doesn't handle st_dev == 0
+
+	* glocalfile.c (_g_local_file_has_trash_dir): Handle the case that
+	st_dev might be zero.
+
+2008-06-29  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 540423 – unrecoverable error after g_seekable_truncate(seekable,
+	0, ...)
+
+	* gmemoryoutputstream.c (array_resize): Handle truncation to
+	zero correctly. Reported by Akira Tagoh
+
+2008-06-29  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 540459 – there are no way of getting the real number of bytes
+	written in GMemoryOutputStream
+
+	* gmemoryoutputstream.c: Fix docs for how to get the data size.
+	Pointed out by Akira Tagoh
+
+2008-05-13  Bastien Nocera  <hadess@hadess.net>
+
+	* gfile.c (has_valid_scheme): A URI scheme must start with a
+	letter, even if later more characters are allowed (#532852)
+
+2008-04-28  David Zeuthen  <davidz@redhat.com>
+
+        * gunixmounts.c (g_unix_mount_guess_should_display): Avoid
+        displaying mounts in a subdirectory not accessible to the
+        user (#526320).
+
+2008-04-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* xdgmime/xdgmime.c: Rework the timestamp checking code
+	to protect against duplicate directories in XDG_DATA_DIRS.
+	Fixes fd.o bug 12513, reported by Joe Shaw.
+
+2008-04-16  Matthias Clasen  <mclasen@redhat.com>
+
+	Partically revert the previous commits after realizing that
+	xdg_mime_media_type_equal doesn't have to init at all.
+
+	* xdgmime/xdgmime.h:
+	* xdgmime/xdgmime.c: Get rid of _xdg_mime_media_type_equal
+
+	* xdgmime/xdgmimecache.c: Use xdg_mime_media_type_equal
+
+2008-04-16  Matthias Clasen  <mclasen@redhat.com>
+
+	* xdgmime/xdgmime.c: Use _-prefixed versions here, too.
+
+2008-04-16  Matthias Clasen  <mclasen@redhat.com>
+
+	Avoid possible memory corruption in xdgmime, fd.o bug 12512,
+	reported by Joe Shaw and Federico Mena Quintero.
+
+	* xdgmime/xdgmime.c(_xdg_mime_media_type_equal): Implement.
+	(xdg_mime_media_type_equal): Turn into a wrapper around the
+	_-prefixed version.
+
+	* xdgmime/xdgmimecache.c: Use _-prefixed versions of
+	comparison functions throughout.
+
+2008-04-16  Michael Meeks  <michael.meeks@novell.com>
+
+	* gdesktopappinfo.c (g_desktop_app_info_new_from_filename): 
+	tolerate an empty TryExec= line without failing; nautilus used
+	to create launchers with these in previous versions. Fixes #528433
+
+2008-04-09  Padraig O'Briain  <padraig.obriain@sun.com>
+
+        * gdesktopappinfo.c: In g_app_info_create_from_commandline set comment
+        after name. Fixes #527132.
+
+2008-04-08  Tomas Bzatek  <tbzatek@redhat.com> 
+
+        * gfile.c: (g_file_replace):
+        Doc update
+
 2008-04-08  Matthias Clasen  <mclasen@redhat.com>
 
 	* === Released 2.16.3 ===

@@ -236,11 +236,11 @@ static gboolean           g_file_real_copy_finish                 (GFile        
 GType
 g_file_get_type (void)
 {
-  static GType file_type = 0;
+  static volatile gsize g_define_type_id__volatile = 0;
 
-  if (! file_type)
+  if (g_once_init_enter (&g_define_type_id__volatile))
     {
-      static const GTypeInfo file_info =
+      const GTypeInfo file_info =
       {
         sizeof (GFileIface), /* class_size */
 	g_file_base_init,   /* base_init */
@@ -252,15 +252,16 @@ g_file_get_type (void)
 	0,              /* n_preallocs */
 	NULL
       };
-
-      file_type =
+      GType g_define_type_id =
 	g_type_register_static (G_TYPE_INTERFACE, I_("GFile"),
 				&file_info, 0);
 
-      g_type_interface_add_prerequisite (file_type, G_TYPE_OBJECT);
+      g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_OBJECT);
+
+      g_once_init_leave (&g_define_type_id__volatile, g_define_type_id);
     }
 
-  return file_type;
+  return g_define_type_id__volatile;
 }
 
 static void
@@ -1490,7 +1491,8 @@ g_file_create (GFile             *file,
  * @error: a #GError, or %NULL
  *
  * Returns an output stream for overwriting the file, possibly
- * creating a backup copy of the file first.
+ * creating a backup copy of the file first. If the file doesn't exist,
+ * it will be created.
  *
  * This will try to replace the file in the safest way possible so
  * that any errors during the writing will not affect an already
@@ -2101,7 +2103,8 @@ g_file_copy_attributes (GFile           *source,
   if  (info)
     {
       res = g_file_set_attributes_from_info (destination,
-					     info, 0,
+					     info,
+                         G_FILE_QUERY_INFO_NOFOLLOW_SYMLINKS,
 					     cancellable,
 					     error);
       g_object_unref (info);
@@ -2378,6 +2381,8 @@ g_file_copy (GFile                  *source,
 	  g_propagate_error (error, my_error);
 	      return FALSE;
 	}
+      else
+	g_clear_error (&my_error);
     }
 
   /* If the types are different, and the destination method failed
@@ -2402,6 +2407,8 @@ g_file_copy (GFile                  *source,
 	      g_propagate_error (error, my_error);
 	      return FALSE;
 	    }
+	  else
+	    g_clear_error (&my_error);
 	}
     }
   
@@ -4011,6 +4018,18 @@ open_read_async_thread (GSimpleAsyncResult *res,
 
   iface = G_FILE_GET_IFACE (object);
 
+  if (iface->read_fn == NULL)
+    {
+      g_set_error (error, G_IO_ERROR,
+                   G_IO_ERROR_NOT_SUPPORTED,
+                   _("Operation not supported"));
+
+      g_simple_async_result_set_from_error (res, error);
+      g_error_free (error);
+
+      return;
+    }
+
   stream = iface->read_fn (G_FILE (object), cancellable, &error);
 
   if (stream == NULL)
@@ -4676,6 +4695,9 @@ is_valid_scheme_character (char c)
   return g_ascii_isalnum (c) || c == '+' || c == '-' || c == '.';
 }
 
+/* Following RFC 2396, valid schemes are built like:
+ *       scheme        = alpha *( alpha | digit | "+" | "-" | "." )
+ */
 static gboolean
 has_valid_scheme (const char *uri)
 {
@@ -4683,7 +4705,7 @@ has_valid_scheme (const char *uri)
   
   p = uri;
   
-  if (!is_valid_scheme_character (*p))
+  if (!g_ascii_isalpha (*p))
     return FALSE;
 
   do {
@@ -5395,6 +5417,7 @@ g_file_replace_contents (GFile             *file,
     {
       /* Ignore errors on close */
       g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, NULL);
+      g_object_unref (out);
       
       /* error is set already */
       return FALSE;
@@ -5406,6 +5429,8 @@ g_file_replace_contents (GFile             *file,
   if (new_etag)
     *new_etag = g_file_output_stream_get_etag (out);
   
+  g_object_unref (out);
+
   return TRUE;
 }
 

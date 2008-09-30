@@ -1,3 +1,5 @@
+Now this directory is private to GLib. Only the files relevant to GLib
+are left. See the separate "build" module in GNOME SVN for history.
 This directory contains various stuff that is used when building
 software from the GNOME CVS (and dependent software) on uncommon
 platforms. It contains:

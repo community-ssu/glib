@@ -1,10 +1,12 @@
+include $(top_srcdir)/Makefile.decl
+
 INCLUDES = \
 	-DG_LOG_DOMAIN=\"GLib-GRegex\" \
 	-DSUPPORT_UCP \
 	-DSUPPORT_UTF8 \
 	-DNEWLINE=-1 \
 	-DMATCH_LIMIT=10000000 \
-	-DMATCH_LIMIT_RECURSION=10000000 \
+	-DMATCH_LIMIT_RECURSION=8192 \
 	-DMAX_NAME_SIZE=32 \
 	-DMAX_NAME_COUNT=10000 \
 	-DMAX_DUPLENGTH=30000 \
@@ -62,4 +64,3 @@ EXTRA_DIST =				\
 		COPYING			\
 		makefile.msc
 
-test: 

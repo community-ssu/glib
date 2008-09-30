@@ -618,6 +618,10 @@ get_fs_type (long f_type)
     {
     case 0xadf5:
       return "adfs";
+    case 0x5346414f:
+      return "afs";
+    case 0x0187:
+      return "autofs";
     case 0xADFF:
       return "affs";
     case 0x42465331:
@@ -1580,7 +1584,8 @@ escape_trash_name (char *name)
 gboolean
 _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
 {
-  static gsize home_dev = 0;
+  static gsize home_dev_set = 0;
+  static dev_t home_dev;
   char *topdir, *globaldir, *trashdir, *tmpname;
   uid_t uid;
   char uid_str[32];
@@ -1588,18 +1593,17 @@ _g_local_file_has_trash_dir (const char *dirname, dev_t dir_dev)
   gboolean res;
   int statres;
       
-  if (g_once_init_enter (&home_dev))
+  if (g_once_init_enter (&home_dev_set))
     {
-      gsize setup_value = 0;
       struct stat home_stat;
       
       g_stat (g_get_home_dir (), &home_stat);
-      setup_value = home_stat.st_dev;
-      g_once_init_leave (&home_dev, setup_value);
+      home_dev = home_stat.st_dev;
+      g_once_init_leave (&home_dev_set, 1);
     }
 
   /* Assume we can trash to the home */
-  if (dir_dev == (dev_t)home_dev)
+  if (dir_dev == home_dev)
     return TRUE;
 
   topdir = find_mountpoint_for (dirname, dir_dev);
@@ -1974,7 +1978,7 @@ g_local_file_make_directory (GFile         *file,
 {
   GLocalFile *local = G_LOCAL_FILE (file);
   
-  if (g_mkdir (local->filename, 0755) == -1)
+  if (g_mkdir (local->filename, 0777) == -1)
     {
       int errsv = errno;
 

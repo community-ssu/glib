@@ -236,7 +236,7 @@ g_desktop_app_info_new_from_filename (const char *filename)
                                     G_KEY_FILE_DESKTOP_GROUP,
                                     G_KEY_FILE_DESKTOP_KEY_TRY_EXEC,
                                     NULL);
-  if (try_exec)
+  if (try_exec && try_exec[0] != '\0')
     {
       char *t;
       t = g_find_program_in_path (try_exec);
@@ -1514,7 +1514,6 @@ g_app_info_create_from_commandline (const char           *commandline,
     info->exec = g_strconcat (commandline, " %u", NULL);
   else
     info->exec = g_strconcat (commandline, " %f", NULL);
-  info->comment = g_strdup_printf (_("Custom definition for %s"), info->name);
   info->nodisplay = TRUE;
   info->binary = binary_from_exec (info->exec);
   
@@ -1530,6 +1529,7 @@ g_app_info_create_from_commandline (const char           *commandline,
       if (info->name == NULL)
 	info->name = g_strdup ("custom");
     }
+  info->comment = g_strdup_printf (_("Custom definition for %s"), info->name);
   
   return G_APP_INFO (info);
 }
@@ -2415,11 +2415,36 @@ get_all_desktop_entries_for_mime_type (const char *base_mime_type)
   char **mime_types;
   char **default_entries;
   char **removed_associations;
-  int i,j;
+  int i, j, k;
+  GPtrArray *array;
+  char **anc;
   
   mime_info_cache_init ();
 
+  /* collect all ancestors */
   mime_types = _g_unix_content_type_get_parents (base_mime_type);
+  array = g_ptr_array_new ();
+  for (i = 0; mime_types[i]; i++)
+    g_ptr_array_add (array, mime_types[i]);
+  g_free (mime_types);
+  for (i = 0; i < array->len; i++)
+    {
+      anc = _g_unix_content_type_get_parents (g_ptr_array_index (array, i));
+      for (j = 0; anc[j]; j++)
+        {
+          for (k = 0; k < array->len; k++)
+            {
+              if (strcmp (anc[j], g_ptr_array_index (array, k)) == 0)
+                break;
+            }
+          if (k == array->len) /* not found */
+            g_ptr_array_add (array, g_strdup (anc[j]));
+        }
+      g_strfreev (anc);
+    }
+  g_ptr_array_add (array, NULL);
+  mime_types = g_ptr_array_free (array, FALSE);
+
   G_LOCK (mime_info_cache);
   
   removed_entries = NULL;
@@ -2440,7 +2465,7 @@ get_all_desktop_entries_for_mime_type (const char *base_mime_type)
 	  for (j = 0; default_entries != NULL && default_entries[j] != NULL; j++)
 	    desktop_entries = append_desktop_entry (desktop_entries, default_entries[j], removed_entries);
 
-	  /* Then removed assiciations from mimeapps.list */
+	  /* Then removed associations from mimeapps.list */
 	  removed_associations = g_hash_table_lookup (dir->mimeapps_list_removed_map, mime_type);
 	  for (j = 0; removed_associations != NULL && removed_associations[j] != NULL; j++)
 	    removed_entries = append_desktop_entry (removed_entries, removed_associations[j], NULL);
@@ -2484,11 +2509,11 @@ static void g_desktop_app_info_lookup_class_init (gpointer g_class,
 GType
 g_desktop_app_info_lookup_get_type (void)
 {
-  static GType desktop_app_info_lookup_type = 0;
+  static volatile gsize g_define_type_id__volatile = 0;
 
-  if (! desktop_app_info_lookup_type)
+  if (g_once_init_enter (&g_define_type_id__volatile))
     {
-      static const GTypeInfo desktop_app_info_lookup_info =
+      const GTypeInfo desktop_app_info_lookup_info =
       {
         sizeof (GDesktopAppInfoLookupIface), /* class_size */
 	g_desktop_app_info_lookup_base_init,   /* base_init */
@@ -2500,15 +2525,16 @@ g_desktop_app_info_lookup_get_type (void)
 	0,              /* n_preallocs */
 	NULL
       };
-
-      desktop_app_info_lookup_type =
+      GType g_define_type_id =
 	g_type_register_static (G_TYPE_INTERFACE, I_("GDesktopAppInfoLookup"),
 				&desktop_app_info_lookup_info, 0);
 
-      g_type_interface_add_prerequisite (desktop_app_info_lookup_type, G_TYPE_OBJECT);
+      g_type_interface_add_prerequisite (g_define_type_id, G_TYPE_OBJECT);
+
+      g_once_init_leave (&g_define_type_id__volatile, g_define_type_id);
     }
 
-  return desktop_app_info_lookup_type;
+  return g_define_type_id__volatile;
 }
 
 static void
