@@ -1,3 +1,12 @@
+2008-10-09  Michael Natterer  <mitch@imendio.com>
+
+	* build/*: merge tons of changes from upstream 2.16.6. This folder
+	was forgotten; it didn't show up in diffs because it has changed
+	in upstream from being an svn:externals to a normal part of GLib.
+	Note that this change has zero effect, it only affects win32 and I
+	only merged the changes to keep the diff to upstream as small as
+	possible.
+
 2008-09-30  Michael Natterer  <mitch@imendio.com>
 
 	* === Merge GLib 2.16.6 from upstream ===
