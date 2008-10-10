@@ -22,7 +22,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include <string.h>
 #include <sys/types.h>
 #ifdef HAVE_PWD_H
@@ -31,10 +31,16 @@
 #include "gfile.h"
 #include "gvfs.h"
 #include "gioscheduler.h"
-#include <glocalfile.h>
+#include "glocalfile.h"
 #include "gsimpleasyncresult.h"
 #include "gfileattribute-priv.h"
 #include "gpollfilemonitor.h"
+#include "gappinfo.h"
+#include "gfileinputstream.h"
+#include "gfileoutputstream.h"
+#include "gcancellable.h"
+#include "gasyncresult.h"
+#include "gioerror.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -97,8 +103,7 @@
  * simply have _async() appended to their function names. The asynchronous 
  * I/O functions call a #GAsyncReadyCallback which is then used to finalize 
  * the operation, producing a GAsyncResult which is then passed to the 
- * function's matching _finish() 
- * operation. 
+ * function's matching _finish() operation. 
  *
  * Some #GFile operations do not have synchronous analogs, as they may
  * take a very long time to finish, and blocking may leave an application
@@ -516,7 +521,7 @@ g_file_get_parse_name (GFile *file)
  *
  * This call does no blocking i/o.
  * 
- * Returns: #GFile that is a duplicate of the given #GFile. 
+ * Returns: a new #GFile that is a duplicate of the given #GFile. 
  **/
 GFile *
 g_file_dup (GFile *file)
@@ -600,6 +605,7 @@ g_file_equal (GFile *file1,
  * 
  * Returns: a #GFile structure to the parent of the given
  *     #GFile or %NULL if there is no parent. 
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_get_parent (GFile *file)
@@ -627,6 +633,7 @@ g_file_get_parent (GFile *file)
  * This call does no blocking i/o.
  * 
  * Returns: a #GFile to a child specified by @name.
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_get_child (GFile      *file,
@@ -654,6 +661,7 @@ g_file_get_child (GFile      *file,
  * 
  * Returns: a #GFile to the specified child, or 
  *     %NULL if the display name couldn't be converted.  
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_get_child_for_display_name (GFile      *file,
@@ -675,14 +683,16 @@ g_file_get_child_for_display_name (GFile      *file,
  * @file: input #GFile.
  * @prefix: input #GFile.
  * 
- * Checks whether @file has the prefix specified by @prefix. In other word, if the
- * names of inital elements of @file<!-- -->s pathname match @prefix.
+ * Checks whether @file has the prefix specified by @prefix. In other word, 
+ * if the names of inital elements of @file<!-- -->s pathname match @prefix.
  * 
- * This call does no i/o, as it works purely on names. As such it can sometimes
- * return %FALSE even if @file is inside a @prefix (from a filesystem point of view),
- * because the prefix of @file is an alias of @prefix.
+ * This call does no i/o, as it works purely on names. As such it can 
+ * sometimes return %FALSE even if @file is inside a @prefix (from a 
+ * filesystem point of view), because the prefix of @file is an alias 
+ * of @prefix.
  *
- * Returns:  %TRUE if the @files's parent, grandparent, etc is @prefix. %FALSE otherwise.
+ * Returns:  %TRUE if the @files's parent, grandparent, etc is @prefix. 
+ *     %FALSE otherwise.
  **/
 gboolean
 g_file_has_prefix (GFile *file,
@@ -713,8 +723,8 @@ g_file_has_prefix (GFile *file,
  * This call does no blocking i/o.
  * 
  * Returns: string with the relative path from @descendant 
- *     to @parent, or %NULL if @descendant doesn't have @parent as prefix. The returned string should be freed with 
- *     g_free() when no longer needed.
+ *     to @parent, or %NULL if @descendant doesn't have @parent as prefix. 
+ *     The returned string should be freed with g_free() when no longer needed.
  **/
 char *
 g_file_get_relative_path (GFile *parent,
@@ -744,6 +754,7 @@ g_file_get_relative_path (GFile *parent,
  * 
  * Returns: #GFile to the resolved path. %NULL if @relative_path 
  *     is %NULL or if @file is invalid.
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_resolve_relative_path (GFile      *file,
@@ -788,6 +799,7 @@ g_file_resolve_relative_path (GFile      *file,
  * Other errors are possible too.
  *
  * Returns: A #GFileEnumerator if successful, %NULL on error. 
+ *     Free the returned object with g_object_unref().
  **/
 GFileEnumerator *
 g_file_enumerate_children (GFile                *file,
@@ -808,9 +820,9 @@ g_file_enumerate_children (GFile                *file,
 
   if (iface->enumerate_children == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
 
@@ -872,6 +884,7 @@ g_file_enumerate_children_async (GFile               *file,
  * See g_file_enumerate_children_async().
  *
  * Returns: a #GFileEnumerator or %NULL if an error occurred.
+ *     Free the returned object with g_object_unref().
  **/
 GFileEnumerator *
 g_file_enumerate_children_finish (GFile         *file,
@@ -933,8 +946,7 @@ g_file_query_exists (GFile *file,
   g_return_val_if_fail (G_IS_FILE(file), FALSE);
   
   info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE,
-			    G_FILE_QUERY_INFO_NONE,
-			    cancellable, NULL);
+			    G_FILE_QUERY_INFO_NONE, cancellable, NULL);
   if (info != NULL)
     {
       g_object_unref (info);
@@ -942,6 +954,45 @@ g_file_query_exists (GFile *file,
     }
   
   return FALSE;
+}
+
+/**
+ * g_file_query_file_type:
+ * @file: input #GFile.
+ * @flags: a set of #GFileQueryInfoFlags passed to g_file_query_info().
+ * @cancellable: optional #GCancellable object, %NULL to ignore.
+ *
+ * Utility function to inspect the #GFileType of a file. This is
+ * implemented using g_file_query_info() and as such does blocking I/O.
+ *
+ * The primary use case of this method is to check if a file is a regular file,
+ * directory, or symlink.
+ * 
+ * Returns: The #GFileType of the file and #G_FILE_TYPE_UNKNOWN if the file
+ *          does not exist
+ *
+ * Since: 2.18
+ */
+GFileType
+g_file_query_file_type (GFile *file,
+                        GFileQueryInfoFlags   flags,
+		 	GCancellable *cancellable)
+{
+  GFileInfo *info;
+  GFileType file_type;
+  
+  g_return_val_if_fail (G_IS_FILE(file), G_FILE_TYPE_UNKNOWN);
+  info = g_file_query_info (file, G_FILE_ATTRIBUTE_STANDARD_TYPE, flags,
+			    cancellable, NULL);
+  if (info != NULL)
+    {
+      file_type = g_file_info_get_file_type (info);
+      g_object_unref (info);
+    }
+  else
+    file_type = G_FILE_TYPE_UNKNOWN;
+  
+  return file_type;
 }
 
 /**
@@ -979,6 +1030,7 @@ g_file_query_exists (GFile *file,
  * Other errors are possible too, and depend on what kind of filesystem the file is on.
  *
  * Returns: a #GFileInfo for the given @file, or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileInfo *
 g_file_query_info (GFile                *file,
@@ -998,9 +1050,9 @@ g_file_query_info (GFile                *file,
 
   if (iface->query_info == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
   
@@ -1061,6 +1113,7 @@ g_file_query_info_async (GFile               *file,
  * See g_file_query_info_async().
  * 
  * Returns: #GFileInfo for given @file or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileInfo *
 g_file_query_info_finish (GFile         *file,
@@ -1113,6 +1166,7 @@ g_file_query_info_finish (GFile         *file,
  * Other errors are possible too, and depend on what kind of filesystem the file is on.
  *
  * Returns: a #GFileInfo or %NULL if there was an error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileInfo *
 g_file_query_filesystem_info (GFile         *file,
@@ -1131,9 +1185,9 @@ g_file_query_filesystem_info (GFile         *file,
 
   if (iface->query_filesystem_info == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
   
@@ -1193,6 +1247,7 @@ g_file_query_filesystem_info_async (GFile               *file,
  * g_file_query_filesystem_info_async().
  * 
  * Returns: #GFileInfo for given @file or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileInfo *
 g_file_query_filesystem_info_finish (GFile         *file,
@@ -1232,6 +1287,7 @@ g_file_query_filesystem_info_finish (GFile         *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
  * 
  * Returns: a #GMount where the @file is located or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GMount *
 g_file_find_enclosing_mount (GFile         *file,
@@ -1249,7 +1305,7 @@ g_file_find_enclosing_mount (GFile         *file,
   if (iface->find_enclosing_mount == NULL)
     {
 
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_FOUND,
 			/* Translators: This is an error message when trying to find the
 			 * enclosing (user visible) mount of a file, but none exists. */
 		   _("Containing mount does not exist"));
@@ -1258,6 +1314,7 @@ g_file_find_enclosing_mount (GFile         *file,
 
   return (* iface->find_enclosing_mount) (file, cancellable, error);
 }
+
 /**
  * g_file_find_enclosing_mount_async:
  * @file: a #GFile
@@ -1304,6 +1361,7 @@ g_file_find_enclosing_mount_async (GFile              *file,
  * See g_file_find_enclosing_mount_async().
  * 
  * Returns: #GMount for given @file or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GMount *
 g_file_find_enclosing_mount_finish (GFile         *file,
@@ -1345,6 +1403,7 @@ g_file_find_enclosing_mount_finish (GFile         *file,
  * Other errors are possible too, and depend on what kind of filesystem the file is on.
  *
  * Returns: #GFileInputStream or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileInputStream *
 g_file_read (GFile         *file,
@@ -1362,9 +1421,9 @@ g_file_read (GFile         *file,
 
   if (iface->read_fn == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
   
@@ -1391,12 +1450,13 @@ g_file_read (GFile         *file,
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
  *
  * Some file systems don't allow all file names, and may
- * return an G_IO_ERROR_INVALID_FILENAME error.
- * If the file is a directory the G_IO_ERROR_IS_DIRECTORY error will be
+ * return an %G_IO_ERROR_INVALID_FILENAME error.
+ * If the file is a directory the %G_IO_ERROR_IS_DIRECTORY error will be
  * returned. Other errors are possible too, and depend on what kind of
  * filesystem the file is on.
  * 
- * Returns: a #GFileOutputStream.
+ * Returns: a #GFileOutputStream, or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileOutputStream *
 g_file_append_to (GFile             *file,
@@ -1415,9 +1475,9 @@ g_file_append_to (GFile             *file,
 
   if (iface->append_to == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
   
@@ -1432,7 +1492,7 @@ g_file_append_to (GFile             *file,
  * @error: a #GError, or %NULL
  *
  * Creates a new file and returns an output stream for writing to it.
- * The file must not already exists.
+ * The file must not already exist.
  *
  * By default files created are generally readable by everyone,
  * but if you pass #G_FILE_CREATE_PRIVATE in @flags the file
@@ -1452,7 +1512,8 @@ g_file_append_to (GFile             *file,
  * filesystem the file is on.
  * 
  * Returns: a #GFileOutputStream for the newly created file, or 
- * %NULL on error.
+ *     %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileOutputStream *
 g_file_create (GFile             *file,
@@ -1471,9 +1532,9 @@ g_file_create (GFile             *file,
 
   if (iface->create == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
   
@@ -1533,6 +1594,7 @@ g_file_create (GFile             *file,
  * filesystem the file is on.
  *
  * Returns: a #GFileOutputStream or %NULL on error. 
+ *     Free the returned object with g_object_unref().
  **/
 GFileOutputStream *
 g_file_replace (GFile             *file,
@@ -1553,9 +1615,9 @@ g_file_replace (GFile             *file,
 
   if (iface->replace == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
   
@@ -1613,6 +1675,7 @@ g_file_read_async (GFile               *file,
  * g_file_read_async(). 
  *  
  * Returns: a #GFileInputStream or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileInputStream *
 g_file_read_finish (GFile         *file,
@@ -1684,6 +1747,7 @@ g_file_append_to_async (GFile               *file,
  * g_file_append_to_async(). 
  * 
  * Returns: a valid #GFileOutputStream or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileOutputStream *
 g_file_append_to_finish (GFile         *file,
@@ -1717,7 +1781,7 @@ g_file_append_to_finish (GFile         *file,
  * @user_data: the data to pass to callback function
  * 
  * Asynchronously creates a new file and returns an output stream for writing to it.
- * The file must not already exists.
+ * The file must not already exist.
  *
  * For more details, see g_file_create() which is
  * the synchronous version of this call.
@@ -1756,6 +1820,7 @@ g_file_create_async (GFile               *file,
  * g_file_create_async(). 
  * 
  * Returns: a #GFileOutputStream or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileOutputStream *
 g_file_create_finish (GFile         *file,
@@ -1835,6 +1900,7 @@ g_file_replace_async (GFile               *file,
  * g_file_replace_async(). 
  * 
  * Returns: a #GFileOutputStream, or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileOutputStream *
 g_file_replace_finish (GFile         *file,
@@ -1893,8 +1959,8 @@ copy_symlink (GFile           *destination,
 	      
 	      if (file_type == G_FILE_TYPE_DIRECTORY)
 		{
-		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
-			       _("Can't copy over directory"));
+		  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_IS_DIRECTORY,
+                                       _("Can't copy over directory"));
 		  return FALSE;
 		}
 	    }
@@ -1953,16 +2019,16 @@ open_source_for_copy (GFile           *source,
 	    {
 	      if (file_type == G_FILE_TYPE_DIRECTORY)
 		{
-		  g_set_error (error, G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
-			       _("Can't copy directory over directory"));
+		  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_WOULD_MERGE,
+                                       _("Can't copy directory over directory"));
 		  return NULL;
 		}
 	      /* continue to would_recurse error */
 	    }
 	  else
 	    {
-	      g_set_error (error, G_IO_ERROR, G_IO_ERROR_EXISTS,
-			   _("Target file exists"));
+	      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_EXISTS,
+                                   _("Target file exists"));
 	      return NULL;
 	    }
 	}
@@ -1979,8 +2045,8 @@ open_source_for_copy (GFile           *source,
 	  g_error_free (my_error);
 	}
       
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
-		   _("Can't recursively copy directory"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_WOULD_RECURSE,
+                           _("Can't recursively copy directory"));
       return NULL;
     }
 
@@ -2615,9 +2681,9 @@ g_file_move (GFile                  *source,
   
   if (flags & G_FILE_COPY_NO_FALLBACK_FOR_MOVE)
     {  
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return FALSE;
     }
   
@@ -2636,7 +2702,16 @@ g_file_move (GFile                  *source,
  * @cancellable: optional #GCancellable object, %NULL to ignore.
  * @error: a #GError, or %NULL 
  *
- * Creates a directory.
+ * Creates a directory. Note that this will only create a child directory of
+ * the immediate parent directory of the path or URI given by the #GFile. To 
+ * recursively create directories, see g_file_make_directory_with_parents().
+ * This function will fail if the parent directory does not exist, setting 
+ * @error to %G_IO_ERROR_NOT_FOUND. If the file system doesn't support creating
+ * directories, this function will fail, setting @error to 
+ * %G_IO_ERROR_NOT_SUPPORTED.
+ *
+ * For a local #GFile the newly created directory will have the default
+ * (current) ownership and permissions of the current process.
  * 
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
@@ -2660,13 +2735,94 @@ g_file_make_directory (GFile         *file,
 
   if (iface->make_directory == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return FALSE;
     }
   
   return (* iface->make_directory) (file, cancellable, error);
+}
+
+/**
+ * g_file_make_directory_with_parents:
+ * @file: input #GFile.
+ * @cancellable: optional #GCancellable object, %NULL to ignore.
+ * @error: a #GError, or %NULL 
+ *
+ * Creates a directory and any parent directories that may not exist similar to
+ * 'mkdir -p'. If the file system does not support creating directories, this
+ * function will fail, setting @error to %G_IO_ERROR_NOT_SUPPORTED.
+ * 
+ * For a local #GFile the newly created directories will have the default
+ * (current) ownership and permissions of the current process.
+ * 
+ * If @cancellable is not %NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+ * 
+ * Returns: %TRUE if all directories have been successfully created, %FALSE
+ * otherwise.
+ *
+ * Since: 2.18
+ **/
+gboolean
+g_file_make_directory_with_parents (GFile         *file,
+		                    GCancellable  *cancellable,
+		                    GError       **error)
+{
+  gboolean result;
+  GFile *parent_file, *work_file;
+  GList *list = NULL, *l;
+  GError *my_error = NULL;
+
+  if (g_cancellable_set_error_if_cancelled (cancellable, error))
+    return FALSE;
+  
+  result = g_file_make_directory (file, cancellable, &my_error);
+  if (result || my_error->code != G_IO_ERROR_NOT_FOUND) 
+    {
+      if (my_error)
+        g_propagate_error (error, my_error);
+      return result;
+    }
+  
+  work_file = file;
+  
+  while (!result && my_error->code == G_IO_ERROR_NOT_FOUND) 
+    {
+      g_clear_error (&my_error);
+    
+      parent_file = g_file_get_parent (work_file);
+      if (parent_file == NULL)
+        break;
+      result = g_file_make_directory (parent_file, cancellable, &my_error);
+    
+      if (!result && my_error->code == G_IO_ERROR_NOT_FOUND)
+        list = g_list_prepend (list, parent_file);
+
+      work_file = parent_file;
+    }
+
+  for (l = list; result && l; l = l->next)
+    {
+      result = g_file_make_directory ((GFile *) l->data, cancellable, &my_error);
+    }
+  
+  /* Clean up */
+  while (list != NULL) 
+    {
+      g_object_unref ((GFile *) list->data);
+      list = g_list_remove (list, list->data);
+    }
+
+  if (!result) 
+    {
+      g_propagate_error (error, my_error);
+      return result;
+    }
+  
+  return g_file_make_directory (file, cancellable, error);
 }
 
 /**
@@ -2700,9 +2856,9 @@ g_file_make_symbolic_link (GFile         *file,
 
   if (*symlink_value == '\0')
     {
-      g_set_error (error, G_IO_ERROR,
-                   G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Invalid symlink value given"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_INVALID_ARGUMENT,
+                           _("Invalid symlink value given"));
       return FALSE;
     }
   
@@ -2710,9 +2866,9 @@ g_file_make_symbolic_link (GFile         *file,
 
   if (iface->make_symbolic_link == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return FALSE;
     }
   
@@ -2750,9 +2906,9 @@ g_file_delete (GFile         *file,
 
   if (iface->delete_file == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return FALSE;
     }
   
@@ -2793,9 +2949,9 @@ g_file_trash (GFile         *file,
 
   if (iface->trash == NULL)
     {
-      g_set_error (error,
-		   G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Trash not supported"));
+      g_set_error_literal (error,
+                           G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Trash not supported"));
       return FALSE;
     }
   
@@ -2824,7 +2980,9 @@ g_file_trash (GFile         *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
  * 
- * Returns: a #GFile specifying what @file was renamed to, or %NULL if there was an error.
+ * Returns: a #GFile specifying what @file was renamed to, or %NULL 
+ *     if there was an error.
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_set_display_name (GFile         *file,
@@ -2904,6 +3062,7 @@ g_file_set_display_name_async (GFile               *file,
  * g_file_set_display_name_async().
  * 
  * Returns: a #GFile or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_set_display_name_finish (GFile         *file,
@@ -3074,9 +3233,9 @@ g_file_set_attribute (GFile                      *file,
 
   if (iface->set_attribute == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return FALSE;
     }
 
@@ -3502,6 +3661,7 @@ g_file_mount_mountable (GFile               *file,
  * with g_file_mount_mountable().
  *
  * Returns: a #GFile or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFile *
 g_file_mount_mountable_finish (GFile         *file,
@@ -3702,8 +3862,8 @@ g_file_eject_mountable_finish (GFile         *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
  * 
- * Returns: a #GFileMonitor for the given @file, 
- * or %NULL on error.
+ * Returns: a #GFileMonitor for the given @file, or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileMonitor*
 g_file_monitor_directory (GFile             *file,
@@ -3722,9 +3882,9 @@ g_file_monitor_directory (GFile             *file,
 
   if (iface->monitor_dir == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-		   G_IO_ERROR_NOT_SUPPORTED,
-		   _("Operation not supported"));
+      g_set_error_literal (error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
       return NULL;
     }
 
@@ -3745,7 +3905,8 @@ g_file_monitor_directory (GFile             *file,
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
  * 
- * Returns: a #GFileMonitor for the given @file.
+ * Returns: a #GFileMonitor for the given @file, or %NULL on error.
+ *     Free the returned object with g_object_unref().
  **/
 GFileMonitor*
 g_file_monitor_file (GFile             *file,
@@ -3773,6 +3934,37 @@ g_file_monitor_file (GFile             *file,
     monitor = _g_poll_file_monitor_new (file);
 
   return monitor;
+}
+
+/**
+ * g_file_monitor:
+ * @file: input #GFile
+ * @flags: a set of #GFileMonitorFlags
+ * @cancellable: optional #GCancellable object, %NULL to ignore
+ * @error: a #GError, or %NULL
+ * 
+ * Obtains a file or directory monitor for the given file, depending
+ * on the type of the file.
+ *
+ * If @cancellable is not %NULL, then the operation can be cancelled by
+ * triggering the cancellable object from another thread. If the operation
+ * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
+ * 
+ * Returns: a #GFileMonitor for the given @file, or %NULL on error.
+ *     Free the returned object with g_object_unref().
+ *
+ * Since: 2.18
+ */
+GFileMonitor*
+g_file_monitor (GFile             *file,
+	        GFileMonitorFlags  flags,
+		GCancellable      *cancellable,
+		GError           **error)
+{
+  if (g_file_query_file_type (file, 0, cancellable) == G_FILE_TYPE_DIRECTORY)
+    return g_file_monitor_directory (file, flags, cancellable, error);
+  else
+    return g_file_monitor_file (file, flags, cancellable, error);
 }
 
 /********************************************
@@ -4020,16 +4212,16 @@ open_read_async_thread (GSimpleAsyncResult *res,
 
   if (iface->read_fn == NULL)
     {
-      g_set_error (error, G_IO_ERROR,
-                   G_IO_ERROR_NOT_SUPPORTED,
-                   _("Operation not supported"));
+      g_set_error_literal (&error, G_IO_ERROR,
+                           G_IO_ERROR_NOT_SUPPORTED,
+                           _("Operation not supported"));
 
       g_simple_async_result_set_from_error (res, error);
       g_error_free (error);
 
       return;
     }
-
+  
   stream = iface->read_fn (G_FILE (object), cancellable, &error);
 
   if (stream == NULL)
@@ -4896,9 +5088,9 @@ g_file_query_default_handler (GFile                  *file,
   if (appinfo != NULL)
     return appinfo;
 
-  g_set_error (error, G_IO_ERROR,
-	       G_IO_ERROR_NOT_SUPPORTED,
-	       _("No application is registered as handling this file"));
+  g_set_error_literal (error, G_IO_ERROR,
+                       G_IO_ERROR_NOT_SUPPORTED,
+                       _("No application is registered as handling this file"));
   return NULL;
   
 }
@@ -4911,20 +5103,23 @@ g_file_query_default_handler (GFile                  *file,
  * @file: input #GFile.
  * @cancellable: optional #GCancellable object, %NULL to ignore.
  * @contents: a location to place the contents of the file.
- * @length: a location to place the length of the contents of the file.
- * @etag_out: a location to place the current entity tag for the file.
+ * @length: a location to place the length of the contents of the file,
+ *    or %NULL if the length is not needed
+ * @etag_out: a location to place the current entity tag for the file,
+ *    or %NULL if the entity tag is not needed
  * @error: a #GError, or %NULL
  *
- * Loads the content of the file into memory, returning the size of
- * the data. The data is always zero terminated, but this is not
- * included in the resultant @length.
+ * Loads the content of the file into memory. The data is always 
+ * zero-terminated, but this is not included in the resultant @length.
+ * The returned @content should be freed with g_free() when no longer
+ * needed.
  * 
  * If @cancellable is not %NULL, then the operation can be cancelled by
  * triggering the cancellable object from another thread. If the operation
  * was cancelled, the error %G_IO_ERROR_CANCELLED will be returned. 
  * 
  * Returns: %TRUE if the @file's contents were successfully loaded.
- * %FALSE if there were errors..
+ * %FALSE if there were errors.
  **/
 gboolean
 g_file_load_contents (GFile         *file,
@@ -5216,12 +5411,17 @@ g_file_load_partial_contents_async (GFile                 *file,
  * @file: input #GFile.
  * @res: a #GAsyncResult. 
  * @contents: a location to place the contents of the file.
- * @length: a location to place the length of the contents of the file.
- * @etag_out: a location to place the current entity tag for the file.
+ * @length: a location to place the length of the contents of the file,
+ *     or %NULL if the length is not needed
+ * @etag_out: a location to place the current entity tag for the file,
+ *     or %NULL if the entity tag is not needed
  * @error: a #GError, or %NULL
  * 
  * Finishes an asynchronous partial load operation that was started
- * with g_file_load_partial_contents_async().
+ * with g_file_load_partial_contents_async(). The data is always 
+ * zero-terminated, but this is not included in the resultant @length.
+ * The returned @content should be freed with g_free() when no longer
+ * needed.
  *
  * Returns: %TRUE if the load was successful. If %FALSE and @error is 
  * present, it will be set appropriately. 
@@ -5317,13 +5517,16 @@ g_file_load_contents_async (GFile               *file,
  * @file: input #GFile.
  * @res: a #GAsyncResult. 
  * @contents: a location to place the contents of the file.
- * @length: a location to place the length of the contents of the file.
- * @etag_out: a location to place the current entity tag for the file.
+ * @length: a location to place the length of the contents of the file,
+ *     or %NULL if the length is not needed
+ * @etag_out: a location to place the current entity tag for the file,
+ *     or %NULL if the entity tag is not needed
  * @error: a #GError, or %NULL
  * 
  * Finishes an asynchronous load of the @file's contents. 
  * The contents are placed in @contents, and @length is set to the 
- * size of the @contents string. If @etag_out is present, it will be 
+ * size of the @contents string. The @content should be freed with
+ * g_free() when no longer needed. If @etag_out is present, it will be 
  * set to the new entity tag for the @file.
  * 
  * Returns: %TRUE if the load was successful. If %FALSE and @error is 
@@ -5351,12 +5554,12 @@ g_file_load_contents_finish (GFile         *file,
  * @contents: a string containing the new contents for @file.
  * @length: the length of @contents in bytes.
  * @etag: the old <link linkend="gfile-etag">entity tag</link> 
- *     for the document.
+ *     for the document, or %NULL
  * @make_backup: %TRUE if a backup should be created.
  * @flags: a set of #GFileCreateFlags.
  * @new_etag: a location to a new <link linkend="gfile-etag">entity tag</link>
  *      for the document. This should be freed with g_free() when no longer 
- *      needed.
+ *      needed, or %NULL
  * @cancellable: optional #GCancellable object, %NULL to ignore.
  * @error: a #GError, or %NULL
  *
@@ -5392,6 +5595,7 @@ g_file_replace_contents (GFile             *file,
   GFileOutputStream *out;
   gsize pos, remainder;
   gssize res;
+  gboolean ret;
 
   g_return_val_if_fail (G_IS_FILE (file), FALSE);
   g_return_val_if_fail (contents != NULL, FALSE);
@@ -5418,20 +5622,19 @@ g_file_replace_contents (GFile             *file,
       /* Ignore errors on close */
       g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, NULL);
       g_object_unref (out);
-      
+
       /* error is set already */
       return FALSE;
     }
   
-  if (!g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, error))
-    return FALSE;
+  ret = g_output_stream_close (G_OUTPUT_STREAM (out), cancellable, error);
 
   if (new_etag)
     *new_etag = g_file_output_stream_get_etag (out);
-  
+
   g_object_unref (out);
 
-  return TRUE;
+  return ret;
 }
 
 typedef struct {
@@ -5564,7 +5767,7 @@ replace_contents_open_callback (GObject      *obj,
  * @file: input #GFile.
  * @contents: string of contents to replace the file with.
  * @length: the length of @contents in bytes.
- * @etag: a new <link linkend="gfile-etag">entity tag</link> for the @file.
+ * @etag: a new <link linkend="gfile-etag">entity tag</link> for the @file, or %NULL
  * @make_backup: %TRUE if a backup should be created.
  * @flags: a set of #GFileCreateFlags.
  * @cancellable: optional #GCancellable object, %NULL to ignore.
@@ -5629,7 +5832,7 @@ g_file_replace_contents_async  (GFile               *file,
  * @res: a #GAsyncResult. 
  * @new_etag: a location of a new <link linkend="gfile-etag">entity tag</link> 
  *     for the document. This should be freed with g_free() when it is no 
- *     longer needed.
+ *     longer needed, or %NULL
  * @error: a #GError, or %NULL 
  * 
  * Finishes an asynchronous replace of the given @file. See

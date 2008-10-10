@@ -16,17 +16,35 @@
  * Free Software Foundation, Inc., 59 Temple Place, Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include	"gboxed.h"
 
-#include	"gbsearcharray.h"
-#include	"gvalue.h"
-#include	"gvaluearray.h"
-#include	"gclosure.h"
-#include	"gvaluecollector.h"
-
-#include	"gobjectalias.h"
+#include "config.h"
 
 #include <string.h>
+
+#include "gboxed.h"
+#include "gbsearcharray.h"
+#include "gvalue.h"
+#include "gvaluearray.h"
+#include "gclosure.h"
+#include "gvaluecollector.h"
+#include "gobjectalias.h"
+
+
+/**
+ * SECTION:gboxed
+ * @short_description: A mechanism to wrap opaque C structures registered
+ *     by the type system
+ * @see_also: #GParamSpecBoxed, g_param_spec_boxed()
+ * @title: Boxed Types
+ *
+ * GBoxed is a generic wrapper mechanism for arbitrary C structures. The only
+ * thing the type system needs to know about the structures is how to copy and
+ * free them, beyond that they are treated as opaque chunks of memory.
+ *
+ * Boxed types are useful for simple value-holder structures like rectangles or
+ * points. They can also be used for wrapping structures defined in non-GObject
+ * based libraries.
+ */
 
 /* --- typedefs & structures --- */
 typedef struct
@@ -94,7 +112,7 @@ value_free (gpointer boxed)
 }
 
 void
-g_boxed_type_init (void) 
+g_boxed_type_init (void)
 {
   static const GTypeInfo info = {
     0,                          /* class_size */
@@ -347,6 +365,18 @@ boxed_proxy_lcopy_value (const GValue *value,
   return NULL;
 }
 
+/**
+ * g_boxed_type_register_static:
+ * @name: Name of the new boxed type.
+ * @boxed_copy: Boxed structure copy function.
+ * @boxed_free: Boxed structure free function.
+ *
+ * This function creates a new %G_TYPE_BOXED derived type id for a new
+ * boxed type with name @name. Boxed type handling functions have to be
+ * provided to copy and free opaque boxed structures of this type.
+ *
+ * Returns: New %G_TYPE_BOXED derived type id for @name.
+ */
 GType
 g_boxed_type_register_static (const gchar   *name,
 			      GBoxedCopyFunc boxed_copy,
@@ -397,6 +427,15 @@ g_boxed_type_register_static (const gchar   *name,
   return type;
 }
 
+/**
+ * g_boxed_copy:
+ * @boxed_type: The type of @src_boxed.
+ * @src_boxed: The boxed structure to be copied.
+ * 
+ * Provide a copy of a boxed structure @src_boxed which is of type @boxed_type.
+ * 
+ * Returns: The newly created copy of the boxed structure.
+ */
 gpointer
 g_boxed_copy (GType         boxed_type,
 	      gconstpointer src_boxed)
@@ -424,7 +463,7 @@ g_boxed_copy (GType         boxed_type,
   else
     {
       GValue src_value, dest_value;
-      
+
       /* we heavily rely on third-party boxed type value vtable
        * implementations to follow normal boxed value storage
        * (data[0].v_pointer is the boxed struct, and
@@ -455,6 +494,13 @@ g_boxed_copy (GType         boxed_type,
   return dest_boxed;
 }
 
+/**
+ * g_boxed_free:
+ * @boxed_type: The type of @boxed.
+ * @boxed: The boxed structure to be freed.
+ *
+ * Free the boxed structure @boxed which is of type @boxed_type.
+ */
 void
 g_boxed_free (GType    boxed_type,
 	      gpointer boxed)
@@ -489,6 +535,14 @@ g_boxed_free (GType    boxed_type,
     }
 }
 
+/**
+ * g_value_get_boxed:
+ * @value: a valid #GValue of %G_TYPE_BOXED derived type
+ *
+ * Get the contents of a %G_TYPE_BOXED derived #GValue.
+ *
+ * Returns: boxed contents of @value
+ */
 gpointer
 g_value_get_boxed (const GValue *value)
 {
@@ -498,6 +552,17 @@ g_value_get_boxed (const GValue *value)
   return value->data[0].v_pointer;
 }
 
+/**
+ * g_value_dup_boxed:
+ * @value: a valid #GValue of %G_TYPE_BOXED derived type
+ *
+ * Get the contents of a %G_TYPE_BOXED derived #GValue.  Upon getting,
+ * the boxed value is duplicated and needs to be later freed with
+ * g_boxed_free(), e.g. like: g_boxed_free (G_VALUE_TYPE (@value),
+ * return_value);
+ *
+ * Returns: boxed contents of @value
+ */
 gpointer
 g_value_dup_boxed (const GValue *value)
 {
@@ -550,6 +615,13 @@ value_set_boxed_internal (GValue       *value,
     }
 }
 
+/**
+ * g_value_set_boxed:
+ * @value: a valid #GValue of %G_TYPE_BOXED derived type
+ * @v_boxed: boxed value to be set
+ *
+ * Set the contents of a %G_TYPE_BOXED derived #GValue to @v_boxed.
+ */
 void
 g_value_set_boxed (GValue       *value,
 		   gconstpointer boxed)
@@ -560,6 +632,15 @@ g_value_set_boxed (GValue       *value,
   value_set_boxed_internal (value, boxed, TRUE, TRUE);
 }
 
+/**
+ * g_value_set_static_boxed:
+ * @value: a valid #GValue of %G_TYPE_BOXED derived type
+ * @v_boxed: static boxed value to be set
+ *
+ * Set the contents of a %G_TYPE_BOXED derived #GValue to @v_boxed.
+ * The boxed value is assumed to be static, and is thus not duplicated
+ * when setting the #GValue.
+ */
 void
 g_value_set_static_boxed (GValue       *value,
 			  gconstpointer boxed)
@@ -570,6 +651,15 @@ g_value_set_static_boxed (GValue       *value,
   value_set_boxed_internal (value, boxed, FALSE, FALSE);
 }
 
+/**
+ * g_value_set_boxed_take_ownership:
+ * @value: a valid #GValue of %G_TYPE_BOXED derived type
+ * @v_boxed: duplicated unowned boxed value to be set
+ *
+ * This is an internal function introduced mainly for C marshallers.
+ *
+ * Deprecated: 2.4: Use g_value_take_boxed() instead.
+ */
 void
 g_value_set_boxed_take_ownership (GValue       *value,
 				  gconstpointer boxed)
@@ -577,6 +667,17 @@ g_value_set_boxed_take_ownership (GValue       *value,
   g_value_take_boxed (value, boxed);
 }
 
+/**
+ * g_value_take_boxed:
+ * @value: a valid #GValue of %G_TYPE_BOXED derived type
+ * @v_boxed: duplicated unowned boxed value to be set
+ *
+ * Sets the contents of a %G_TYPE_BOXED derived #GValue to @v_boxed
+ * and takes over the ownership of the callers reference to @v_boxed;
+ * the caller doesn't have to unref it any more.
+ *
+ * Since: 2.4
+ */
 void
 g_value_take_boxed (GValue       *value,
 		    gconstpointer boxed)

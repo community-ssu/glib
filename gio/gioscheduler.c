@@ -20,9 +20,10 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include "gioscheduler.h"
+#include "gcancellable.h"
 
 #include "gioalias.h"
 

@@ -21,10 +21,12 @@
  *         David Zeuthen <davidz@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include "gmount.h"
 #include "gvolume.h"
+#include "gasyncresult.h"
 #include "gsimpleasyncresult.h"
+#include "gioerror.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -158,7 +160,7 @@ g_volume_base_init (gpointer g_class)
  * Gets the name of @volume.
  * 
  * Returns: the name for the given @volume. The returned string should 
- * be freed when no longer needed.
+ * be freed with g_free() when no longer needed.
  **/
 char *
 g_volume_get_name (GVolume *volume)
@@ -179,6 +181,8 @@ g_volume_get_name (GVolume *volume)
  * Gets the icon for @volume.
  * 
  * Returns: a #GIcon.
+ *     The returned object should be unreffed with g_object_unref()
+ *     when no longer needed.
  **/
 GIcon *
 g_volume_get_icon (GVolume *volume)
@@ -202,6 +206,8 @@ g_volume_get_icon (GVolume *volume)
  * available.
  * 
  * Returns: the UUID for @volume or %NULL if no UUID can be computed.
+ *     The returned string should be freed with g_free() 
+ *     when no longer needed.
  **/
 char *
 g_volume_get_uuid (GVolume *volume)
@@ -222,6 +228,8 @@ g_volume_get_uuid (GVolume *volume)
  * Gets the drive for the @volume.
  * 
  * Returns: a #GDrive or %NULL if @volume is not associated with a drive.
+ *     The returned object should be unreffed with g_object_unref()
+ *     when no longer needed.
  **/
 GDrive *
 g_volume_get_drive (GVolume *volume)
@@ -242,6 +250,8 @@ g_volume_get_drive (GVolume *volume)
  * Gets the mount for the @volume.
  * 
  * Returns: a #GMount or %NULL if @volume isn't mounted.
+ *     The returned object should be unreffed with g_object_unref()
+ *     when no longer needed.
  **/
 GMount *
 g_volume_get_mount (GVolume *volume)
@@ -333,12 +343,14 @@ g_volume_should_automount (GVolume *volume)
  * @mount_operation: a #GMountOperation or %NULL to avoid user interaction.
  * @cancellable: optional #GCancellable object, %NULL to ignore.
  * @callback: a #GAsyncReadyCallback, or %NULL.
- * @user_data: a #gpointer.
+ * @user_data: user data that gets passed to @callback
  * 
- * Mounts a volume.
+ * Mounts a volume. This is an asynchronous operation, and is
+ * finished by calling g_volume_mount_finish() with the @volume
+ * and #GAsyncResult returned in the @callback.
  **/
 void
-g_volume_mount (GVolume    *volume,
+g_volume_mount (GVolume             *volume,
 		GMountMountFlags     flags,
                 GMountOperation     *mount_operation,
                 GCancellable        *cancellable,
@@ -365,18 +377,19 @@ g_volume_mount (GVolume    *volume,
 
 /**
  * g_volume_mount_finish:
- * @volume: pointer to a #GVolume.
- * @result: a #GAsyncResult.
- * @error: a #GError.
+ * @volume: a #GVolume
+ * @result: a #GAsyncResult
+ * @error: a #GError location to store an error, or %NULL to ignore
  * 
- * Finishes mounting a volume.
+ * Finishes mounting a volume. If any errors occured during the operation,
+ * @error will be set to contain the errors and %FALSE will be returned.
  * 
  * Returns: %TRUE, %FALSE if operation failed.
  **/
 gboolean
-g_volume_mount_finish (GVolume  *volume,
-                       GAsyncResult      *result,
-                       GError           **error)
+g_volume_mount_finish (GVolume       *volume,
+                       GAsyncResult  *result,
+                       GError       **error)
 {
   GVolumeIface *iface;
 
@@ -400,12 +413,14 @@ g_volume_mount_finish (GVolume  *volume,
  * @flags: flags affecting the unmount if required for eject
  * @cancellable: optional #GCancellable object, %NULL to ignore.
  * @callback: a #GAsyncReadyCallback, or %NULL.
- * @user_data: a #gpointer.
+ * @user_data: user data that gets passed to @callback
  * 
- * Ejects a volume.
+ * Ejects a volume. This is an asynchronous operation, and is
+ * finished by calling g_volume_eject_finish() with the @volume
+ * and #GAsyncResult returned in the @callback.
  **/
 void
-g_volume_eject (GVolume    *volume,
+g_volume_eject (GVolume             *volume,
 		GMountUnmountFlags   flags,
                 GCancellable        *cancellable,
                 GAsyncReadyCallback  callback,
@@ -433,16 +448,17 @@ g_volume_eject (GVolume    *volume,
  * g_volume_eject_finish:
  * @volume: pointer to a #GVolume.
  * @result: a #GAsyncResult.
- * @error: a #GError.
+ * @error: a #GError location to store an error, or %NULL to ignore
  * 
- * Finishes ejecting a volume.
+ * Finishes ejecting a volume. If any errors occured during the operation,
+ * @error will be set to contain the errors and %FALSE will be returned.
  * 
  * Returns: %TRUE, %FALSE if operation failed.
  **/
 gboolean
-g_volume_eject_finish (GVolume  *volume,
-                       GAsyncResult      *result,
-                       GError           **error)
+g_volume_eject_finish (GVolume       *volume,
+                       GAsyncResult  *result,
+                       GError       **error)
 {
   GVolumeIface *iface;
 
@@ -514,6 +530,88 @@ g_volume_enumerate_identifiers (GVolume *volume)
   
   return (* iface->enumerate_identifiers) (volume);
 }
+
+/**
+ * g_volume_get_activation_root:
+ * @volume: a #GVolume
+ *
+ * Gets the activation root for a #GVolume if it is known ahead of
+ * mount time. Returns %NULL otherwise. If not %NULL and if @volume
+ * is mounted, then the result of g_mount_get_root() on the
+ * #GMount object obtained from g_volume_get_mount() will always
+ * either be equal or a prefix of what this function returns. In
+ * other words, in code
+ *
+ * <programlisting>
+ *   GMount *mount;
+ *   GFile *mount_root
+ *   GFile *volume_activation_root;
+ *
+ *   mount = g_volume_get_mount (volume); /&ast; mounted, so never NULL &ast;/
+ *   mount_root = g_mount_get_root (mount);
+ *   volume_activation_root = g_volume_get_activation_root(volume); /&ast; assume not NULL &ast;/
+ * </programlisting>
+ *
+ * then the expression
+ *
+ * <programlisting>
+ *   (g_file_has_prefix (volume_activation_root, mount_root) ||
+      g_file_equal (volume_activation_root, mount_root))
+ * </programlisting>
+ *
+ * will always be %TRUE.
+ *
+ * There is a number of possible uses of this function.
+ *
+ * First, implementations of #GVolumeMonitor can use this method to
+ * determine if a #GMount should be adopted in the implementation of
+ * g_volume_monitor_adopt_orphan_mount() by testing if the result of
+ * this function equals (or has as prefix) the root of the given
+ * #GMount. In particular this is useful in the in-process proxy part
+ * of an out-of-process volume monitor implementation.
+ *
+ * Second, applications such as a file manager can use this to
+ * navigate to the correct root in response to the user navigating to
+ * a server. Now suppose there is a volume monitor for networked
+ * servers that creates #GVolume objects corresponding to the
+ * "favorite servers" (e.g. set up by the user via some "Connect to
+ * Server" dialog). Suppose also that one of the favorite servers is
+ * named "public_html @ fd.o" and the URI is
+ * <literal>sftp://people.freedesktop.org/home/david/public_html</literal>.
+ *
+ * Now, due to the way GIO works, when the corresponding #GVolume is
+ * mounted then a #GMount (typically adopted by the volume monitor)
+ * will appear with the mount root (e.g. the result of
+ * g_mount_get_root())
+ * <literal>sftp://people.freedesktop.org</literal>. However, this
+ * function (g_volume_get_activation_root()) can return a #GFile for
+ * the URI
+ * <literal>sftp://people.freedesktop.org/home/david/public_html</literal>.
+ *
+ * All this means that a file manager can use the latter URI for
+ * navigating when the user clicks an icon representing the #GVolume
+ * (e.g. clicking an icon with the name "public_html @ fd.o" or
+ * similar).
+ *
+ * Returns: the activation root of @volume or %NULL. Use
+ * g_object_unref() to free.
+ *
+ * Since: 2.18
+ **/
+GFile *
+g_volume_get_activation_root (GVolume *volume)
+{
+  GVolumeIface *iface;
+
+  g_return_val_if_fail (G_IS_VOLUME (volume), NULL);
+  iface = G_VOLUME_GET_IFACE (volume);
+
+  if (iface->get_activation_root == NULL)
+    return NULL;
+
+  return (* iface->get_activation_root) (volume);
+}
+
 
 
 #define __G_VOLUME_C__

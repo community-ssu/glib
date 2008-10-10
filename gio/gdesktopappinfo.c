@@ -21,7 +21,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <errno.h>
 #include <string.h>
@@ -34,12 +34,14 @@
 
 #include "gcontenttypeprivate.h"
 #include "gdesktopappinfo.h"
+#include "gfile.h"
 #include "gioerror.h"
 #include "gthemedicon.h"
 #include "gfileicon.h"
 #include <glib/gstdio.h>
 #include "glibintl.h"
 #include "giomodule-priv.h"
+#include "gappinfo.h"
 
 #include "gioalias.h"
 
@@ -184,38 +186,27 @@ binary_from_exec (const char *exec)
 }
 
 /**
- * g_desktop_app_info_new_from_filename:
- * @filename: a string containing a file name.
+ * g_desktop_app_info_new_from_keyfile:
+ * @key_file: an opened #GKeyFile
  * 
  * Creates a new #GDesktopAppInfo.
  *
  * Returns: a new #GDesktopAppInfo or %NULL on error.
+ *
+ * Since: 2.18
  **/
 GDesktopAppInfo *
-g_desktop_app_info_new_from_filename (const char *filename)
+g_desktop_app_info_new_from_keyfile (GKeyFile *key_file)
 {
   GDesktopAppInfo *info;
-  GKeyFile *key_file;
   char *start_group;
   char *type;
   char *try_exec;
   
-  key_file = g_key_file_new ();
-  
-  if (!g_key_file_load_from_file (key_file,
-				  filename,
-				  G_KEY_FILE_NONE,
-				  NULL))
-    {
-      g_key_file_free (key_file);
-      return NULL;
-    }
-
   start_group = g_key_file_get_start_group (key_file);
   if (start_group == NULL || strcmp (start_group, G_KEY_FILE_DESKTOP_GROUP) != 0)
     {
       g_free (start_group);
-      g_key_file_free (key_file);
       return NULL;
     }
   g_free (start_group);
@@ -227,7 +218,6 @@ g_desktop_app_info_new_from_filename (const char *filename)
   if (type == NULL || strcmp (type, G_KEY_FILE_DESKTOP_TYPE_APPLICATION) != 0)
     {
       g_free (type);
-      g_key_file_free (key_file);
       return NULL;
     }
   g_free (type);
@@ -243,14 +233,13 @@ g_desktop_app_info_new_from_filename (const char *filename)
       if (t == NULL)
 	{
 	  g_free (try_exec);
-	  g_key_file_free (key_file);
 	  return NULL;
 	}
       g_free (t);
     }
 
   info = g_object_new (G_TYPE_DESKTOP_APP_INFO, NULL);
-  info->filename = g_strdup (filename);
+  info->filename = NULL;
 
   info->name = g_key_file_get_locale_string (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_NAME, NULL, NULL);
   info->comment = g_key_file_get_locale_string (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_COMMENT, NULL, NULL);
@@ -264,8 +253,6 @@ g_desktop_app_info_new_from_filename (const char *filename)
   info->terminal = g_key_file_get_boolean (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_TERMINAL, NULL) != FALSE;
   info->startup_notify = g_key_file_get_boolean (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_STARTUP_NOTIFY, NULL) != FALSE;
   info->hidden = g_key_file_get_boolean (key_file, G_KEY_FILE_DESKTOP_GROUP, G_KEY_FILE_DESKTOP_KEY_HIDDEN, NULL) != FALSE;
-
-  g_key_file_free (key_file);
   
   info->icon = NULL;
   if (info->icon_name)
@@ -285,6 +272,43 @@ g_desktop_app_info_new_from_filename (const char *filename)
   if (info->exec)
     info->binary = binary_from_exec (info->exec);
   
+  if (info->path && info->path[0] == '\0')
+    {
+      g_free (info->path);
+      info->path = NULL;
+    }
+
+  return info;
+}
+
+/**
+ * g_desktop_app_info_new_from_filename:
+ * @filename: the path of a desktop file, in the GLib filename encoding
+ * 
+ * Creates a new #GDesktopAppInfo.
+ *
+ * Returns: a new #GDesktopAppInfo or %NULL on error.
+ **/
+GDesktopAppInfo *
+g_desktop_app_info_new_from_filename (const char *filename)
+{
+  GKeyFile *key_file;
+  GDesktopAppInfo *info = NULL;
+
+  key_file = g_key_file_new ();
+  
+  if (g_key_file_load_from_file (key_file,
+				 filename,
+				 G_KEY_FILE_NONE,
+				 NULL))
+    {
+      info = g_desktop_app_info_new_from_keyfile (key_file);
+      if (info)
+        info->filename = g_strdup (filename);
+    }  
+
+  g_key_file_free (key_file);
+
   return info;
 }
 
@@ -584,8 +608,8 @@ expand_application_parameters (GDesktopAppInfo   *info,
   
   if (info->exec == NULL)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		   _("Desktop file didn't specify Exec field"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                           _("Desktop file didn't specify Exec field"));
       return FALSE;
     }
   
@@ -878,8 +902,8 @@ g_desktop_app_info_launch_uris (GAppInfo           *appinfo,
       
       if (info->terminal && !prepend_terminal_to_vector (&argc, &argv))
 	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       _("Unable to find terminal required for application"));
+	  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Unable to find terminal required for application"));
 	  goto out;
 	}
 

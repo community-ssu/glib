@@ -52,12 +52,13 @@
  * attributes.
  **/
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
 #include "gfileinfo.h"
 #include "gfileattribute-priv.h"
+#include "gicon.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -234,9 +235,8 @@ g_file_info_finalize (GObject *object)
 
   if (info->mask != NO_ATTRIBUTE_MASK)
     g_file_attribute_matcher_unref (info->mask);
-  
-  if (G_OBJECT_CLASS (g_file_info_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_info_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_file_info_parent_class)->finalize (object);
 }
 
 static void
@@ -1325,7 +1325,7 @@ g_file_info_get_icon (GFileInfo *info)
  * 
  * Gets the file's content type.
  * 
- * Returns: a string containing the file's content type.s
+ * Returns: a string containing the file's content type.
  **/
 const char *
 g_file_info_get_content_type (GFileInfo *info)

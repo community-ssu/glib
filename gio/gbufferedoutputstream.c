@@ -20,7 +20,7 @@
  * Author: Christian Kellner <gicmo@gnome.org> 
  */
 
-#include <config.h>
+#include "config.h"
 #include "gbufferedoutputstream.h"
 #include "goutputstream.h"
 #include "gsimpleasyncresult.h"
@@ -335,8 +335,7 @@ g_buffered_output_stream_finalize (GObject *object)
 
   g_free (priv->buffer);
 
-  if (G_OBJECT_CLASS (g_buffered_output_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_buffered_output_stream_parent_class)->finalize) (object);
+  G_OBJECT_CLASS (g_buffered_output_stream_parent_class)->finalize (object);
 }
 
 static void

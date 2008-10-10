@@ -21,9 +21,10 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include "gdatainputstream.h"
 #include "gioenumtypes.h"
+#include "gioerror.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -305,8 +306,8 @@ read_data (GDataInputStream  *stream,
 	return FALSE;
       if (res == 0)
 	{
-	  g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED,
-		       _("Unexpected early end-of-stream"));
+	  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                               _("Unexpected early end-of-stream"));
 	  return FALSE;
 	}
     }

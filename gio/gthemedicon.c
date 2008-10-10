@@ -20,11 +20,12 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
 #include "gthemedicon.h"
+#include "gicon.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -83,6 +84,10 @@ g_themed_icon_get_property (GObject    *object,
     {
       case PROP_NAMES:
         g_value_set_boxed (value, icon->names);
+        break;
+
+      case PROP_USE_DEFAULT_FALLBACKS:
+        g_value_set_boolean (value, icon->use_default_fallbacks);
         break;
 
       default:
@@ -181,9 +186,8 @@ g_themed_icon_finalize (GObject *object)
   themed = G_THEMED_ICON (object);
 
   g_strfreev (themed->names);
-  
-  if (G_OBJECT_CLASS (g_themed_icon_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_themed_icon_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_themed_icon_parent_class)->finalize (object);
 }
 
 static void
@@ -244,7 +248,7 @@ g_themed_icon_class_init (GThemedIconClass *klass)
                                                          _("use default fallbacks"),
                                                          _("Whether to use default fallbacks found by shortening the name at '-' characters. Ignores names after the first if multiple names are given."),
                                                          FALSE,
-                                                         G_PARAM_CONSTRUCT_ONLY | G_PARAM_WRITABLE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB | G_PARAM_STATIC_NICK));
+                                                         G_PARAM_CONSTRUCT_ONLY | G_PARAM_READWRITE | G_PARAM_STATIC_NAME | G_PARAM_STATIC_BLURB | G_PARAM_STATIC_NICK));
 }
 
 static void
@@ -368,7 +372,8 @@ g_themed_icon_get_names (GThemedIcon *icon)
  * </para></note>
  */
 void
-g_themed_icon_append_name (GThemedIcon *icon, const char *iconname)
+g_themed_icon_append_name (GThemedIcon *icon, 
+                           const char  *iconname)
 {
   guint num_names;
 
@@ -379,6 +384,44 @@ g_themed_icon_append_name (GThemedIcon *icon, const char *iconname)
   icon->names = g_realloc (icon->names, sizeof (char*) * (num_names + 2));
   icon->names[num_names] = g_strdup (iconname);
   icon->names[num_names + 1] = NULL;
+
+  g_object_notify (G_OBJECT (icon), "names");
+}
+
+/**
+ * g_themed_icon_prepend_name:
+ * @icon: a #GThemedIcon
+ * @iconname: name of icon to prepend to list of icons from within @icon.
+ *
+ * Prepend a name to the list of icons from within @icon.
+ *
+ * <note><para>
+ * Note that doing so invalidates the hash computed by prior calls
+ * to g_icon_hash().
+ * </para></note>
+ *
+ * Since: 2.18
+ */
+void
+g_themed_icon_prepend_name (GThemedIcon *icon, 
+                            const char  *iconname)
+{
+  guint num_names;
+  gchar **names;
+  gint i;
+
+  g_return_if_fail (G_IS_THEMED_ICON (icon));
+  g_return_if_fail (iconname != NULL);
+
+  num_names = g_strv_length (icon->names);
+  names = g_new (char*, num_names + 2);
+  for (i = 0; icon->names[i]; i++)
+    names[i + 1] = icon->names[i];
+  names[0] = g_strdup (iconname);
+  names[num_names + 1] = NULL;
+
+  g_free (icon->names);
+  icon->names = names;
 
   g_object_notify (G_OBJECT (icon), "names");
 }

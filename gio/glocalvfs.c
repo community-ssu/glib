@@ -20,10 +20,11 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include "glocalvfs.h"
 #include "glocalfile.h"
 #include "giomodule.h"
+#include "gvfs.h"
 #include <gio/gdummyfile.h>
 #include <sys/types.h>
 #ifdef HAVE_PWD_H

@@ -20,7 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -78,9 +78,8 @@ g_cancellable_finalize (GObject *object)
   
   if (cancellable->cancel_pipe[1] != -1)
     close (cancellable->cancel_pipe[1]);
-  
-  if (G_OBJECT_CLASS (g_cancellable_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_cancellable_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_cancellable_parent_class)->finalize (object);
 }
 
 static void
@@ -290,10 +289,10 @@ g_cancellable_set_error_if_cancelled (GCancellable  *cancellable,
 {
   if (g_cancellable_is_cancelled (cancellable))
     {
-      g_set_error (error,
-		   G_IO_ERROR,
-		   G_IO_ERROR_CANCELLED,
-		   _("Operation was cancelled"));
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_CANCELLED,
+                           _("Operation was cancelled"));
       return TRUE;
     }
   

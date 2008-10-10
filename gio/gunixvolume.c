@@ -23,7 +23,7 @@
  *         David Zeuthen <davidz@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #include <sys/wait.h>
@@ -32,9 +32,12 @@
 #include <glib.h>
 #include "gunixvolume.h"
 #include "gunixmount.h"
+#include "gunixmounts.h"
 #include "gthemedicon.h"
+#include "gvolume.h"
 #include "gvolumemonitor.h"
 #include "gsimpleasyncresult.h"
+#include "gioerror.h"
 #include "glibintl.h"
 /* for BUFSIZ */
 #include <stdio.h>
@@ -85,8 +88,7 @@ g_unix_volume_finalize (GObject *object)
   g_free (volume->identifier);
   g_free (volume->identifier_type);
 
-  if (G_OBJECT_CLASS (g_unix_volume_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_unix_volume_parent_class)->finalize) (object);
+  G_OBJECT_CLASS (g_unix_volume_parent_class)->finalize (object);
 }
 
 static void
@@ -190,7 +192,7 @@ _g_unix_volume_set_mount (GUnixVolume  *volume,
   /* TODO: Emit changed in idle to avoid locking issues */
   g_signal_emit_by_name (volume, "changed");
   if (volume->volume_monitor != NULL)
-    g_signal_emit_by_name (volume->volume_monitor, "volume_changed", volume);
+    g_signal_emit_by_name (volume->volume_monitor, "volume-changed", volume);
 }
 
 /**
@@ -209,7 +211,7 @@ _g_unix_volume_unset_mount (GUnixVolume  *volume,
       /* TODO: Emit changed in idle to avoid locking issues */
       g_signal_emit_by_name (volume, "changed");
       if (volume->volume_monitor != NULL)
-        g_signal_emit_by_name (volume->volume_monitor, "volume_changed", volume);
+        g_signal_emit_by_name (volume->volume_monitor, "volume-changed", volume);
     }
 }
 

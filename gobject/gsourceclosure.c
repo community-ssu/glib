@@ -17,6 +17,8 @@
  * Boston, MA 02111-1307, USA.
  */
 
+#include "config.h"
+
 #include "gsourceclosure.h"
 #include "gboxed.h"
 #include "genums.h"
@@ -24,6 +26,7 @@
 #include "gvalue.h"
 #include "gvaluetypes.h"
 #include "gobjectalias.h"
+
 
 GType
 g_io_channel_get_type (void)
@@ -155,6 +158,17 @@ static GSourceCallbackFuncs closure_callback_funcs = {
   closure_callback_get
 };
 
+/**
+ * g_source_set_closure:
+ * @source: the source
+ * @closure: a #GClosure
+ *
+ * Set the callback for a source as a #GClosure.
+ *
+ * If the source is not one of the standard GLib types, the @closure_callback
+ * and @closure_marshal fields of the #GSourceFuncs structure must have been
+ * filled in with pointers to appropriate functions.
+ */
 void
 g_source_set_closure (GSource  *source,
 		      GClosure *closure)

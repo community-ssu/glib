@@ -28,25 +28,28 @@ top_builddir_full=`cd \$(top_builddir); pwd`
 
 lib_LTLIBRARIES = libgthread-2.0.la
 
+if OS_WIN32_AND_DLL_COMPILATION
 if MS_LIB_AVAILABLE
 noinst_DATA = gthread-2.0.lib
 
+install_ms_lib_cmd = $(INSTALL) gthread-2.0.lib $(DESTDIR)$(libdir)
+uninstall_ms_lib_cmd = -rm $(DESTDIR)$(libdir)/gthread-2.0.lib
+endif
+endif
+
 install-ms-lib:
-	$(INSTALL) gthread-2.0.lib $(DESTDIR)$(libdir)
+	$(install_ms_lib_cmd)
 
 uninstall-ms-lib:
-	-rm $(DESTDIR)$(libdir)/gthread-2.0.lib
-else
-install-ms-lib:
-uninstall-ms-lib:
-endif
+	$(uninstall_ms_lib_cmd)
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
-if OS_WIN32
+if OS_WIN32_AND_DLL_COMPILATION
 export_symbols = -export-symbols $(srcdir)/gthread.def
+gthread_def = gthread.def
 
 install-def-file:
 	$(INSTALL) $(srcdir)/gthread.def $(DESTDIR)$(libdir)/gthread-2.0.def
@@ -58,7 +61,7 @@ install-def-file:
 uninstall-def-file:
 endif
 
-if OS_WIN32
+if OS_WIN32_AND_DLL_COMPILATION
 gthread_win32_res = gthread-win32-res.o
 gthread_win32_res_ldflag = -Wl,$(gthread_win32_res)
 endif
@@ -71,15 +74,13 @@ libgthread_2_0_la_LDFLAGS = \
 
 libgthread_2_0_la_LIBADD = $(G_THREAD_LIBS_EXTRA) $(G_THREAD_LIBS_FOR_GTHREAD) $(libglib)
 
-libgthread_2_0_la_DEPENDENCIES = $(gthread_win32_res) $(GTHREAD_DEF)
+libgthread_2_0_la_DEPENDENCIES = $(gthread_win32_res) $(gthread_def)
 
-if OS_WIN32
 gthread-win32-res.o: gthread.rc
 	$(WINDRES) gthread.rc $@
-endif
 
 gthread-2.0.lib: libgthread-2.0.la gthread.def
-	lib -name:libgthread-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:$(srcdir)/gthread.def -out:$@
+	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libgthread-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:$(srcdir)/gthread.def -out:$@
 
 dist-hook: $(BUILT_EXTRA_DIST)
 	files='$(BUILT_EXTRA_DIST)'; \

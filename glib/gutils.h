@@ -21,8 +21,12 @@
  * Modified by the GLib Team and others 1997-2000.  See the AUTHORS
  * file for a list of people on the GLib Team.  See the ChangeLog
  * files for a list of changes.  These files are distributed with
- * GLib at ftp://ftp.gtk.org/pub/gtk/. 
+ * GLib at ftp://ftp.gtk.org/pub/gtk/.
  */
+
+#if defined(G_DISABLE_SINGLE_INCLUDES) && !defined (__GLIB_H_INSIDE__) && !defined (GLIB_COMPILATION)
+#error "Only <glib.h> can be included directly."
+#endif
 
 #ifndef __G_UTILS_H__
 #define __G_UTILS_H__
@@ -97,11 +101,7 @@ G_BEGIN_DECLS
 #  define G_INLINE_FUNC
 #  undef  G_CAN_INLINE
 #elif defined (__GNUC__) 
-#  if defined (__GNUC_STDC_INLINE__) || defined (__GNUC_GNU_INLINE__)
-#   define G_INLINE_FUNC extern inline __attribute__ ((__gnu_inline__))
-#  else
-#   define G_INLINE_FUNC extern inline
-#  endif
+#  define G_INLINE_FUNC static __inline __attribute__ ((unused))
 #elif defined (G_CAN_INLINE) 
 #  define G_INLINE_FUNC static inline
 #else /* can't inline */
@@ -430,11 +430,13 @@ const gchar * glib_check_version (guint required_major,
 
 G_END_DECLS
 
+#ifndef G_DISABLE_DEPRECATED
+
 /*
- * This macro will be deprecated in the future. This DllMain() is too
- * complex. It is recommended to have a DLlMain() that just saves the
- * handle to the DLL and then use that handle in normal code instead,
- * for instance passing it to
+ * This macro is deprecated. This DllMain() is too complex. It is
+ * recommended to write an explicit minimal DLlMain() that just saves
+ * the handle to the DLL and then use that handle instead, for
+ * instance passing it to
  * g_win32_get_package_installation_directory_of_module().
  *
  * On Windows, this macro defines a DllMain function that stores the
@@ -472,6 +474,9 @@ DllMain (HINSTANCE hinstDLL,						\
 									\
   return TRUE;								\
 }
+
+#endif	/* !G_DISABLE_DEPRECATED */
+
 #endif /* G_PLATFORM_WIN32 */
 
 #endif /* __G_UTILS_H__ */

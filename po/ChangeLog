@@ -1,60 +1,371 @@
-2008-09-12  Matthias Clasen  <mclasen@redhat.com>
+2008-09-17  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.16.6 ===
+	* === Released 2.18.1 ===
 
-2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+2008-09-17  Krishnababu K  <kkrothap@redhat.com>
 
-	* === Released 2.16.5 === 
+	* te.po: Updated Telugu Translation.
 
-2008-07-13  Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
+2008-09-15  Djihed Afifi <djihed@gmail.com> 
 
-	* zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
-	* zh_TW.po: Updated Traditional Chinese translation(Taiwan).
+	* ar.po: Updated Arabic Translation by Khaled Hosny.
 
-2008-07-01  Matthias Clasen  <mclasen@redhat.com>
-	
-	* === Released 2.16.4 ===
+2008-09-13  Baris Cicek  <baris@teamforce.name.tr>
 
-2008-05-31  Philipp Kerling  <k.philipp@gmail.com>
+	* tr.po: Updated Turkish Translation.
 
-	* de.po: Updated German translation
+2008-09-11  Rajesh Ranjan <rajeshkajha@yahoo.com>
 
-2008-05-09  Alexander Shopov  <ash@contact.bg>
+        * hi.po: Updated Hindi Translation.
+
+2008-09-09  Manoj Kumar Giri  <mgiri@redhat.com>
+
+	* or.po: Updated Oriya Translation
+
+2008-09-09  Runa Bhattacharjee  <runab@redhat.com>
+
+	* bn_IN.po: Updated Bengali India Translation
+
+2008-09-08  Robert Sedak  <robert.sedak@sk.t-com.hr>
+
+	* hr.po: Updated Croatian translation.
+
+2008-09-04  Changwoo Ryu  <cwryu@debian.org>
+
+	* ko.po: Updated Korean translation.
+
+2008-09-03  Philip Withnall  <philip@tecnocode.co.uk>
+
+	* en_GB.po: Updated British English translation.
+
+2008-09-02  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.18.0 ===
+
+2008-09-02  Alexander Shopov  <ash@contact.bg>
 
 	* bg.po: Updated Bulgarian translation by
 	Alexander Shopov <ash@contact.bg>
 
-2008-04-08  Matthias Clasen  <mclasen@redhat.com>
+2008-09-02  Wouter Bolsterlee  <wbolster@svn.gnome.org>
 
-	* === Released 2.16.3 ===
+	* nl.po: Updated Dutch translation by Tino Meinen.
+
+2008-08-30  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
+
+	* eu.po: Updated Basque translation.
+
+2008-08-28  Gabor Kelemen  <kelemeng@gnome.hu>
+
+	* hu.po: Translation updated.
+
+2008-08-28  Hendrik Richter  <hendrikr@gnome.org>
+
+	* de.po: Updated German translation.
+
+2008-08-28  Rajesh Ranjan  <rajeshkajha@yahoo.com>
+
+	* mai.po: Added Maithili translation.
+
+2008-08-27  Petr Kovar  <pknbe@volny.cz>
+
+	* cs.po: Updated Czech translation.
+
+2008-08-25  Daniel Nylander <po@danielnylander.se>
+
+	* sv.po: Updated Swedish translation.
+
+2008-08-25  Goran Rakic  <grakic@devbase.net>
+
+        * LINGUAS, sr@latin.po, sr@Latn.po: Conversion from sr@Latn to sr@latin.
+
+2008-08-24  Gintautas Miliauskas  <gintas@akl.lt>
+
+	* lt.po: Updated Lithuanian translation.
+
+2008-08-24 Maxim Dziumanenko <dziumanenko@gmail.com>
+
+        * uk.po: Update Ukrainian translation.
+
+2008-08-23  Priit Laes  <plaes at svn dot gnome dot org>
+
+	* et.po: Translation updated by Ivar Smolin
+
+2008-08-23  Theppitak Karoonboonyanan  <thep@linux.thai.net>
+
+	* th.po: Updated Thai translation.
+
+2008-08-23  Takeshi AIHANA <takeshi.aihana@gmail.com>
+
+	* ja.po: Updated Japanese translation.
+
+2008-08-22  Nguyễn Thái Ngọc Duy <pclouds@gmail.com>
+
+	* vi.po: Updated Vietnamese translation
+
+2008-08-21  Robert-André Mauchin  <zebob.m@pengzone.org>
+
+	* fr.po: Updated French translation.
+
+2008-08-19  Luca Ferretti  <elle.uca@libero.it>
+
+	* it.po: Updated Italian translation.
+
+2008-08-18  Yair Hershkovitz  <yairhr@gmail.com>
+
+	* he.po: Updated Hebrew translation.
+
+2008-08-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.7 ===
+
+=======
+2008-08-18  Laurent Dhima  <laurenti@alblinux.net>
+
+	* sq.po: Updated Albanian Translation.
+
+2008-08-15  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* POTFILES.in: Add missing file.
+	* nb.po: Update.
+
+2008-08-15  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* nb.po: Updated Norwegian bokmål translation.
+
+2008-08-14  Ilkka Tuohela <hile@iki.fi>
+
+	* fi.po: Updated Finnish translation.
+
+2008-08-13  Leonardo Ferreira Fontenelle  <leonardof@gnome.org>
+
+	* pt_BR.po: Brazilian Portuguese translation updated by Henrique P.
+	Machado and Leonardo F. Fontenelle.
+
+2008-08-13  Sandeep Shedmake  <sshedmak@redhat.com>
+
+	* mr.po: Updated Marathi translations
+
+2008-08-12  Yair Hershkovitz  <yairhr@gmail.com>
+
+	* he.po: Updated Hebrew translation.
+
+2008-08-12  Theppitak Karoonboonyanan  <thep@linux.thai.net>
+
+	* th.po: Updated Thai translation.
+
+2008-08-12  Inaki Larranaga Murgoitio  <dooteo@euskalgnu.org>
+
+	* eu.po: Updated Basque translation.
+
+2008-08-10  Jorge Gonzalez  <jorgegonz@svn.gnome.org> 
+
+	* es.po: Updated Spanish translation
+
+2008-08-10  Gil Forcada  <gforcada@gnome.org>
+
+	* ca.po: Updated Catalan translation.
+
+2008-08-09  Duarte Loreto <happyguy_pt@hotmail.com>
+
+	* pt.po: Updated Portuguese translation.
+
+2008-08-08  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gl.po: Updated Galician translation
+
+2008-08-6  Djihed Afifi <djihed@gmail.com> 
+
+	* ar.po: Updated Arabic Translation by Khaled Hosny.
+
+2008-08-05  Gil Forcada  <gforcada@gnome.org>
+
+	* ca.po: Updated Catalan translation.
+	* POTFILES.in: Added missing file.
+
+2008-08-05  Yair Hershkovitz  <yairhr@gmail.com>
+
+	* he.po: Updated Hebrew translation.
+
+2008-08-05  Daniel Nylander <po@danielnylander.se>
+
+	* sv.po: Updated Swedish translation.
+
+2008-08-04  Jorge Gonzalez  <jorgegonz@svn.gnome.org>
+
+	* es.po: Updated Spanish translation
+
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.6 ===
+
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.5 ===
+
+2008-08-04  Changwoo Ryu  <cwryu@debian.org>
+
+	* ko.po: Updated Korean translation.
+
+2008-07-31  Duarte Loreto <happyguy_pt@hotmail.com>
+
+	* pt.po: Updated Portuguese translation.
+
+2008-07-29  Ignacio Casal Quinteiro  <nacho.resa@gmail.com>
+
+	* gl.po: Updated Galician Translation.
+
+2008-07-29  Djihed Afifi <djihed@gmail.com> 
+
+	* ar.po: Updated Arabic Translation by Khaled Hosny.
+
+2008-07-28  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* nb.po: Updated Norwegian bokmål translation.
+
+2008-07-26  Takeshi AIHANA <takeshi.aihana@gmail.com>
+
+	* ja.po: Updated Japanese translation.
+
+2008-07-23  Gil Forcada  <gforcada@gnome.org>
+
+	* ps.po: Minor update to Pashto by Zabeeh Khan.
+
+2008-07-23  Luca Ferretti  <elle.uca@libero.it>
+
+	* it.po: Updated Italian translation.
+
+wpV862008-07-22  Priit Laes  <plaes at svn dot gnome dot org>
+
+	* et.po: Translation updated by Ivar Smolin
+
+2008-07-21  Matthias Clasen  <mclasen2redhat.com>
+
+	* === Released 2.17.4 ===
+
+2008-07-20  Leonardo Ferreira Fontenelle  <leonardof@gnome.org>
+
+	* pt_BR.po: Brazilian Portuguese translation improvements.
+
+2008-07-20  Andre Klapper  <a9016009@gmx.de>
+
+        * de.po: Updated German translation
+
+2008-07-16  Laurent Dhima  <laurenti@alblinux.net>
+
+	* sq.po: Updated Albanian Translation.
+
+2008-07-15  Runa Bhattacharjee <runabh@gmail.com>
+
+	* ps.po: Added Pashto (ps) Translations by Zabeeh Khan.
+	* LINGUAS: Added Pashto (ps) to the List of Languages
+
+2008-07-14  Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
+
+        * zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
+        * zh_TW.po: Updated Traditional Chinese translation(Taiwan).
+
+2008-07-13  Chao-Hsiung Liao  <j_h_liau@yahoo.com.tw>
+
+        * zh_HK.po: Updated Traditional Chinese translation(Hong Kong).
+        * zh_TW.po: Updated Traditional Chinese translation(Taiwan).
+
+2008-07-10  Theppitak Karoonboonyanan  <thep@linux.thai.net>
+
+	* th.po: Updated Thai translation.
+
+2008-07-04  Priit Laes  <plaes at svn dot gnome dot org>
+
+	* et.po: Translation updated by Ivar Smolin
+
+2008-07-03  Hendrik Richter  <hendrikr@gnome.org>
+
+	* de.po: Updated German translation, fix #540762.
+
+2008-07-02  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.3 ===
+
+2008-07-02  Yannig Marchegay <yannig@marchegay.org>
+
+	* oc.po: Updated Occitan translation.
+
+2008-06-23  Changwoo Ryu  <cwryu@debian.org>
+
+	* ko.po: Updated Korean translation.
+
+2008-06-12  Matthias Clasen  <mclasen@redhat.com>
+	
+	* === Released 2.17.2 ===
+
+2008-06-12  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.1 ===
+
+2008-06-11  Djihed Afifi <djihed@gmail.com> 
+
+	* ar.po: Updated Arabic Translation by Khaled Hosny.
+
+2008-06-10  Theppitak Karoonboonyanan  <thep@linux.thai.net>
+
+	* th.po: Updated Thai translation.
+
+2008-06-07  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* nb.po: Updated Norwegian bokmål translation.
+
+2008-05-31  Luca Ferretti  <elle.uca@libero.it>
+
+	* it.po: Updated Italian translation.
+
+2008-05-31  Philipp Kerling  <k.philipp@gmail.com>
+
+	* de.po: Updated German translation.
+
+2008-05-27  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.0 ===
+
+2008-05-22  Djihed Afifi <djihed@gmail.com> 
+
+	* ar.po: Updated Arabic Translation by Khaled Hosny.
+
+2008-05-08  Alexander Shopov  <ash@contact.bg>
+
+	* bg.po: Updated Bulgarian translation by
+	Alexander Shopov <ash@contact.bg>
+
+2008-04-23  Yannig Marchegay  <yannig@marchegay.org>
+
+	* oc.po: Updated Occitan translation.
+
+2008-04-22  Adam Weinberger  <adamw@gnome.org>
+
+	* en_CA.po: Updated Canadian English translation.
+
+2008-04-20  Yair Hershkovitz  <yairhr@gmail.com>
+
+	* he.po: Updated Hebrew translation.
+
+2008-04-19  Kjartan Maraas  <kmaraas@gnome.org>
+
+	* nb.po: Updated Norwegian bokmål translation.
+
+2008-04-15  Philip Withnall  <pwithnall@svn.gnome.org>
+
+	* en_GB.po: Fixed British English translation.
 
 2008-04-02  Petr Kovar  <pknbe@volny.cz>
 
 	* cs.po: Updated Czech translation.
 
-2008-03-31  Matthias Clasen  <mclasen@redhat.com>
-
-	* === Released 2.16.2 ===
-
-2008-03-30  Changwoo Ryu  <cwryu@debian.org>
-
-	* ko.po: Updated Korean translation.
-
-2008-03-28  Yair Hershkovitz  <yairhr@gmail.com>
-
-	* he.po: Updated Hebrew translation.
-
-2008-03-25  Philip Withnall  <pwithnall@svn.gnome.org>
-
-	* en_GB.po: Updated British English translation.
-
 2008-03-23  Nguyễn Thái Ngọc Duy <pclouds@gmail.com>
 
 	* vi.po: Update Vietnamese translation
 
-2008-03-21  Claude Paroz  <claude@2xlibre.net>
+2008-03-20  Priit Laes  <plaes at svn dot gnome dot org>
 
-	* fr.po: Updated French translation.
+	* et.po: Translation updated by Ivar Smolin
 
 2008-03-18  Laurent Dhima  <laurenti@alblinux.net>
 
@@ -68,17 +379,13 @@
 
 	* sq.po: Updated Albanian Translation.
 
-2008-03-17  Luca Ferretti  <elle.uca@libero.it>
-
-	* it.po: Updated Italian translation.
-
-2008-03-16  Ihar Hrachyshka <booxter@lacinka.org>
-
-	* be@latin.po: Updated Belarusian Latin translation.
-
 2008-03-16  Gabor Kelemen  <kelemeng@gnome.hu>
 
 	* hu.po: Translation updated
+
+2008-03-15  Yuri Kozlov <kozlov.y@gmail.com>
+
+	* ru.po: Updated Russian translation.
 
 2008-03-15  Marcel Telka  <marcel@telka.sk>
 

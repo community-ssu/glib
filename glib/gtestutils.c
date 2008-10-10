@@ -28,6 +28,7 @@
 #endif
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>
 #endif
@@ -228,6 +229,9 @@ g_test_log (GTestLogType lbit,
     }
 }
 
+/* We intentionally parse the command line without GOptionContext
+ * because otherwise you would never be able to test it.
+ */
 static void
 parse_args (gint    *argc_p,
             gchar ***argv_p)
@@ -347,6 +351,27 @@ parse_args (gint    *argc_p,
             }
           argv[i] = NULL;
         }
+      else if (strcmp ("-?", argv[i]) == 0 || strcmp ("--help", argv[i]) == 0)
+        {
+          printf ("Usage:\n"
+                  "  %s [OPTION...]\n\n"
+                  "Help Options:\n"
+                  "  -?, --help                     Show help options\n"
+                  "Test Options:\n"
+                  "  -l                             List test cases available in a test executable\n"
+                  "  -seed=RANDOMSEED               Provide a random seed to reproduce test\n"
+                  "                                 runs using random numbers\n"
+                  "  --verbose                      Run tests verbosely\n"
+                  "  -q, --quiet                    Run tests quietly\n"
+                  "  -p TESTPATH                    execute all tests matching TESTPATH\n"
+                  "  -m {perf|slow|thorough|quick}  Execute tests according modes\n"
+                  "  --debug-log                    debug test logging output\n"
+                  "  -k, --keep-going               gtester-specific argument\n"
+                  "  --GTestLogFD=N                 gtester-specific argument\n"
+                  "  --GTestSkipCount=N             gtester-specific argument\n",
+                  argv[0]);
+          exit (0);
+        }
     }
   /* collapse argv */
   e = 1;
@@ -372,23 +397,77 @@ parse_args (gint    *argc_p,
  * test random number generator, the name for g_get_prgname()
  * and parsing test related command line args.
  * So far, the following arguments are understood:
- * <informalexample>
- * -l                   list test cases available in a test executable.
- * --seed RANDOMSEED    provide a random seed to reproduce test runs using random numbers.
- * --verbose            run tests verbosely.
- * -q, --quiet          run tests quietly.
- * -p TESTPATH          execute all tests matching TESTPATH.
- * -m {perf|slow|thorough|quick}
- *                      execute tests according to these test modes:
- *                      perf - performance tests, may take long and report results.
- *                      slow - slow and thorough tests, may take quite long and maximize coverage.
- *                      thorough - currently an alias for "slow".
- *                      quick - quick tests, should run really quickly and give good coverage.
- * --debug-log          debug test logging output.
- * -k, --keep-going     gtester specific argument.
- * --GTestLogFD N       gtester specific argument.
- * --GTestSkipCount N   gtester specific argument.
- * </informalexample>
+ * <variablelist>
+ *   <varlistentry>
+ *     <term><option>-l</option></term>
+ *     <listitem><para>
+ *       list test cases available in a test executable.
+ *     </para></listitem>
+ *   </varlistentry>
+ *   <varlistentry>
+ *     <term><option>--seed=<replaceable>RANDOMSEED</replaceable></option></term>
+ *     <listitem><para>
+ *       provide a random seed to reproduce test runs using random numbers.
+ *     </para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>--verbose</option></term>
+ *       <listitem><para>run tests verbosely.</para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>-q</option>, <option>--quiet</option></term>
+ *       <listitem><para>run tests quietly.</para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>-p <replaceable>TESTPATH</replaceable></option></term>
+ *       <listitem><para>
+ *         execute all tests matching <replaceable>TESTPATH</replaceable>.
+ *       </para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>-m {perf|slow|thorough|quick}</option></term>
+ *       <listitem><para>
+ *         execute tests according to these test modes:
+ *         <variablelist>
+ *           <varlistentry>
+ *             <term>perf</term>
+ *             <listitem><para>
+ *               performance tests, may take long and report results.
+ *             </para></listitem>
+ *           </varlistentry>
+ *           <varlistentry>
+ *             <term>slow, thorough</term>
+ *             <listitem><para>
+ *               slow and thorough tests, may take quite long and 
+ *               maximize coverage.
+ *             </para></listitem>
+ *           </varlistentry>
+ *           <varlistentry>
+ *             <term>quick</term>
+ *             <listitem><para>
+ *               quick tests, should run really quickly and give good coverage.
+ *             </para></listitem>
+ *           </varlistentry>
+ *         </variablelist>
+ *       </para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>--debug-log</option></term>
+ *       <listitem><para>debug test logging output.</para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>-k</option>, <option>--keep-going</option></term>
+ *       <listitem><para>gtester-specific argument.</para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>--GTestLogFD <replaceable>N</replaceable></option></term>
+ *       <listitem><para>gtester-specific argument.</para></listitem>
+ *     </varlistentry>
+ *     <varlistentry>
+ *       <term><option>--GTestSkipCount <replaceable>N</replaceable></option></term>
+ *       <listitem><para>gtester-specific argument.</para></listitem>
+ *     </varlistentry>
+ *  </variablelist>
  *
  * Since: 2.16
  */
@@ -484,10 +563,12 @@ test_run_seed (const gchar *rseed)
 /**
  * g_test_rand_int:
  *
- * Get a reproducable random integer number.
- * The random numbers generate by the g_test_rand_*() family of functions
+ * Get a reproducible random integer number.
+ *
+ * The random numbers generated by the g_test_rand_*() family of functions
  * change with every new test program start, unless the --seed option is
  * given when starting test programs.
+ *
  * For individual test cases however, the random number generator is
  * reseeded, to avoid dependencies between tests and to make --seed
  * effective for all test cases.
@@ -507,7 +588,7 @@ g_test_rand_int (void)
  * @begin: the minimum value returned by this function
  * @end:   the smallest value not to be returned by this function
  *
- * Get a reproducable random integer number out of a specified range,
+ * Get a reproducible random integer number out of a specified range,
  * see g_test_rand_int() for details on test case random numbers.
  *
  * Returns: a number with @begin <= number < @end.
@@ -524,7 +605,7 @@ g_test_rand_int_range (gint32          begin,
 /**
  * g_test_rand_double:
  *
- * Get a reproducable random floating point number,
+ * Get a reproducible random floating point number,
  * see g_test_rand_int() for details on test case random numbers.
  *
  * Returns: a random number from the seeded random number generator.
@@ -542,7 +623,7 @@ g_test_rand_double (void)
  * @range_start: the minimum value returned by this function
  * @range_end: the minimum value not returned by this function
  *
- * Get a reproducable random floating pointer number out of a specified range,
+ * Get a reproducible random floating pointer number out of a specified range,
  * see g_test_rand_int() for details on test case random numbers.
  *
  * Returns: a number with @range_start <= number < @range_end.
@@ -689,6 +770,7 @@ g_test_message (const char *format,
  * @uri_pattern: the base pattern for bug URIs
  *
  * Specify the base URI for bug reports.
+ *
  * The base URI is used to construct bug report messages for
  * g_test_message() when g_test_bug() is called.
  * Calling this function outside of a test case sets the
@@ -874,13 +956,13 @@ g_test_add_vtable (const char     *testpath,
 
 /**
  * g_test_add_func:
- * @testpath:   Slash seperated test case path name for the test.
+ * @testpath:   Slash-separated test case path name for the test.
  * @test_func:  The test function to invoke for this test.
  *
  * Create a new test case, similar to g_test_create_case(). However
  * the test is assumed to use no fixture, and test suites are automatically
  * created on the fly and added to the root fixture, based on the
- * slash seperated portions of @testpath.
+ * slash-separated portions of @testpath.
  *
  * Since: 2.16
  */
@@ -896,14 +978,14 @@ g_test_add_func (const char     *testpath,
 
 /**
  * g_test_add_data_func:
- * @testpath:   Slash separated test case path name for the test.
+ * @testpath:   Slash-separated test case path name for the test.
  * @test_data:  Test data argument for the test function.
  * @test_func:  The test function to invoke for this test.
  *
  * Create a new test case, similar to g_test_create_case(). However
  * the test is assumed to use no fixture, and test suites are automatically
  * created on the fly and added to the root fixture, based on the
- * slash seperated portions of @testpath. The @test_data argument
+ * slash-separated portions of @testpath. The @test_data argument
  * will be passed as first argument to @test_func.
  *
  * Since: 2.16
@@ -1118,7 +1200,8 @@ g_test_run_suite_internal (GTestSuite *suite,
  *
  * Execute the tests within @suite and all nested #GTestSuites.
  * The test suites to be executed are filtered according to
- * test path arguments (-p <testpath>) as parsed by g_test_init().
+ * test path arguments (-p <replaceable>testpath</replaceable>) 
+ * as parsed by g_test_init().
  * g_test_run_suite() or g_test_run() may only be called once
  * in a program.
  *
@@ -1209,10 +1292,10 @@ g_assertion_message (const char     *domain,
     message = "code should not be reached";
   g_snprintf (lstr, 32, "%d", line);
   s = g_strconcat (domain ? domain : "", domain && domain[0] ? ":" : "",
-                   "ERROR:(", file, ":", lstr, "):",
+                   "ERROR:", file, ":", lstr, ":",
                    func, func[0] ? ":" : "",
                    " ", message, NULL);
-  g_printerr ("**\n** %s\n", s);
+  g_printerr ("**\n%s\n", s);
   g_test_log (G_TEST_LOG_ERROR, s, NULL, 0, NULL);
   g_free (s);
   abort();
@@ -1430,22 +1513,12 @@ test_time_stamp (void)
  * Fork the current test program to execute a test case that might
  * not return or that might abort. The forked test case is aborted
  * and considered failing if its run time exceeds @usec_timeout.
- * The forking behavior can be configured with the following flags:
- * %G_TEST_TRAP_SILENCE_STDOUT - redirect stdout of the test child
- * to /dev/null so it cannot be observed on the console during test
- * runs. The actual output is still captured though to allow later
- * tests with g_test_trap_assert_stdout().
- * %G_TEST_TRAP_SILENCE_STDERR - redirect stderr of the test child
- * to /dev/null so it cannot be observed on the console during test
- * runs. The actual output is still captured though to allow later
- * tests with g_test_trap_assert_stderr().
- * %G_TEST_TRAP_INHERIT_STDIN - if this flag is given, stdin of the
- * forked child process is shared with stdin of its parent process.
- * It is redirected to /dev/null otherwise.
+ *
+ * The forking behavior can be configured with the #GTestTrapFlags flags.
  *
  * In the following example, the test code forks, the forked child
  * process produces some sample output and exits successfully.
- * The forking parent process then asserts successfull child program
+ * The forking parent process then asserts successful child program
  * termination and validates child program outputs.
  *
  * |[
@@ -1614,7 +1687,7 @@ g_test_trap_fork (guint64        usec_timeout,
 /**
  * g_test_trap_has_passed:
  *
- * Check the reuslt of the last g_test_trap_fork() call.
+ * Check the result of the last g_test_trap_fork() call.
  *
  * Returns: %TRUE if the last forked child terminated successfully.
  *
@@ -1629,7 +1702,7 @@ g_test_trap_has_passed (void)
 /**
  * g_test_trap_reached_timeout:
  *
- * Check the reuslt of the last g_test_trap_fork() call.
+ * Check the result of the last g_test_trap_fork() call.
  *
  * Returns: %TRUE if the last forked child got killed due to a fork timeout.
  *
@@ -1891,7 +1964,7 @@ g_test_log_msg_free (GTestLogMsg *tmsg)
  *
  * Hook up a new test case at @testpath, similar to g_test_add_func().
  * A fixture data structure with setup and teardown function may be provided
- * though, simmilar to g_test_create_case().
+ * though, similar to g_test_create_case().
  * g_test_add() is implemented as a macro, so that the fsetup(), ftest() and
  * fteardown() callbacks can expect a @Fixture pointer as first argument in
  * a type safe manner.

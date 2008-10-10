@@ -1,18 +1,25 @@
 ## Process this file with automake to produce Makefile.in
 include $(top_srcdir)/Makefile.decl
 
+AUTOMAKE_OPTIONS = 1.6
+
 # The name of the module.
 DOC_MODULE=gobject
 
 # The top-level SGML file.
 DOC_MAIN_SGML_FILE=gobject-docs.sgml
 
-# Extra options to supply to gtkdoc-scan
-SCAN_OPTIONS=
-
 # The directory containing the source code. Relative to $(srcdir)
 DOC_SOURCE_DIR=../../../gobject
 
+# Extra options to supply to gtkdoc-scan
+SCAN_OPTIONS=--deprecated-guards="G_DISABLE_DEPRECATED" \
+	--ignore-decorators=G_GNUC_INTERNAL
+
+# Extra options to supply to gtkdoc-mkdb
+MKDB_OPTIONS=--sgml-mode --output-format=xml
+
+# Used for dependencies
 HFILE_GLOB=$(top_srcdir)/gobject/*.h
 CFILE_GLOB=$(top_srcdir)/gobject/*.c
 
@@ -32,8 +39,9 @@ GTKDOC_LIBS = \
 	$(top_builddir)/glib/libglib-2.0.la	\
 	$(top_builddir)/gobject/libgobject-2.0.la
 
-# Extra options to supply to gtkdoc-mkdb
-MKDB_OPTIONS=
+# Images to copy into HTML directory
+HTML_IMAGES =  \
+	$(srcdir)/images/glue.png
 
 # Extra SGML files that are included by $(DOC_MAIN_SGML_FILE)
 content_files = version.xml 		\
@@ -46,10 +54,6 @@ content_files = version.xml 		\
 		tut_howto.xml \
 		tut_intro.xml \
 		tut_tools.xml
-
-# Images to copy into HTML directory
-HTML_IMAGES =  \
-	$(srcdir)/images/glue.png
 
 # Extra options to supply to gtkdoc-fixref
 FIXXREF_OPTIONS=--extra-dir=$(srcdir)/../glib/html

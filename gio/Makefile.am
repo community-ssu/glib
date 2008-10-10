@@ -8,18 +8,20 @@ if OS_UNIX
 SUBDIRS += xdgmime
 endif
 
+if OS_WIN32_AND_DLL_COMPILATION
 if MS_LIB_AVAILABLE
 noinst_DATA = gio-2.0.lib
 
+install_ms_lib_cmd = $(INSTALL) gio-2.0.lib $(DESTDIR)$(libdir)
+uninstall_ms_lib_cmd = -rm $(DESTDIR)$(libdir)/gio-2.0.lib
+endif
+endif
+
 install-ms-lib:
-	$(INSTALL) gio-2.0.lib $(DESTDIR)$(libdir)
+	$(install_ms_lib_cmd)
 
 uninstall-ms-lib:
-	-rm $(DESTDIR)$(libdir)/gio-2.0.lib
-else
-install-ms-lib:
-uninstall-ms-lib:
-endif
+	$(uninstall_ms_lib_cmd)
 
 gio.def: gio.symbols
 	(echo -e EXPORTS; $(CPP) -P -DINCLUDE_VARIABLES -DINCLUDE_INTERNAL_SYMBOLS -DG_OS_WIN32 -DALL_FILES - <$(srcdir)/gio.symbols | sed -e '/^$$/d' -e 's/^/	/' -e 's/G_GNUC_[^ ]*//g' | sort) > gio.def.tmp && \
@@ -92,12 +94,28 @@ local_sources = \
 	$(NULL)
 
 platform_libadd =
+platform_deps =
 appinfo_sources =
 
 if HAVE_INOTIFY
 SUBDIRS += inotify
 platform_libadd += inotify/libinotify.la
+platform_deps += inotify/libinotify.la
 endif
+
+if HAVE_FEN
+AM_CPPFLAGS += -DHAVE_FEN
+SUBDIRS += fen
+platform_libadd += fen/libfen.la
+platform_deps += fen/libfen.la
+endif
+
+if OS_WIN32
+SUBDIRS += win32
+platform_libadd += win32/libgiowin32.la
+platform_deps += win32/libgiowin32.la
+endif
+
 
 SUBDIRS += .
 
@@ -108,6 +126,7 @@ endif
 if OS_UNIX
 appinfo_sources += gdesktopappinfo.c gdesktopappinfo.h
 platform_libadd += xdgmime/libxdgmime.la
+platform_deps += xdgmime/libxdgmime.la
 unix_sources = \
 	gunixmount.c		\
 	gunixmount.h		\
@@ -134,6 +153,13 @@ endif
 if OS_WIN32
 appinfo_sources += gwin32appinfo.c gwin32appinfo.h
 platform_libadd += -lshlwapi
+win32_sources = \
+	gwin32mount.c \
+	gwin32mount.h \
+	gwin32volumemonitor.c \
+	gwin32volumemonitor.h \
+	$(NULL)
+
 endif
 
 SUBDIRS += tests
@@ -153,6 +179,10 @@ libgio_2_0_la_SOURCES =		\
 	gdrive.c 		\
 	gdummyfile.h 		\
 	gdummyfile.c 		\
+	gemblem.h 		\
+	gemblem.c 		\
+	gemblemedicon.h		\
+	gemblemedicon.c		\
 	gfile.c 		\
 	gfileattribute.c 	\
 	gfileattribute-priv.h 	\
@@ -167,6 +197,7 @@ libgio_2_0_la_SOURCES =		\
 	gfilteroutputstream.c 	\
 	gicon.c 		\
 	ginputstream.c 		\
+	gioenums.h		\
 	gioerror.c 		\
 	giomodule.c 		\
 	giomodule-priv.h	\
@@ -196,6 +227,7 @@ libgio_2_0_la_SOURCES =		\
 	gioaliasdef.c		\
 	$(appinfo_sources) 	\
 	$(unix_sources) 	\
+	$(win32_sources) 	\
 	$(local_sources) 	\
 	$(marshal_sources) 	\
 	$(NULL)
@@ -216,7 +248,7 @@ if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
-if OS_WIN32
+if OS_WIN32_AND_DLL_COMPILATION
 export_symbols = -export-symbols gio.def
 gio_def = gio.def
 
@@ -236,8 +268,11 @@ install-data-local: install-ms-lib install-def-file
 
 uninstall-local: uninstall-ms-lib uninstall-def-file
 
-libgio_2_0_la_LDFLAGS= -export-dynamic $(no_undefined) $(export_symbols)
-libgio_2_0_la_DEPENDENCIES = $(gio_def)
+libgio_2_0_la_LDFLAGS = \
+	-version-info $(LT_CURRENT):$(LT_REVISION):$(LT_AGE) \
+	-export-dynamic $(no_undefined) $(export_symbols)
+
+libgio_2_0_la_DEPENDENCIES = $(gio_def) $(platform_deps)
 
 gio_headers =			\
 	gappinfo.h 		\
@@ -249,6 +284,8 @@ gio_headers =			\
 	gdatainputstream.h 	\
 	gdataoutputstream.h 	\
 	gdrive.h 		\
+	gemblem.h 		\
+	gemblemedicon.h		\
 	gfile.h 		\
 	gfileattribute.h 	\
 	gfileenumerator.h 	\
@@ -263,7 +300,8 @@ gio_headers =			\
 	gicon.h 		\
 	ginputstream.h 		\
 	gio.h			\
-	gioenumtypes.h		\
+	giotypes.h		\
+	gioenums.h		\
 	gioerror.h 		\
 	giomodule.h 		\
 	gioscheduler.h 		\
@@ -302,6 +340,7 @@ EXTRA_DIST += 			\
 	gio.symbols		\
 	gioenumtypes.h.template	\
 	gioenumtypes.c.template	\
+	makefile.msc		\
 	makegioalias.pl		\
 	abicheck.sh		\
 	pltcheck.sh		\
@@ -322,4 +361,4 @@ gioenumtypes.c: $(gio_headers) gioenumtypes.c.template
 	    gioenumtypes.c.tmp && mv gioenumtypes.c.tmp gioenumtypes.c
 
 gio-2.0.lib: libgio-2.0.la gio.def
-	lib -name:libgio-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:gio.def -out:$@
+	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libgio-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:gio.def -out:$@

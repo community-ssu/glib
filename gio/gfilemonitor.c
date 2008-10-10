@@ -20,12 +20,13 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include <string.h>
 
 #include "gfilemonitor.h"
 #include "gio-marshal.h"
 #include "gioenumtypes.h"
+#include "gfile.h"
 #include "gvfs.h"
 #include "glibintl.h"
 
@@ -39,7 +40,8 @@
  * Monitors a file or directory for changes.
  *
  * To obtain a #GFileMonitor for a file or directory, use
- * g_file_monitor_file() or g_file_monitor_directory().
+ * g_file_monitor(), g_file_monitor_file(), or
+ * g_file_monitor_directory().
  *
  * To get informed about changes to the file or directory you
  * are monitoring, connect to the #GFileMonitor::changed signal.
@@ -51,6 +53,9 @@ enum {
   CHANGED,
   LAST_SIGNAL
 };
+
+/* work around a limitation of the aliasing foo */
+#undef g_file_monitor
 
 G_DEFINE_ABSTRACT_TYPE (GFileMonitor, g_file_monitor, G_TYPE_OBJECT);
 
@@ -156,9 +161,8 @@ g_file_monitor_finalize (GObject *object)
     }
 
   g_hash_table_destroy (monitor->priv->rate_limiter);
-  
-  if (G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_file_monitor_parent_class)->finalize (object);
 }
 
 static void
@@ -170,9 +174,8 @@ g_file_monitor_dispose (GObject *object)
 
   /* Make sure we cancel on last unref */
   g_file_monitor_cancel (monitor);
-  
-  if (G_OBJECT_CLASS (g_file_monitor_parent_class)->dispose)
-    (*G_OBJECT_CLASS (g_file_monitor_parent_class)->dispose) (object);
+
+  G_OBJECT_CLASS (g_file_monitor_parent_class)->dispose (object);
 }
 
 static void

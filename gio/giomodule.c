@@ -20,7 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
@@ -50,7 +50,7 @@
  * SECTION:extensionpoints
  * @short_description: Extension Points
  * @include: gio.h
- * @see_also: <link linkend="gio-extension-points">Extending GIO</link>
+ * @see_also: <link linkend="extending-gio">Extending GIO</link>
  *
  * #GIOExtensionPoint provides a mechanism for modules to extend the
  * functionality of the library or application that loaded it in an 
@@ -285,10 +285,16 @@ g_io_modules_load_all_in_directory (const char *dirname)
 
 G_LOCK_DEFINE_STATIC (loaded_dirs);
 
+extern GType _g_fen_directory_monitor_get_type (void);
+extern GType _g_fen_file_monitor_get_type (void);
 extern GType _g_inotify_directory_monitor_get_type (void);
 extern GType _g_inotify_file_monitor_get_type (void);
 extern GType _g_unix_volume_monitor_get_type (void);
 extern GType _g_local_vfs_get_type (void);
+
+extern GType _g_win32_volume_monitor_get_type (void);
+extern GType g_win32_directory_monitor_get_type (void);
+extern GType _g_winhttp_vfs_get_type (void);
 
 void
 _g_io_modules_ensure_loaded (void)
@@ -296,6 +302,7 @@ _g_io_modules_ensure_loaded (void)
   GList *modules, *l;
   static gboolean loaded_dirs = FALSE;
   GIOExtensionPoint *ep;
+  const char *module_path;
 
   G_LOCK (loaded_dirs);
 
@@ -325,13 +332,41 @@ _g_io_modules_ensure_loaded (void)
       
       modules = g_io_modules_load_all_in_directory (GIO_MODULE_DIR);
 
+      module_path = g_getenv ("GIO_EXTRA_MODULES");
+
+      if (module_path)
+        {
+          int i = 0;
+          gchar **paths;
+          paths = g_strsplit (module_path, ":", 0);
+    
+          while (paths[i] != NULL)
+            { 
+              modules = g_list_concat (modules, g_io_modules_load_all_in_directory (paths[i]));
+              i++;
+            }
+
+          g_strfreev (paths);
+        }
+
       /* Initialize types from built-in "modules" */
 #if defined(HAVE_SYS_INOTIFY_H) || defined(HAVE_LINUX_INOTIFY_H)
       _g_inotify_directory_monitor_get_type ();
       _g_inotify_file_monitor_get_type ();
 #endif
+#if defined(HAVE_FEN)
+      _g_fen_directory_monitor_get_type ();
+      _g_fen_file_monitor_get_type ();
+#endif
+#ifdef G_OS_WIN32
+      _g_win32_volume_monitor_get_type ();
+      g_win32_directory_monitor_get_type ();
+#endif
 #ifdef G_OS_UNIX
       _g_unix_volume_monitor_get_type ();
+#endif
+#ifdef G_OS_WIN32
+      _g_winhttp_vfs_get_type ();
 #endif
       _g_local_vfs_get_type ();
     

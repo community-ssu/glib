@@ -179,6 +179,7 @@ g_checksum_new
 g_checksum_copy
 g_checksum_free
 g_checksum_update
+g_checksum_reset
 g_checksum_get_string
 g_checksum_get_digest
 g_compute_checksum_for_data
@@ -213,10 +214,12 @@ g_locale_from_utf8 G_GNUC_MALLOC
 g_locale_to_utf8 G_GNUC_MALLOC
 g_filename_display_name G_GNUC_MALLOC
 g_filename_display_basename G_GNUC_MALLOC
+#ifndef _WIN64
 g_filename_from_uri PRIVATE G_GNUC_MALLOC
 g_filename_from_utf8 PRIVATE G_GNUC_MALLOC
 g_filename_to_uri PRIVATE G_GNUC_MALLOC
 g_filename_to_utf8 PRIVATE G_GNUC_MALLOC 
+#endif
 #ifdef G_OS_WIN32
 g_filename_from_uri_utf8 G_GNUC_MALLOC
 g_filename_from_utf8_utf8
@@ -315,8 +318,10 @@ g_date_valid_year G_GNUC_CONST
 #if IN_HEADER(__G_DIR_H__)
 #if IN_FILE(__G_DIR_C__)
 g_dir_close
+#ifndef _WIN64
 g_dir_open PRIVATE
 g_dir_read_name PRIVATE
+#endif
 #ifdef G_OS_WIN32
 g_dir_open_utf8
 g_dir_read_name_utf8
@@ -335,6 +340,7 @@ g_error_new G_GNUC_PRINTF(3,4)
 g_error_new_literal
 g_propagate_error
 g_set_error G_GNUC_PRINTF(4,5)
+g_set_error_literal
 g_prefix_error G_GNUC_PRINTF(2,3)
 g_propagate_prefixed_error G_GNUC_PRINTF(3,4)
 #endif
@@ -348,13 +354,19 @@ g_build_path G_GNUC_MALLOC G_GNUC_NULL_TERMINATED
 g_build_pathv G_GNUC_MALLOC 
 g_file_error_from_errno
 g_file_error_quark
+#ifndef _WIN64
 g_file_get_contents PRIVATE
+#endif
 g_file_set_contents
+#ifndef _WIN64
 g_file_open_tmp PRIVATE
 g_file_test PRIVATE
+#endif
 g_file_read_link
 g_format_size_for_display
+#ifndef _WIN64
 g_mkstemp PRIVATE
+#endif
 g_mkdir_with_parents
 #ifdef G_OS_WIN32
 g_file_get_contents_utf8
@@ -480,14 +492,18 @@ g_io_channel_new_file PRIVATE
 #ifdef G_OS_WIN32
 g_io_channel_unix_get_fd
 g_io_channel_unix_new
+#ifndef _WIN64
 g_io_channel_new_file PRIVATE
+#endif
 g_io_channel_new_file_utf8
 g_io_channel_win32_get_fd
 g_io_channel_win32_make_pollfd
 g_io_channel_win32_new_fd
 g_io_channel_win32_new_messages
 g_io_channel_win32_new_socket
-g_io_channel_win32_new_stream_socket
+#ifndef _WIN64
+g_io_channel_win32_new_stream_socket PRIVATE
+#endif
 g_io_channel_win32_poll
 g_io_channel_win32_set_debug
 #endif
@@ -669,8 +685,11 @@ g_markup_parse_context_free
 g_markup_parse_context_get_element
 g_markup_parse_context_get_element_stack
 g_markup_parse_context_get_position
+g_markup_parse_context_get_user_data
 g_markup_parse_context_new
 g_markup_parse_context_parse
+g_markup_parse_context_push
+g_markup_parse_context_pop
 g_markup_printf_escaped G_GNUC_PRINTF(1,2)
 g_markup_vprintf_escaped
 g_markup_collect_attributes
@@ -1053,13 +1072,19 @@ g_slist_sort_with_data
 
 #if IN_HEADER(__G_SPAWN_H__)
 #if IN_FILE(__G_SPAWN_C__)
+#ifndef _WIN64
 g_spawn_async PRIVATE
 g_spawn_async_with_pipes PRIVATE
+#endif
 g_spawn_close_pid
+#ifndef _WIN64
 g_spawn_command_line_async PRIVATE
 g_spawn_command_line_sync PRIVATE
+#endif
 g_spawn_error_quark
+#ifndef _WIN64
 g_spawn_sync PRIVATE
+#endif
 #ifdef G_OS_WIN32
 g_spawn_async_utf8
 g_spawn_async_with_pipes_utf8
@@ -1084,6 +1109,7 @@ g_lstat
 g_remove
 g_fopen
 g_freopen
+g_utime
 #endif
 g_access
 g_chdir
@@ -1145,8 +1171,11 @@ g_strup
 g_strdown
 #endif
 g_strv_length
-g_strip_context
-g_dpgettext
+g_strip_context G_GNUC_FORMAT(1)
+g_dgettext G_GNUC_FORMAT(2)
+g_dngettext G_GNUC_FORMAT(3)
+g_dpgettext G_GNUC_FORMAT(2)
+g_dpgettext2 G_GNUC_FORMAT(3)
 #endif
 #endif
 
@@ -1466,13 +1495,17 @@ g_atexit
 g_basename
 #endif
 g_get_application_name
+#ifndef _WIN64
 g_find_program_in_path PRIVATE
 g_get_current_dir PRIVATE
 g_getenv PRIVATE
 g_unsetenv PRIVATE
 g_get_home_dir PRIVATE
+#endif
 g_get_host_name
+#ifndef _WIN64
 g_setenv PRIVATE
+#endif
 g_listenv
 #ifdef G_OS_WIN32
 g_find_program_in_path_utf8
@@ -1484,7 +1517,9 @@ g_get_home_dir_utf8
 #endif
 g_get_language_names
 g_get_prgname
+#ifndef _WIN64
 g_get_real_name PRIVATE
+#endif
 #ifdef G_OS_WIN32
 g_get_real_name_utf8
 #endif
@@ -1493,7 +1528,9 @@ g_get_system_data_dirs
 #ifdef G_OS_WIN32
 g_win32_get_system_data_dirs_for_module
 #endif
+#ifndef _WIN64
 g_get_tmp_dir PRIVATE
+#endif
 #ifdef G_OS_WIN32
 g_get_tmp_dir_utf8
 #endif
@@ -1501,7 +1538,9 @@ g_get_user_cache_dir
 g_get_user_config_dir
 g_get_user_data_dir
 g_get_user_special_dir
+#ifndef _WIN64
 g_get_user_name PRIVATE
+#endif
 #ifdef G_OS_WIN32
 g_get_user_name_utf8
 #endif
@@ -1572,9 +1611,13 @@ g_match_info_fetch_all
 g_win32_error_message
 g_win32_ftruncate
 g_win32_get_package_installation_directory_of_module
+#ifndef _WIN64
 g_win32_get_package_installation_directory PRIVATE
+#endif
 g_win32_get_package_installation_directory_utf8
+#ifndef _WIN64
 g_win32_get_package_installation_subdirectory PRIVATE
+#endif
 g_win32_get_package_installation_subdirectory_utf8
 g_win32_get_windows_version
 g_win32_getlocale

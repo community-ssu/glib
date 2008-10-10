@@ -20,9 +20,13 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include "goutputstream.h"
+#include "gcancellable.h"
+#include "gasyncresult.h"
 #include "gsimpleasyncresult.h"
+#include "ginputstream.h"
+#include "gioerror.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -32,7 +36,14 @@
  * @short_description: Base class for implementing streaming output
  * @include: gio/gio.h
  *
+ * GOutputStream has functions to write to a stream (g_output_stream_write()),
+ * to close a stream (g_output_stream_close()) and to flush pending writes
+ * (g_output_stream_flush()). 
  *
+ * To copy the content of an input stream to an output stream without 
+ * manually handling the reads and writes, use g_output_stream_splice(). 
+ *
+ * All of these functions have async variants too.
  **/
 
 G_DEFINE_TYPE (GOutputStream, g_output_stream, G_TYPE_OBJECT);
@@ -92,9 +103,8 @@ g_output_stream_finalize (GObject *object)
   GOutputStream *stream;
 
   stream = G_OUTPUT_STREAM (object);
-  
-  if (G_OBJECT_CLASS (g_output_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_output_stream_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_output_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -106,9 +116,8 @@ g_output_stream_dispose (GObject *object)
   
   if (!stream->priv->closed)
     g_output_stream_close (stream, NULL, NULL);
-  
-  if (G_OBJECT_CLASS (g_output_stream_parent_class)->dispose)
-    (*G_OBJECT_CLASS (g_output_stream_parent_class)->dispose) (object);
+
+  G_OBJECT_CLASS (g_output_stream_parent_class)->dispose (object);
 }
 
 static void
@@ -198,8 +207,8 @@ g_output_stream_write (GOutputStream  *stream,
 
   if (class->write_fn == NULL) 
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Output stream doesn't implement write"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Output stream doesn't implement write"));
       return -1;
     }
   
@@ -359,8 +368,8 @@ g_output_stream_splice (GOutputStream             *stream,
 
   if (g_input_stream_is_closed (source))
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
-		   _("Source stream is already closed"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
+                           _("Source stream is already closed"));
       return -1;
     }
 
@@ -399,8 +408,8 @@ g_output_stream_real_splice (GOutputStream             *stream,
   bytes_copied = 0;
   if (class->write_fn == NULL) 
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Output stream doesn't implement write"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Output stream doesn't implement write"));
       res = FALSE;
       goto notsupported;
     }
@@ -1072,18 +1081,18 @@ g_output_stream_set_pending (GOutputStream *stream,
   
   if (stream->priv->closed)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
-		   _("Stream is already closed"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
+                           _("Stream is already closed"));
       return FALSE;
     }
   
   if (stream->priv->pending)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_PENDING,
-		      /* Translators: This is an error you get if there is
-		       * already an operation running against this stream when
-		       * you try to start one */
-		      _("Stream has outstanding operation"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_PENDING,
+                           /* Translators: This is an error you get if there is
+                            * already an operation running against this stream when
+                            * you try to start one */
+                           _("Stream has outstanding operation"));
       return FALSE;
     }
   

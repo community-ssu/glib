@@ -21,10 +21,13 @@
  * Author: Christian Kellner <gicmo@gnome.org> 
  */
 
-#include <config.h>
+#include "config.h"
 #include "gbufferedinputstream.h"
 #include "ginputstream.h"
+#include "gcancellable.h"
+#include "gasyncresult.h"
 #include "gsimpleasyncresult.h"
+#include "gioerror.h"
 #include <string.h>
 #include "glibintl.h"
 
@@ -298,8 +301,7 @@ g_buffered_input_stream_finalize (GObject *object)
 
   g_free (priv->buffer);
 
-  if (G_OBJECT_CLASS (g_buffered_input_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_buffered_input_stream_parent_class)->finalize) (object);
+  G_OBJECT_CLASS (g_buffered_input_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -866,8 +868,8 @@ g_buffered_input_stream_read_byte (GBufferedInputStream  *stream,
 
   if (g_input_stream_is_closed (input_stream))
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
-       _("Stream is already closed"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_CLOSED,
+                           _("Stream is already closed"));
       return -1;
     }
 

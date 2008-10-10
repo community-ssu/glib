@@ -2054,11 +2054,11 @@ g_option_group_set_translate_func (GOptionGroup   *group,
   group->translate_notify = destroy_notify;
 }
 
-static gchar *
+static const gchar *
 dgettext_swapped (const gchar *msgid, 
 		  const gchar *domainname)
 {
-  return dgettext (domainname, msgid);
+  return g_dgettext (domainname, msgid);
 }
 
 /**

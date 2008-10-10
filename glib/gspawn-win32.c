@@ -111,12 +111,16 @@ dup_noninherited (int fd,
 		   GetCurrentProcess (), &filehandle,
 		   0, FALSE, DUPLICATE_SAME_ACCESS);
   close (fd);
-  return _open_osfhandle ((long) filehandle, mode | _O_NOINHERIT);
+  return _open_osfhandle ((gintptr) filehandle, mode | _O_NOINHERIT);
 }
 
 #ifndef GSPAWN_HELPER
 
+#ifdef _WIN64
+#define HELPER_PROCESS "gspawn-win64-helper"
+#else
 #define HELPER_PROCESS "gspawn-win32-helper"
+#endif
 
 static gchar *
 protect_argv_string (const gchar *string)
@@ -257,7 +261,7 @@ read_data (GString     *str,
            GError     **error)
 {
   GIOStatus giostatus;
-  gssize bytes;
+  gsize bytes;
   gchar buf[4096];
 
  again:
@@ -275,8 +279,8 @@ read_data (GString     *str,
     goto again;
   else if (giostatus == G_IO_STATUS_ERROR)
     {
-      g_set_error (error, G_SPAWN_ERROR, G_SPAWN_ERROR_READ,
-                   _("Failed to read data from child process"));
+      g_set_error_literal (error, G_SPAWN_ERROR, G_SPAWN_ERROR_READ,
+                           _("Failed to read data from child process"));
       
       return READ_FAILED;
     }
@@ -304,22 +308,22 @@ make_pipe (gint     p[2],
  */
 static gboolean
 read_helper_report (int      fd,
-		    gint     report[2],
+		    gintptr  report[2],
 		    GError **error)
 {
   gint bytes = 0;
   
-  while (bytes < sizeof(gint)*2)
+  while (bytes < sizeof(gintptr)*2)
     {
       gint chunk;
 
       if (debug)
-	g_print ("%s:read_helper_report: read %d...\n",
+	g_print ("%s:read_helper_report: read %" G_GSIZE_FORMAT "...\n",
 		 __FILE__,
-		 sizeof(gint)*2 - bytes);
+		 sizeof(gintptr)*2 - bytes);
 
       chunk = read (fd, ((gchar*)report) + bytes,
-		    sizeof(gint)*2 - bytes);
+		    sizeof(gintptr)*2 - bytes);
 
       if (debug)
 	g_print ("...got %d bytes\n", chunk);
@@ -345,14 +349,14 @@ read_helper_report (int      fd,
 	bytes += chunk;
     }
 
-  if (bytes < sizeof(gint)*2)
+  if (bytes < sizeof(gintptr)*2)
     return FALSE;
 
   return TRUE;
 }
 
 static void
-set_child_error (gint         report[2],
+set_child_error (gintptr      report[2],
 		 const gchar *working_directory,
 		 GError     **error)
 {
@@ -425,7 +429,7 @@ do_spawn_directly (gint                 *exit_status,
 {
   const int mode = (exit_status == NULL) ? P_NOWAIT : P_WAIT;
   char **new_argv;
-  int rc = -1;
+  gintptr rc = -1;
   int saved_errno;
   GError *conv_error = NULL;
   gint conv_error_index;
@@ -532,7 +536,7 @@ do_spawn_with_pipes (gint                 *exit_status,
   char args[ARG_COUNT][10];
   char **new_argv;
   int i;
-  int rc = -1;
+  gintptr rc = -1;
   int saved_errno;
   int argc;
   int stdin_pipe[2] = { -1, -1 };
@@ -540,7 +544,7 @@ do_spawn_with_pipes (gint                 *exit_status,
   int stderr_pipe[2] = { -1, -1 };
   int child_err_report_pipe[2] = { -1, -1 };
   int helper_sync_pipe[2] = { -1, -1 };
-  int helper_report[2];
+  gintptr helper_report[2];
   static gboolean warned_about_child_setup = FALSE;
   GError *conv_error = NULL;
   gint conv_error_index;
@@ -955,7 +959,7 @@ g_spawn_sync_utf8 (const gchar          *working_directory,
 				      G_IO_IN | G_IO_ERR | G_IO_HUP,
 				      &outfd);
       if (debug)
-	g_print ("outfd=%x\n", outfd.fd);
+	g_print ("outfd=%p\n", (HANDLE) outfd.fd);
     }
       
   if (errpipe >= 0)
@@ -968,7 +972,7 @@ g_spawn_sync_utf8 (const gchar          *working_directory,
 				      G_IO_IN | G_IO_ERR | G_IO_HUP,
 				      &errfd);
       if (debug)
-	g_print ("errfd=%x\n", errfd.fd);
+	g_print ("errfd=%p\n", (HANDLE) errfd.fd);
     }
 
   /* Read data until we get EOF on all pipes. */
@@ -998,8 +1002,8 @@ g_spawn_sync_utf8 (const gchar          *working_directory,
         {
           failed = TRUE;
 
-          g_set_error (error, G_SPAWN_ERROR, G_SPAWN_ERROR_READ,
-                       _("Unexpected error in g_io_channel_win32_poll() reading data from a child process"));
+          g_set_error_literal (error, G_SPAWN_ERROR, G_SPAWN_ERROR_READ,
+                               _("Unexpected error in g_io_channel_win32_poll() reading data from a child process"));
 	  
           break;
         }
@@ -1070,7 +1074,7 @@ g_spawn_sync_utf8 (const gchar          *working_directory,
       /* Helper process was involved. Read its report now after the
        * grandchild has finished.
        */
-      gint helper_report[2];
+      gintptr helper_report[2];
 
       if (!read_helper_report (reportpipe, helper_report, error))
 	failed = TRUE;
@@ -1226,6 +1230,8 @@ g_spawn_close_pid (GPid pid)
 {
     CloseHandle (pid);
 }
+
+#if !defined (_WIN64)
 
 /* Binary compatibility versions that take system codepage pathnames,
  * argument vectors and environments. These get used only by code
@@ -1491,6 +1497,8 @@ g_spawn_command_line_async (const gchar *command_line,
 
   return retval;
 }
+
+#endif	/* !_WIN64 */
 
 #endif /* !GSPAWN_HELPER */
 

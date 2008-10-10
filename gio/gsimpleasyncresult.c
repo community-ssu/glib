@@ -20,7 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -32,6 +32,8 @@
 #endif
 
 #include "gsimpleasyncresult.h"
+#include "gasyncresult.h"
+#include "gcancellable.h"
 #include "gioscheduler.h"
 #include <gio/gioerror.h>
 #include "glibintl.h"
@@ -155,9 +157,8 @@ g_simple_async_result_finalize (GObject *object)
 
   if (simple->error)
     g_error_free (simple->error);
-  
-  if (G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_simple_async_result_parent_class)->finalize (object);
 }
 
 static void

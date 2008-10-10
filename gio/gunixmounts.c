@@ -22,7 +22,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -1132,9 +1132,8 @@ g_unix_mount_monitor_finalize (GObject *object)
     }
 
   the_mount_monitor = NULL;
-  
-  if (G_OBJECT_CLASS (g_unix_mount_monitor_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_unix_mount_monitor_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_unix_mount_monitor_parent_class)->finalize (object);
 }
 
 
@@ -1146,11 +1145,12 @@ g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
   gobject_class->finalize = g_unix_mount_monitor_finalize;
   /**
    * GUnixMountMonitor::mounts-changed:
+   * @monitor: the object on which the signal is emitted
    * 
    * Emitted when the unix mounts have changed.
    **/ 
   signals[MOUNTS_CHANGED] =
-    g_signal_new ("mounts_changed",
+    g_signal_new ("mounts-changed",
 		  G_TYPE_FROM_CLASS (klass),
 		  G_SIGNAL_RUN_LAST,
 		  0,
@@ -1159,11 +1159,12 @@ g_unix_mount_monitor_class_init (GUnixMountMonitorClass *klass)
 		  G_TYPE_NONE, 0);
   /**
    * GUnixMountMonitor::mountpoints-changed:
+   * @monitor: the object on which the signal is emitted
    * 
    * Emitted when the unix mount points have changed.
    **/
   signals[MOUNTPOINTS_CHANGED] =
-    g_signal_new ("mountpoints_changed",
+    g_signal_new ("mountpoints-changed",
 		  G_TYPE_FROM_CLASS (klass),
 		  G_SIGNAL_RUN_LAST,
 		  0,
@@ -1233,9 +1234,36 @@ g_unix_mount_monitor_init (GUnixMountMonitor *monitor)
 }
 
 /**
+ * g_unix_mount_monitor_set_rate_limit:
+ * @mount_monitor: a #GUnixMountMonitor
+ * @limit_msec: a integer with the limit in milliseconds to
+ *     poll for changes.
+ *
+ * Sets the rate limit to which the @mount_monitor will report
+ * consecutive change events to the mount and mount point entry files.
+ *
+ * Since: 2.18
+ **/
+void
+g_unix_mount_monitor_set_rate_limit (GUnixMountMonitor *mount_monitor,
+                                     int                limit_msec)
+{
+  g_return_if_fail (G_IS_UNIX_MOUNT_MONITOR (mount_monitor));
+
+  if (mount_monitor->fstab_monitor != NULL)
+    g_file_monitor_set_rate_limit (mount_monitor->fstab_monitor, limit_msec);
+
+  if (mount_monitor->mtab_monitor != NULL)
+    g_file_monitor_set_rate_limit (mount_monitor->mtab_monitor, limit_msec);
+}
+
+/**
  * g_unix_mount_monitor_new:
  * 
- * Gets a new #GUnixMountMonitor.
+ * Gets a new #GUnixMountMonitor. The default rate limit for which the
+ * monitor will report consecutive changes for the mount and mount
+ * point entry files is the default for a #GFileMonitor. Use
+ * g_unix_mount_monitor_set_rate_limit() to change this.
  * 
  * Returns: a #GUnixMountMonitor. 
  **/
@@ -1285,19 +1313,6 @@ g_unix_mount_point_free (GUnixMountPoint *mount_point)
   g_free (mount_point);
 }
 
-static int
-strcmp_null (const char *str1,
-	     const char *str2)
-{
-  if (str1 == str2)
-    return 0;
-  if (str1 == NULL && str2 != NULL) 
-    return -1;
-  if (str1 != NULL && str2 == NULL)
-    return 1;
-  return strcmp (str1, str2);
-}
-
 /**
  * g_unix_mount_compare:
  * @mount1: first #GUnixMountEntry to compare.
@@ -1316,15 +1331,15 @@ g_unix_mount_compare (GUnixMountEntry *mount1,
 
   g_return_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
   
-  res = strcmp_null (mount1->mount_path, mount2->mount_path);
+  res = g_strcmp0 (mount1->mount_path, mount2->mount_path);
   if (res != 0)
     return res;
 	
-  res = strcmp_null (mount1->device_path, mount2->device_path);
+  res = g_strcmp0 (mount1->device_path, mount2->device_path);
   if (res != 0)
     return res;
 	
-  res = strcmp_null (mount1->filesystem_type, mount2->filesystem_type);
+  res = g_strcmp0 (mount1->filesystem_type, mount2->filesystem_type);
   if (res != 0)
     return res;
 
@@ -1433,15 +1448,15 @@ g_unix_mount_point_compare (GUnixMountPoint *mount1,
 
   g_return_val_if_fail (mount1 != NULL && mount2 != NULL, 0);
 
-  res = strcmp_null (mount1->mount_path, mount2->mount_path);
+  res = g_strcmp0 (mount1->mount_path, mount2->mount_path);
   if (res != 0) 
     return res;
 	
-  res = strcmp_null (mount1->device_path, mount2->device_path);
+  res = g_strcmp0 (mount1->device_path, mount2->device_path);
   if (res != 0) 
     return res;
 	
-  res = strcmp_null (mount1->filesystem_type, mount2->filesystem_type);
+  res = g_strcmp0 (mount1->filesystem_type, mount2->filesystem_type);
   if (res != 0) 
     return res;
 
@@ -1601,27 +1616,10 @@ guess_mount_type (const char *mount_path,
     {
       basename = g_path_get_basename (mount_path);
       
-      if (g_str_has_prefix (basename, "cdrom") ||
+      if (g_str_has_prefix (basename, "cdr") ||
 	  g_str_has_prefix (basename, "cdwriter") ||
 	  g_str_has_prefix (basename, "burn") ||
-	  g_str_has_prefix (basename, "cdr") ||
-	  g_str_has_prefix (basename, "cdrw") ||
-	  g_str_has_prefix (basename, "dvdrom") ||
-	  g_str_has_prefix (basename, "dvdram") ||
-	  g_str_has_prefix (basename, "dvdr") ||
-	  g_str_has_prefix (basename, "dvdrw") ||
-	  g_str_has_prefix (basename, "cdrom_dvdrom") ||
-	  g_str_has_prefix (basename, "cdrom_dvdram") ||
-	  g_str_has_prefix (basename, "cdrom_dvdr") ||
-	  g_str_has_prefix (basename, "cdrom_dvdrw") ||
-	  g_str_has_prefix (basename, "cdr_dvdrom") ||
-	  g_str_has_prefix (basename, "cdr_dvdram") ||
-	  g_str_has_prefix (basename, "cdr_dvdr") ||
-	  g_str_has_prefix (basename, "cdr_dvdrw") ||
-	  g_str_has_prefix (basename, "cdrw_dvdrom") ||
-	  g_str_has_prefix (basename, "cdrw_dvdram") ||
-	  g_str_has_prefix (basename, "cdrw_dvdr") ||
-	  g_str_has_prefix (basename, "cdrw_dvdrw"))
+	  g_str_has_prefix (basename, "dvdr"))
 	type = G_UNIX_MOUNT_TYPE_CDROM;
       else if (g_str_has_prefix (basename, "floppy"))
 	type = G_UNIX_MOUNT_TYPE_FLOPPY;

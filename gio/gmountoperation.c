@@ -20,7 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
@@ -47,7 +47,8 @@
  * user credentials such as FTP or WebDAV.
  *
  * Users should instantiate a subclass of this that implements all
- * the various callbacks to show the required dialogs.
+ * the various callbacks to show the required dialogs, such as 
+ * #GtkMountOperation.
  **/
 
 G_DEFINE_TYPE (GMountOperation, g_mount_operation, G_TYPE_OBJECT);
@@ -187,9 +188,8 @@ g_mount_operation_finalize (GObject *object)
   g_free (priv->password);
   g_free (priv->user);
   g_free (priv->domain);
-  
-  if (G_OBJECT_CLASS (g_mount_operation_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_mount_operation_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_mount_operation_parent_class)->finalize (object);
 }
 
 static gboolean
@@ -251,7 +251,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * Emitted when a mount operation asks the user for a password.
    */
   signals[ASK_PASSWORD] =
-    g_signal_new (I_("ask_password"),
+    g_signal_new (I_("ask-password"),
 		  G_TYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, ask_password),
@@ -270,7 +270,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
    * choices for the user to choose from. 
    */
   signals[ASK_QUESTION] =
-    g_signal_new (I_("ask_question"),
+    g_signal_new (I_("ask-question"),
 		  G_TYPE_FROM_CLASS (object_class),
 		  G_SIGNAL_RUN_LAST,
 		  G_STRUCT_OFFSET (GMountOperationClass, ask_question),
@@ -282,7 +282,7 @@ g_mount_operation_class_init (GMountOperationClass *klass)
   /**
    * GMountOperation::reply:
    * @op: a #GMountOperation.
-   * @abort: a boolean indicating %TRUE if the operation was aborted.
+   * @result: a #GMountOperationResult indicating how the request was handled
    * 
    * Emitted when the user has replied to the mount operation.
    */
@@ -427,7 +427,6 @@ g_mount_operation_get_username (GMountOperation *op)
  * @username: input username.
  *
  * Sets the user name within @op to @username.
- * 
  **/
 void
 g_mount_operation_set_username (GMountOperation *op,

@@ -20,12 +20,15 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <glib.h>
 #include <gfileoutputstream.h>
 #include <gseekable.h>
 #include "gsimpleasyncresult.h"
+#include "gasyncresult.h"
+#include "gcancellable.h"
+#include "gioerror.h"
 #include "glibintl.h"
 
 #include "gioalias.h"
@@ -164,8 +167,8 @@ g_file_output_stream_query_info (GFileOutputStream      *stream,
   if (class->query_info)
     info = class->query_info (stream, attributes, cancellable, error);
   else
-    g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		 _("Stream doesn't support query_info"));
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                         _("Stream doesn't support query_info"));
   
   if (cancellable)
     g_cancellable_pop_current (cancellable);
@@ -377,8 +380,8 @@ g_file_output_stream_seek (GFileOutputStream  *stream,
 
   if (!class->seek)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Seek not supported on stream"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Seek not supported on stream"));
       return FALSE;
     }
 
@@ -453,8 +456,8 @@ g_file_output_stream_truncate (GFileOutputStream  *stream,
 
   if (!class->truncate_fn)
     {
-      g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		   _("Truncate not supported on stream"));
+      g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                           _("Truncate not supported on stream"));
       return FALSE;
     }
 
@@ -519,8 +522,8 @@ query_info_async_thread (GSimpleAsyncResult *res,
   if (class->query_info)
     info = class->query_info (G_FILE_OUTPUT_STREAM (object), data->attributes, cancellable, &error);
   else
-    g_set_error (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
-		 _("Stream doesn't support query_info"));
+    g_set_error_literal (&error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                         _("Stream doesn't support query_info"));
 
   if (info == NULL)
     {

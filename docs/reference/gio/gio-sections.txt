@@ -48,7 +48,6 @@ g_file_get_parse_name
 g_file_get_parent
 g_file_get_child
 g_file_get_child_for_display_name
-g_file_contains_file
 g_file_has_prefix
 g_file_get_relative_path
 g_file_resolve_relative_path
@@ -71,6 +70,7 @@ g_file_query_info
 g_file_query_info_async
 g_file_query_info_finish
 g_file_query_exists
+g_file_query_file_type
 g_file_query_filesystem_info
 g_file_query_filesystem_info_async
 g_file_query_filesystem_info_finish
@@ -91,6 +91,7 @@ g_file_copy_async
 g_file_copy_finish
 g_file_move
 g_file_make_directory
+g_file_make_directory_with_parents
 g_file_make_symbolic_link
 g_file_query_settable_attributes
 g_file_query_writable_namespaces
@@ -114,6 +115,7 @@ g_file_mount_enclosing_volume
 g_file_mount_enclosing_volume_finish
 g_file_monitor_directory
 g_file_monitor_file
+g_file_monitor
 g_file_load_contents
 g_file_load_contents_async
 g_file_load_contents_finish
@@ -145,6 +147,7 @@ g_file_enumerator_close_finish
 g_file_enumerator_is_closed
 g_file_enumerator_has_pending
 g_file_enumerator_set_pending
+g_file_enumerator_get_container
 <SUBSECTION Standard>
 GFileEnumeratorClass
 G_FILE_ENUMERATOR
@@ -364,7 +367,9 @@ GThemedIcon
 g_themed_icon_new
 g_themed_icon_new_from_names
 g_themed_icon_new_with_default_fallbacks
+g_themed_icon_prepend_name
 g_themed_icon_append_name
+g_themed_icon_get_names
 <SUBSECTION Standard>
 GThemedIconClass
 G_THEMED_ICON
@@ -410,6 +415,40 @@ G_IS_FILE_ICON_CLASS
 G_FILE_ICON_GET_CLASS
 <SUBSECTION Private>
 g_file_icon_get_type
+</SECTION>
+
+<SECTION>
+<FILE>gemblemedicon</FILE>
+<TITLE>GEmblemedIcon</TITLE>
+GEmblemedIcon
+g_emblemed_icon_new
+g_emblemed_icon_get_icon
+g_emblemed_icon_get_emblems
+g_emblemed_icon_add_emblem
+<SUBSECTION Standard>
+GEmblemedIconClass
+G_EMBLEMED_ICON
+G_EMBLEMED_ICON_CLASS
+G_EMBLEMED_ICON_GET_CLASS
+G_IS_EMBLEMED_ICON
+G_IS_EMBLEMED_ICON_CLASS
+G_TYPE_EMBLEMED_ICON
+
+<SUBSECTION Private>
+g_emblemed_icon_get_type
+</SECTION>
+
+<SECTION>
+<FILE>gemblem</FILE>
+<TITLE>GEmblem</TITLE>
+GEmblem
+GEmblemOrigin
+g_emblem_new
+g_emblem_new_with_origin
+g_emblem_get_icon
+g_emblem_get_origin
+<SUBSECTION Private>
+g_emblem_get_type
 </SECTION>
 
 <SECTION>
@@ -685,6 +724,7 @@ GMemoryOutputStream
 g_memory_output_stream_new
 g_memory_output_stream_get_data
 g_memory_output_stream_get_size
+g_memory_output_stream_get_data_size
 <SUBSECTION Standard>
 GMemoryOutputStreamClass
 G_MEMORY_OUTPUT_STREAM
@@ -809,6 +849,9 @@ g_mount_remount_finish
 g_mount_can_eject
 g_mount_eject
 g_mount_eject_finish
+g_mount_guess_content_type
+g_mount_guess_content_type_finish
+g_mount_guess_content_type_sync
 <SUBSECTION Standard>
 G_IS_MOUNT
 G_MOUNT
@@ -830,6 +873,7 @@ g_volume_get_drive
 g_volume_get_mount
 g_volume_can_mount
 g_volume_should_automount
+g_volume_get_activation_root
 g_volume_mount
 g_volume_mount_finish
 g_volume_can_eject
@@ -990,7 +1034,9 @@ g_content_type_get_description
 g_content_type_get_mime_type
 g_content_type_get_icon
 g_content_type_can_be_executable
+g_content_type_from_mime_type
 g_content_type_guess
+g_content_type_guess_for_tree
 g_content_types_get_registered
 </SECTION>
 
@@ -1135,6 +1181,7 @@ g_unix_mount_at
 g_unix_mounts_changed_since
 g_unix_mount_points_changed_since
 g_unix_mount_monitor_new
+g_unix_mount_monitor_set_rate_limit
 g_unix_is_mount_path_system_internal
 <SUBSECTION Standard>
 GUnixMountClass
@@ -1166,6 +1213,7 @@ GUnixVolumeMonitorClass
 <TITLE>Desktop file based GAppInfo</TITLE>
 GDesktopAppInfo
 g_desktop_app_info_new_from_filename
+g_desktop_app_info_new_from_keyfile
 g_desktop_app_info_new
 g_desktop_app_info_get_is_hidden
 g_desktop_app_info_set_desktop_env

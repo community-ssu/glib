@@ -287,7 +287,7 @@ mktime_utc (struct tm *tm)
 
 /**
  * g_time_val_from_iso8601:
- * @iso_date: a ISO 8601 encoded date string
+ * @iso_date: an ISO 8601 encoded date string
  * @time_: a #GTimeVal
  *
  * Converts a string containing an ISO 8601 encoded date and time
@@ -365,10 +365,18 @@ g_time_val_from_iso8601 (const gchar *iso_date,
     }
 
   time_->tv_sec = mktime_utc (&tm);
-  time_->tv_usec = 1;
+  time_->tv_usec = 0;
   
   if (*iso_date == '.')
-    time_->tv_usec = strtoul (iso_date + 1, (char **)&iso_date, 10);
+    {
+      glong mul = 100000;
+
+      while (g_ascii_isdigit (*++iso_date))
+        {
+          time_->tv_usec += (*iso_date - '0') * mul;
+          mul /= 10;
+        }
+    }
     
   if (*iso_date == '+' || *iso_date == '-')
     {
@@ -377,24 +385,29 @@ g_time_val_from_iso8601 (const gchar *iso_date,
       val = 60 * strtoul (iso_date + 1, (char **)&iso_date, 10);
       
       if (*iso_date == ':')
-	val = 60 * val + strtoul (iso_date + 1, NULL, 10);
+	val = 60 * val + strtoul (iso_date + 1, (char **)&iso_date, 10);
       else
         val = 60 * (val / 100) + (val % 100);
 
       time_->tv_sec += (time_t) (val * sign);
     }
+  else if (*iso_date++ != 'Z')
+    return FALSE;
 
-  return TRUE;
+  while (g_ascii_isspace (*iso_date))
+    iso_date++;
+
+  return *iso_date == '\0';
 }
 
 /**
  * g_time_val_to_iso8601:
  * @time_: a #GTimeVal
  * 
- * Converts @time_ into a ISO 8601 encoded string, relative to the
+ * Converts @time_ into an ISO 8601 encoded string, relative to the
  * Coordinated Universal Time (UTC).
  *
- * Return value: a newly allocated string containing a ISO 8601 date
+ * Return value: a newly allocated string containing an ISO 8601 date
  *
  * Since: 2.12
  */
@@ -402,24 +415,53 @@ gchar *
 g_time_val_to_iso8601 (GTimeVal *time_)
 {
   gchar *retval;
+  struct tm *tm;
 #ifdef HAVE_GMTIME_R
   struct tm tm_;
 #endif
   
   g_return_val_if_fail (time_->tv_usec >= 0 && time_->tv_usec < G_USEC_PER_SEC, NULL);
 
-#define ISO_8601_LEN 	21
-#define ISO_8601_FORMAT "%Y-%m-%dT%H:%M:%SZ"
-  retval = g_new0 (gchar, ISO_8601_LEN + 1);
-
-  strftime (retval, ISO_8601_LEN,
-	    ISO_8601_FORMAT,
-#ifdef HAVE_GMTIME_R
-	    gmtime_r (&(time_->tv_sec), &tm_)
+#ifdef _WIN32
+  {
+    time_t secs = time_->tv_sec;
+    tm = gmtime (&secs);
+  }
 #else
-	    gmtime (&(time_->tv_sec))
+#ifdef HAVE_GMTIME_R
+  tm = gmtime_r (&time_->tv_sec, &tm_);
+#else
+  tm = gmtime (&time_->tv_sec);
 #endif
-            );
+#endif
+
+  if (time_->tv_usec != 0)
+    {
+      /* ISO 8601 date and time format, with fractionary seconds:
+       *   YYYY-MM-DDTHH:MM:SS.MMMMMMZ
+       */
+      retval = g_strdup_printf ("%4d-%02d-%02dT%02d:%02d:%02d.%06ldZ",
+                                tm->tm_year + 1900,
+                                tm->tm_mon + 1,
+                                tm->tm_mday,
+                                tm->tm_hour,
+                                tm->tm_min,
+                                tm->tm_sec,
+                                time_->tv_usec);
+    }
+  else
+    {
+      /* ISO 8601 date and time format:
+       *   YYYY-MM-DDTHH:MM:SSZ
+       */
+      retval = g_strdup_printf ("%4d-%02d-%02dT%02d:%02d:%02dZ",
+                                tm->tm_year + 1900,
+                                tm->tm_mon + 1,
+                                tm->tm_mday,
+                                tm->tm_hour,
+                                tm->tm_min,
+                                tm->tm_sec);
+    }
   
   return retval;
 }

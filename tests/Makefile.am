@@ -77,6 +77,7 @@ TEST_PROGS              += scannerapi
 scannerapi_SOURCES       = scannerapi.c
 scannerapi_LDADD         = $(progs_ldadd)
 TEST_PROGS		+= testglib
+testglib_SOURCES         = testglib.c
 testglib_LDADD		 = $(libglib)
 TEST_PROGS              += testingbase64
 testingbase64_SOURCES    = testingbase64.c
@@ -95,7 +96,6 @@ endif
 
 test_programs =					\
 	atomic-test				\
-	array-test				\
 	base64-test				\
 	bit-test				\
 	$(CXX_TEST)				\
@@ -110,7 +110,6 @@ test_programs =					\
 	gio-test				\
 	hash-test				\
 	iochannel-test				\
-	keyfile-test				\
 	list-test				\
 	mainloop-test				\
 	mapping-test				\
@@ -119,13 +118,10 @@ test_programs =					\
 	module-test				\
 	node-test				\
 	onceinit				\
-	option-test				\
 	patterntest				\
-	printf-test				\
 	queue-test				\
 	asyncqueue-test				\
 	qsort-test				\
-	rand-test				\
 	relation-test				\
 	sequence-test				\
 	shell-test				\
@@ -136,10 +132,6 @@ test_programs =					\
 	slice-threadinit			\
 	spawn-test				\
 	$(spawn_test_win32_gui)			\
-	strfunc-test				\
-	string-test				\
-	strtod-test				\
-	strtoll-test				\
 	thread-test				\
 	threadpool-test				\
 	tree-test				\
@@ -168,7 +160,6 @@ thread_ldadd = $(libgthread) $(G_THREAD_LIBS) $(progs_ldadd)
 module_ldadd = $(libgmodule) $(G_MODULE_LIBS) $(progs_ldadd)
 
 atomic_test_LDADD = $(progs_ldadd)
-array_test_LDADD = $(progs_ldadd)
 base64_test_LDADD = $(progs_ldadd)
 bit_test_LDADD = $(progs_ldadd)
 bookmarkfile_test_LDADD = $(progs_ldadd)
@@ -183,7 +174,6 @@ env_test_LDADD = $(progs_ldadd)
 gio_test_LDADD = $(progs_ldadd)
 hash_test_LDADD = $(progs_ldadd)
 iochannel_test_LDADD = $(progs_ldadd)
-keyfile_test_LDADD = $(progs_ldadd)
 list_test_LDADD = $(progs_ldadd)
 mainloop_test_LDADD = $(thread_ldadd)
 markup_test_LDADD = $(progs_ldadd)
@@ -193,12 +183,9 @@ module_test_LDADD = $(module_ldadd) $(module_test_exp)
 module_test_LDFLAGS = $(G_MODULE_LDFLAGS)
 node_test_LDADD = $(progs_ldadd)
 onceinit_LDADD = $(thread_ldadd)
-option_test_LDADD = $(progs_ldadd)
-printf_test_LDADD = $(progs_ldadd)
 queue_test_LDADD = $(progs_ldadd)
 asyncqueue_test_LDADD = $(thread_ldadd)
 qsort_test_LDADD = $(progs_ldadd)
-rand_test_LDADD = $(progs_ldadd)
 relation_test_LDADD = $(progs_ldadd)
 sequence_test_LDADD = $(progs_ldadd)
 shell_test_LDADD = $(progs_ldadd)
@@ -212,10 +199,6 @@ slice_concurrent_LDADD = $(thread_ldadd)
 slice_threadinit_SOURCES = slice-threadinit.c
 slice_threadinit_LDADD = $(thread_ldadd)
 spawn_test_LDADD = $(progs_ldadd)
-strfunc_test_LDADD = $(progs_ldadd)
-string_test_LDADD = $(progs_ldadd)
-strtod_test_LDADD = $(progs_ldadd) -lm
-strtoll_test_LDADD = $(progs_ldadd) -lm
 thread_test_LDADD = $(thread_ldadd)
 threadpool_test_LDADD = $(thread_ldadd)
 tree_test_LDADD = $(progs_ldadd)

@@ -36,25 +36,31 @@ libglib = $(top_builddir)/glib/libglib-2.0.la
 # libraries to compile and install
 lib_LTLIBRARIES = libgobject-2.0.la
 
+if OS_WIN32_AND_DLL_COMPILATION
 if MS_LIB_AVAILABLE
 noinst_DATA = gobject-2.0.lib
 
+install_ms_lib_cmd = $(INSTALL) gobject-2.0.lib $(DESTDIR)$(libdir)
+uninstall_ms_lib_cmd = -rm $(DESTDIR)$(libdir)/gobject-2.0.lib
+endif
+endif
+
 install-ms-lib:
-	$(INSTALL) gobject-2.0.lib $(DESTDIR)$(libdir)
+	$(install_ms_lib_cmd)
 
 uninstall-ms-lib:
-	-rm $(DESTDIR)$(libdir)/gobject-2.0.lib
-else
-install-ms-lib:
-uninstall-ms-lib:
-endif
+	$(uninstall_ms_lib_cmd)
 
 if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
-if OS_WIN32
+if OS_WIN32_AND_DLL_COMPILATION
 export_symbols = -export-symbols gobject.def
+gobject_def = gobject.def
+
+gobject_win32_res = gobject-win32-res.o
+gobject_win32_res_ldflag = -Wl,$(gobject_win32_res)
 
 install-def-file:
 	$(INSTALL) gobject.def $(DESTDIR)$(libdir)/gobject-2.0.def
@@ -68,11 +74,6 @@ uninstall-def-file:
 export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
 endif
 
-if OS_WIN32
-gobject_win32_res = gobject-win32-res.o
-gobject_win32_res_ldflag = -Wl,$(gobject_win32_res)
-endif
-
 # libtool stuff: set version and export symbols for resolving
 libgobjectincludedir = $(includedir)/glib-2.0/gobject
 libgobject_2_0_la_LDFLAGS = \
@@ -82,7 +83,7 @@ libgobject_2_0_la_LDFLAGS = \
 
 libgobject_2_0_la_LIBADD = $(libglib)
 
-libgobject_2_0_la_DEPENDENCIES = $(gobject_win32_res) $(GOBJECT_DEF)
+libgobject_2_0_la_DEPENDENCIES = $(gobject_win32_res) $(gobject_def)
 
 #
 # setup source file variables
@@ -239,14 +240,11 @@ BUILT_EXTRA_DIST = \
 	gobjectalias.h		\
 	gobjectaliasdef.c
 
-
-if OS_WIN32
 gobject-win32-res.o: gobject.rc
 	$(WINDRES) gobject.rc $@
-endif
 
 gobject-2.0.lib: libgobject-2.0.la gobject.def
-	lib -name:libgobject-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:gobject.def -out:$@
+	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libgobject-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:gobject.def -out:$@
 
 dist-hook: $(BUILT_EXTRA_DIST)
 	files='$(BUILT_EXTRA_DIST)'; \

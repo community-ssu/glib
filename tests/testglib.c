@@ -33,7 +33,7 @@
 #include <errno.h>
 
 #include "glib.h"
-#include "gstdio.h"
+#include <glib/gstdio.h>
 
 #include <stdlib.h>
 
@@ -242,7 +242,7 @@ node_build_string (GNode    *node,
   gchar *string;
   gchar c[2] = "_";
 
-  c[0] = ((gchar) ((long) (node->data)));
+  c[0] = ((gchar) ((gintptr) (node->data)));
 
   string = g_strconcat (*p ? *p : "", c, NULL);
   g_free (*p);
@@ -255,7 +255,7 @@ static void
 gnode_test (void)
 {
 #define	C2P(c)		((gpointer) ((long) (c)))
-#define	P2C(p)		((gchar) ((long) (p)))
+#define	P2C(p)		((gchar) ((gintptr) (p)))
   GNode *root;
   GNode *node;
   GNode *node_B;
@@ -504,85 +504,6 @@ find_first_that(gpointer key,
   gint *v = value;
   gint *test = user_data;
   return (*v == *test);
-}
-
-
-static void
-test_g_mkdir_with_parents_1 (const gchar *base)
-{
-  char *p0 = g_build_filename (base, "fum", NULL);
-  char *p1 = g_build_filename (p0, "tem", NULL);
-  char *p2 = g_build_filename (p1, "zap", NULL);
-  FILE *f;
-
-  g_remove (p2);
-  g_remove (p1);
-  g_remove (p0);
-
-  if (g_file_test (p0, G_FILE_TEST_EXISTS))
-    g_error ("failed, %s exists, cannot test g_mkdir_with_parents\n", p0);
-
-  if (g_file_test (p1, G_FILE_TEST_EXISTS))
-    g_error ("failed, %s exists, cannot test g_mkdir_with_parents\n", p1);
-
-  if (g_file_test (p2, G_FILE_TEST_EXISTS))
-    g_error ("failed, %s exists, cannot test g_mkdir_with_parents\n", p2);
-
-  if (g_mkdir_with_parents (p2, 0777) == -1)
-    g_error ("failed, g_mkdir_with_parents(%s) failed: %s\n", p2, g_strerror (errno));
-
-  if (!g_file_test (p2, G_FILE_TEST_IS_DIR))
-    g_error ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory\n", p2, p2);
-
-  if (!g_file_test (p1, G_FILE_TEST_IS_DIR))
-    g_error ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory\n", p2, p1);
-
-  if (!g_file_test (p0, G_FILE_TEST_IS_DIR))
-    g_error ("failed, g_mkdir_with_parents(%s) succeeded, but %s is not a directory\n", p2, p0);
-
-  g_rmdir (p2);
-  if (g_file_test (p2, G_FILE_TEST_EXISTS))
-    g_error ("failed, did g_rmdir(%s), but %s is still there\n", p2, p2);
-
-  g_rmdir (p1);
-  if (g_file_test (p1, G_FILE_TEST_EXISTS))
-    g_error ("failed, did g_rmdir(%s), but %s is still there\n", p1, p1);
-
-  f = g_fopen (p1, "w");
-  if (f == NULL)
-    g_error ("failed, couldn't create file %s\n", p1);
-  fclose (f);
-
-  if (g_mkdir_with_parents (p1, 0666) == 0)
-    g_error ("failed, g_mkdir_with_parents(%s) succeeded, even if %s is a file\n", p1, p1);
-
-  if (g_mkdir_with_parents (p2, 0666) == 0)
-    g_error("failed, g_mkdir_with_parents(%s) succeeded, even if %s is a file\n", p2, p1);
-
-  g_remove (p2);
-  g_remove (p1);
-  g_remove (p0);
-}
-
-static void
-test_g_mkdir_with_parents (void)
-{
-  gchar *cwd;
-  if (g_test_verbose())
-    g_print ("checking g_mkdir_with_parents() in subdir ./hum/");
-  test_g_mkdir_with_parents_1 ("hum");
-  g_remove ("hum");
-  if (g_test_verbose())
-    g_print ("checking g_mkdir_with_parents() in subdir ./hii///haa/hee/");
-  test_g_mkdir_with_parents_1 ("hii///haa/hee");
-  g_remove ("hii/haa/hee");
-  g_remove ("hii/haa");
-  g_remove ("hii");
-  cwd = g_get_current_dir ();
-  if (g_test_verbose())
-    g_print ("checking g_mkdir_with_parents() in cwd: %s", cwd);
-  test_g_mkdir_with_parents_1 (cwd);
-  g_free (cwd);
 }
 
 static void
@@ -1383,41 +1304,83 @@ various_string_tests (void)
   g_free (tmp_string);
   g_free (string);
 
-#define REF_INVALID  "Wed Dec 19 17:20:20 GMT 2007"
-#define REF_SEC_UTC  320063760
-#define REF_STR_UTC  "1980-02-22T10:36:00Z"
-#define REF_STR_CEST "1980-02-22T12:36:00+02:00"
-#define REF_STR_EST  "1980-02-22T05:36:00-05:00"
+#define REF_INVALID1      "Wed Dec 19 17:20:20 GMT 2007"
+#define REF_INVALID2      "1980-02-22T10:36:00Zulu"
+#define REF_SEC_UTC       320063760
+#define REF_STR_UTC       "1980-02-22T10:36:00Z"
+#define REF_STR_CEST      "1980-02-22T12:36:00+02:00"
+#define REF_STR_EST       "19800222T053600-0500"
+#define REF_USEC_UTC      50000
+#define REF_STR_USEC_UTC  "1980-02-22T10:36:00.050000Z"
+#define REF_STR_USEC_CEST "19800222T123600.050000000+0200"
+#define REF_STR_USEC_EST  "1980-02-22T05:36:00.05-05:00"
 
   if (g_test_verbose())
     g_print ("checking g_time_val_from_iso8601...\n");
   ref_date.tv_sec = REF_SEC_UTC;
   ref_date.tv_usec = 0;
-  g_assert (g_time_val_from_iso8601 (REF_INVALID, &date) == FALSE);
+  g_assert (g_time_val_from_iso8601 (REF_INVALID1, &date) == FALSE);
+  g_assert (g_time_val_from_iso8601 (REF_INVALID2, &date) == FALSE);
   g_assert (g_time_val_from_iso8601 (REF_STR_UTC, &date) != FALSE);
   if (g_test_verbose())
-    g_print ("\t=> UTC stamp = %ld (should be: %ld) (%ld off)\n", date.tv_sec, ref_date.tv_sec, date.tv_sec - ref_date.tv_sec);
-  g_assert (date.tv_sec == ref_date.tv_sec);
+    g_print ("\t=> UTC stamp = %ld.%06ld (should be: %ld.%06ld) (%ld.%06ld off)\n",
+             date.tv_sec, date.tv_usec, ref_date.tv_sec, ref_date.tv_usec,
+             date.tv_sec - ref_date.tv_sec, date.tv_usec - ref_date.tv_usec);
+  g_assert (date.tv_sec == ref_date.tv_sec && date.tv_usec == ref_date.tv_usec);
 
   g_assert (g_time_val_from_iso8601 (REF_STR_CEST, &date) != FALSE);
   if (g_test_verbose())
-    g_print ("\t=> CEST stamp = %ld (should be: %ld) (%ld off)\n", date.tv_sec, ref_date.tv_sec, date.tv_sec - ref_date.tv_sec);
-  g_assert (date.tv_sec == ref_date.tv_sec);
+    g_print ("\t=> CEST stamp = %ld.%06ld (should be: %ld.%06ld) (%ld.%06ld off)\n",
+             date.tv_sec, date.tv_usec, ref_date.tv_sec, ref_date.tv_usec,
+             date.tv_sec - ref_date.tv_sec, date.tv_usec - ref_date.tv_usec);
+  g_assert (date.tv_sec == ref_date.tv_sec && date.tv_usec == ref_date.tv_usec);
 
   g_assert (g_time_val_from_iso8601 (REF_STR_EST, &date) != FALSE);
   if (g_test_verbose())
-    g_print ("\t=> EST stamp = %ld (should be: %ld) (%ld off)\n", date.tv_sec, ref_date.tv_sec, date.tv_sec - ref_date.tv_sec);
-  g_assert (date.tv_sec == ref_date.tv_sec);
+    g_print ("\t=> EST stamp = %ld.%06ld (should be: %ld.%06ld) (%ld.%06ld off)\n",
+             date.tv_sec, date.tv_usec, ref_date.tv_sec, ref_date.tv_usec,
+             date.tv_sec - ref_date.tv_sec, date.tv_usec - ref_date.tv_usec);
+  g_assert (date.tv_sec == ref_date.tv_sec && date.tv_usec == ref_date.tv_usec);
+
+  ref_date.tv_usec = REF_USEC_UTC;
+  g_assert (g_time_val_from_iso8601 (REF_STR_USEC_UTC, &date) != FALSE);
+  if (g_test_verbose())
+    g_print ("\t=> UTC stamp = %ld.%06ld (should be: %ld.%06ld) (%ld.%06ld off)\n",
+             date.tv_sec, date.tv_usec, ref_date.tv_sec, ref_date.tv_usec,
+             date.tv_sec - ref_date.tv_sec, date.tv_usec - ref_date.tv_usec);
+  g_assert (date.tv_sec == ref_date.tv_sec && date.tv_usec == ref_date.tv_usec);
+
+  g_assert (g_time_val_from_iso8601 (REF_STR_USEC_CEST, &date) != FALSE);
+  if (g_test_verbose())
+    g_print ("\t=> CEST stamp = %ld.%06ld (should be: %ld.%06ld) (%ld.%06ld off)\n",
+             date.tv_sec, date.tv_usec, ref_date.tv_sec, ref_date.tv_usec,
+             date.tv_sec - ref_date.tv_sec, date.tv_usec - ref_date.tv_usec);
+  g_assert (date.tv_sec == ref_date.tv_sec && date.tv_usec == ref_date.tv_usec);
+
+  g_assert (g_time_val_from_iso8601 (REF_STR_USEC_EST, &date) != FALSE);
+  if (g_test_verbose())
+    g_print ("\t=> EST stamp = %ld.%06ld (should be: %ld.%06ld) (%ld.%06ld off)\n",
+             date.tv_sec, date.tv_usec, ref_date.tv_sec, ref_date.tv_usec,
+             date.tv_sec - ref_date.tv_sec, date.tv_usec - ref_date.tv_usec);
+  g_assert (date.tv_sec == ref_date.tv_sec && date.tv_usec == ref_date.tv_usec);
 
   if (g_test_verbose())
     g_print ("checking g_time_val_to_iso8601...\n");
   ref_date.tv_sec = REF_SEC_UTC;
-  ref_date.tv_usec = 1;
+  ref_date.tv_usec = 0;
   date_str = g_time_val_to_iso8601 (&ref_date);
   g_assert (date_str != NULL);
   if (g_test_verbose())
     g_print ("\t=> date string = %s (should be: %s)\n", date_str, REF_STR_UTC);
   g_assert (strcmp (date_str, REF_STR_UTC) == 0);
+  g_free (date_str);
+
+  ref_date.tv_usec = REF_USEC_UTC;
+  date_str = g_time_val_to_iso8601 (&ref_date);
+  g_assert (date_str != NULL);
+  if (g_test_verbose())
+    g_print ("\t=> date string = %s (should be: %s)\n", date_str, REF_STR_USEC_UTC);
+  g_assert (strcmp (date_str, REF_STR_USEC_UTC) == 0);
   g_free (date_str);
 
   if (g_test_verbose())
@@ -1523,6 +1486,7 @@ various_string_tests (void)
   /* g_debug (argv[0]); */
 }
 
+#ifndef G_DISABLE_DEPRECATED
 static void
 test_mem_chunks (void)
 {
@@ -1539,6 +1503,7 @@ test_mem_chunks (void)
   for (i = 0; i < 10000; i++)
     g_mem_chunk_free (mem_chunk, mem[i]);
 }
+#endif
 
 int
 main (int   argc,
@@ -1559,9 +1524,10 @@ main (int   argc,
   g_test_add_func ("/testglib/Relation", relation_test);
   g_test_add_func ("/testglib/File Paths", test_paths);
   g_test_add_func ("/testglib/File Functions", test_file_functions);
-  g_test_add_func ("/testglib/Mkdir", test_g_mkdir_with_parents);
   g_test_add_func ("/testglib/Parse Debug Strings", test_g_parse_debug_string);
+#ifndef G_DISABLE_DEPRECATED
   g_test_add_func ("/testglib/GMemChunk (deprecated)", test_mem_chunks);
+#endif
   g_test_add_func ("/testglib/Warnings & Errors", log_warning_error_tests);
   g_test_add_func ("/testglib/Timers (slow)", timer_tests);
 

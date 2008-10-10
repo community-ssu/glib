@@ -1,5 +1,6 @@
 ## Process this file with automake to produce Makefile.in
 include $(top_srcdir)/Makefile.decl
+
 AUTOMAKE_OPTIONS = 1.6
 
 # The name of the module.
@@ -8,11 +9,14 @@ DOC_MODULE=glib
 # The top-level SGML file.
 DOC_MAIN_SGML_FILE=glib-docs.sgml
 
+# The directory containing the source code. Relative to $(srcdir)
+DOC_SOURCE_DIR=../../../glib ../../../gmodule
+
 # Extra options to supply to gtkdoc-scan
 SCAN_OPTIONS=--deprecated-guards="G_DISABLE_DEPRECATED"
 
-# The directory containing the source code. Relative to $(srcdir)
-DOC_SOURCE_DIR=../../..
+# Extra options to supply to gtkdoc-mkdb
+MKDB_OPTIONS=--sgml-mode --output-format=xml
 
 # Used for dependencies
 HFILE_GLOB=$(top_srcdir)/glib/*.h $(top_srcdir)/gmodule/*.h
@@ -43,9 +47,6 @@ IGNORE_HFILES=			\
 	pcre			\
 	update-pcre
 
-# Extra options to supply to gtkdoc-mkdb
-MKDB_OPTIONS=--sgml-mode --output-format=xml 
-
 # Images to copy into HTML directory
 HTML_IMAGES =  				\
 	file-name-encodings.png		\
@@ -61,7 +62,9 @@ content_files =				\
 	resources.sgml			\
 	regex-syntax.sgml		\
 	version.xml			\
-	glib-gettextize.xml
+	glib-gettextize.xml		\
+	gtester.xml			\
+	gtester-report.xml
 
 # Extra options to supply to gtkdoc-fixref
 FIXXREF_OPTIONS=
@@ -80,8 +83,10 @@ EXTRA_DIST +=				\
 
 ########################################################################
 
-man_MANS = glib-gettextize.1 
-
+man_MANS =		  	\
+	glib-gettextize.1 	\
+	gtester.1		\
+	gtester-report.1
 if ENABLE_MAN
 
 %.1 : %.xml 

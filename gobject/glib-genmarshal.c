@@ -16,22 +16,23 @@
  * Free Software Foundation, Inc., 59 Temple Place - Suite 330,
  * Boston, MA 02111-1307, USA.
  */
-#include	"config.h"
+
+#include "config.h"
+
+#include <stdlib.h>
+#include <fcntl.h>
+#include <string.h>
+#include <errno.h>
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>
+#endif
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #undef G_LOG_DOMAIN
 #define G_LOG_DOMAIN "GLib-Genmarshal"
-#include	<glib.h>
-
-#include	<glib/gprintf.h>
-#include	<stdlib.h>
-#include	<fcntl.h>
-#include	<string.h>
-#include	<errno.h>
-#ifdef HAVE_UNISTD_H
-#include	<unistd.h>
-#endif
-#include	<sys/types.h>
-#include	<sys/stat.h>
+#include <glib.h>
+#include <glib/gprintf.h>
 
 #ifdef G_OS_WIN32
 #include <io.h>

@@ -20,11 +20,12 @@
  * Author: Christian Kellner <gicmo@gnome.org>
  */
 
-#include <config.h>
+#include "config.h"
 #include "gmemoryoutputstream.h"
 #include "goutputstream.h"
 #include "gseekable.h"
 #include "gsimpleasyncresult.h"
+#include "gioerror.h"
 #include "string.h"
 #include "glibintl.h"
 
@@ -136,9 +137,8 @@ g_memory_output_stream_finalize (GObject *object)
   
   if (priv->destroy)
     priv->destroy (priv->data);
-    
-  if (G_OBJECT_CLASS (g_memory_output_stream_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_memory_output_stream_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_memory_output_stream_parent_class)->finalize (object);
 }
 
 static void
@@ -235,16 +235,14 @@ g_memory_output_stream_get_data (GMemoryOutputStream *ostream)
  * Gets the size of the currently allocated data area (availible from
  * g_memory_output_stream_get_data()). If the stream isn't
  * growable (no realloc was passed to g_memory_output_stream_new()) then
- * this is the max size of the stream and further writes
- * will return G_IO_ERROR_NO_SPACE.
+ * this is the maximum size of the stream and further writes
+ * will return %G_IO_ERROR_NO_SPACE.
  *
  * Note that for growable streams the returned size may become invalid on
  * the next write or truncate operation on the stream.
  *
- * Note, this does not return the number of bytes written to the stream.
- * In glib 2.18 this is availible with g_memory_output_stream_get_data_size(),
- * but for 2.16 you have to use g_seekable_seek() to %G_SEEK_CUR
- * and call g_seekable_tell() to achive this.
+ * If you want the number of bytes currently written to the stream, use
+ * g_memory_output_stream_get_data_size().
  * 
  * Returns: the number of bytes allocated for the data buffer
  */
@@ -256,6 +254,27 @@ g_memory_output_stream_get_size (GMemoryOutputStream *ostream)
   return ostream->priv->len;
 }
 
+/**
+ * g_memory_output_stream_get_data_size:
+ * @ostream: a #GMemoryOutputStream
+ *
+ * Returns the number of bytes from the start up
+ * to including the last byte written in the stream
+ * that has not been truncated away.
+ * 
+ * Returns: the number of bytes written to the stream
+ *
+ * Since: 2.18
+ */
+gsize
+g_memory_output_stream_get_data_size (GMemoryOutputStream *ostream)
+{
+  g_return_val_if_fail (G_IS_MEMORY_OUTPUT_STREAM (ostream), 0);
+  
+  return ostream->priv->pos;
+}
+
+
 static gboolean
 array_check_boundary (GMemoryOutputStream  *stream,
                       goffset               size,
@@ -263,10 +282,10 @@ array_check_boundary (GMemoryOutputStream  *stream,
 {
   if (size > G_MAXUINT)
     {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_FAILED,
-                   _("Reached maximum data array limit"));
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_FAILED,
+                           _("Reached maximum data array limit"));
 
       return FALSE;
     }
@@ -298,10 +317,10 @@ array_resize (GMemoryOutputStream  *ostream,
 	  priv->pos < priv->len)
 	return TRUE; /* Short write */
       
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_NO_SPACE,
-                   _("Memory output stream not resizable"));
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_NO_SPACE,
+                           _("Memory output stream not resizable"));
       return FALSE;
     }
 
@@ -314,10 +333,10 @@ array_resize (GMemoryOutputStream  *ostream,
 	  priv->pos < priv->len)
 	return TRUE; /* Short write */
       
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_NO_SPACE,
-                   _("Failed to resize memory output stream"));
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_NO_SPACE,
+                           _("Failed to resize memory output stream"));
       return FALSE;
     }
 
@@ -520,20 +539,20 @@ g_memory_output_stream_seek (GSeekable    *seekable,
       break;
   
     default:
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Invalid GSeekType supplied"));
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_INVALID_ARGUMENT,
+                           _("Invalid GSeekType supplied"));
 
       return FALSE;
     }
 
   if (absolute < 0) 
     {
-      g_set_error (error,
-                   G_IO_ERROR,
-                   G_IO_ERROR_INVALID_ARGUMENT,
-                   _("Invalid seek request"));
+      g_set_error_literal (error,
+                           G_IO_ERROR,
+                           G_IO_ERROR_INVALID_ARGUMENT,
+                           _("Invalid seek request"));
       return FALSE;
     }
 

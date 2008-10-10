@@ -33,8 +33,17 @@
 
 #include "config.h"
 
-/* uncomment the next line to get poll() debugging info */
+/* Uncomment the next line to enable debugging printouts if the
+ * environment variable G_MAIN_POLL_DEBUG is set to some value.
+ */
 /* #define G_MAIN_POLL_DEBUG */
+
+#ifdef _WIN32
+/* Always enable debugging printout on Windows, as it is more often
+ * needed there...
+ */
+#define G_MAIN_POLL_DEBUG
+#endif
 
 #include "glib.h"
 #include "gthreadprivate.h"
@@ -80,6 +89,16 @@
 
 #include "galias.h"
 
+#ifdef G_OS_WIN32
+#ifdef _WIN64
+#define GPOLLFD_FORMAT "%#I64x"
+#else
+#define GPOLLFD_FORMAT "%#x"
+#endif
+#else
+#define GPOLLFD_FORMAT "%d"
+#endif
+
 /* Types */
 
 typedef struct _GTimeoutSource GTimeoutSource;
@@ -108,8 +127,12 @@ typedef struct _GMainDispatch GMainDispatch;
 struct _GMainDispatch
 {
   gint depth;
-  GSList *source; /* stack of current sources */
+  GSList *dispatching_sources; /* stack of current sources */
 };
+
+#ifdef G_MAIN_POLL_DEBUG
+static gboolean g_main_poll_debug = FALSE;
+#endif
 
 struct _GMainContext
 {
@@ -318,67 +341,34 @@ extern gint poll (GPollFD *ufds, guint nfsd, gint timeout);
 
 #ifdef G_OS_WIN32
 
-static gint
-g_poll (GPollFD *fds,
-	guint    nfds,
-	gint     timeout)
+static int
+poll_rest (gboolean  poll_msgs,
+	   HANDLE   *handles,
+	   gint      nhandles,
+	   GPollFD  *fds,
+	   guint     nfds,
+	   gint      timeout)
 {
-  HANDLE handles[MAXIMUM_WAIT_OBJECTS];
-  gboolean poll_msgs = FALSE;
-  GPollFD *f;
   DWORD ready;
-  MSG msg;
-  gint nhandles = 0;
-
-  for (f = fds; f < &fds[nfds]; ++f)
-    if (f->fd >= 0)
-      {
-	if (f->fd == G_WIN32_MSG_HANDLE)
-	  poll_msgs = TRUE;
-	else if (nhandles == MAXIMUM_WAIT_OBJECTS)
-	  {
-	    g_warning (G_STRLOC ": Too many handles to wait for!\n");
-	    break;
-	  }
-	else
-	  {
-#ifdef G_MAIN_POLL_DEBUG
-	    g_print ("g_poll: waiting for %#x\n", f->fd);
-#endif
-	    handles[nhandles++] = (HANDLE) f->fd;
-	  }
-      }
-
-  if (timeout == -1)
-    timeout = INFINITE;
+  GPollFD *f;
+  int recursed_result;
 
   if (poll_msgs)
     {
-      /* Waiting for messages, and maybe events
-       * -> First PeekMessage
+      /* Wait for either messages or handles
+       * -> Use MsgWaitForMultipleObjectsEx
        */
-#ifdef G_MAIN_POLL_DEBUG
-      g_print ("PeekMessage\n");
-#endif
-      if (PeekMessage (&msg, NULL, 0, 0, PM_NOREMOVE))
-	ready = WAIT_OBJECT_0 + nhandles;
-      else
-	{
-	  /* Wait for either message or event
-	   * -> Use MsgWaitForMultipleObjectsEx
-	   */
-#ifdef G_MAIN_POLL_DEBUG
-	  g_print ("MsgWaitForMultipleObjectsEx(%d, %d)\n", nhandles, timeout);
-#endif
-	  ready = MsgWaitForMultipleObjectsEx (nhandles, handles, timeout,
-					       QS_ALLINPUT, MWMO_ALERTABLE);
+      if (g_main_poll_debug)
+	g_print ("  MsgWaitForMultipleObjectsEx(%d, %d)\n", nhandles, timeout);
 
-	  if (ready == WAIT_FAILED)
-	    {
-	      gchar *emsg = g_win32_error_message (GetLastError ());
-	      g_warning (G_STRLOC ": MsgWaitForMultipleObjectsEx() failed: %s", emsg);
-	      g_free (emsg);
-	    }
+      ready = MsgWaitForMultipleObjectsEx (nhandles, handles, timeout,
+					   QS_ALLINPUT, MWMO_ALERTABLE);
+
+      if (ready == WAIT_FAILED)
+	{
+	  gchar *emsg = g_win32_error_message (GetLastError ());
+	  g_warning ("MsgWaitForMultipleObjectsEx failed: %s", emsg);
+	  g_free (emsg);
 	}
     }
   else if (nhandles == 0)
@@ -394,30 +384,27 @@ g_poll (GPollFD *fds,
     }
   else
     {
-      /* Wait for just events
+      /* Wait for just handles
        * -> Use WaitForMultipleObjectsEx
        */
-#ifdef G_MAIN_POLL_DEBUG
-      g_print ("WaitForMultipleObjectsEx(%d, %d)\n", nhandles, timeout);
-#endif
+      if (g_main_poll_debug)
+	g_print ("  WaitForMultipleObjectsEx(%d, %d)\n", nhandles, timeout);
+
       ready = WaitForMultipleObjectsEx (nhandles, handles, FALSE, timeout, TRUE);
       if (ready == WAIT_FAILED)
 	{
 	  gchar *emsg = g_win32_error_message (GetLastError ());
-	  g_warning (G_STRLOC ": WaitForMultipleObjectsEx() failed: %s", emsg);
+	  g_warning ("WaitForMultipleObjectsEx failed: %s", emsg);
 	  g_free (emsg);
 	}
     }
 
-#ifdef G_MAIN_POLL_DEBUG
-  g_print ("wait returns %ld%s\n",
-	   ready,
-	   (ready == WAIT_FAILED ? " (WAIT_FAILED)" :
-	    (ready == WAIT_TIMEOUT ? " (WAIT_TIMEOUT)" :
-	     (poll_msgs && ready == WAIT_OBJECT_0 + nhandles ? " (msg)" : ""))));
-#endif
-  for (f = fds; f < &fds[nfds]; ++f)
-    f->revents = 0;
+  if (g_main_poll_debug)
+    g_print ("  wait returns %ld%s\n",
+	     ready,
+	     (ready == WAIT_FAILED ? " (WAIT_FAILED)" :
+	      (ready == WAIT_TIMEOUT ? " (WAIT_TIMEOUT)" :
+	       (poll_msgs && ready == WAIT_OBJECT_0 + nhandles ? " (msg)" : ""))));
 
   if (ready == WAIT_FAILED)
     return -1;
@@ -427,26 +414,141 @@ g_poll (GPollFD *fds,
   else if (poll_msgs && ready == WAIT_OBJECT_0 + nhandles)
     {
       for (f = fds; f < &fds[nfds]; ++f)
-	if (f->fd >= 0)
-	  {
-	    if (f->events & G_IO_IN)
-	      if (f->fd == G_WIN32_MSG_HANDLE)
-		f->revents |= G_IO_IN;
-	  }
+	if (f->fd == G_WIN32_MSG_HANDLE && f->events & G_IO_IN)
+	  f->revents |= G_IO_IN;
+
+      /* If we have a timeout, or no handles to poll, be satisfied
+       * with just noticing we have messages waiting.
+       */
+      if (timeout != 0 || nhandles == 0)
+	return 1;
+
+      /* If no timeout and handles to poll, recurse to poll them,
+       * too.
+       */
+      recursed_result = poll_rest (FALSE, handles, nhandles, fds, nfds, 0);
+      return (recursed_result == -1) ? -1 : 1 + recursed_result;
     }
   else if (ready >= WAIT_OBJECT_0 && ready < WAIT_OBJECT_0 + nhandles)
-    for (f = fds; f < &fds[nfds]; ++f)
+    {
+      for (f = fds; f < &fds[nfds]; ++f)
+	{
+	  if ((HANDLE) f->fd == handles[ready - WAIT_OBJECT_0])
+	    {
+	      f->revents = f->events;
+	      if (g_main_poll_debug)
+		g_print ("  got event %p\n", (HANDLE) f->fd);
+	    }
+	}
+
+      /* If no timeout and polling several handles, recurse to poll
+       * the rest of them.
+       */
+      if (timeout == 0 && nhandles > 1)
+	{
+	  /* Remove the handle that fired */
+	  if (ready < nhandles - 1)
+	    memmove (handles + ready - WAIT_OBJECT_0, handles + ready - WAIT_OBJECT_0 + 1, nhandles - ready - 1);
+	  nhandles--;
+	  recursed_result = poll_rest (FALSE, handles, nhandles, fds, nfds, 0);
+	  return (recursed_result == -1) ? -1 : 1 + recursed_result;
+	}
+      return 1;
+    }
+    
+  return 0;
+}
+
+
+static gint
+g_poll (GPollFD *fds,
+	guint    nfds,
+	gint     timeout)
+{
+  HANDLE handles[MAXIMUM_WAIT_OBJECTS];
+  gboolean poll_msgs = FALSE;
+  GPollFD *f;
+  gint nhandles = 0;
+  int retval;
+
+  if (g_main_poll_debug)
+    g_print ("g_poll: waiting for");
+
+  for (f = fds; f < &fds[nfds]; ++f)
+    if (f->fd == G_WIN32_MSG_HANDLE && (f->events & G_IO_IN))
       {
-	if (f->fd == (gint) handles[ready - WAIT_OBJECT_0])
+	if (g_main_poll_debug && !poll_msgs)
+	  g_print (" MSG");
+	poll_msgs = TRUE;
+      }
+    else if (f->fd > 0)
+      {
+	/* Don't add the same handle several times into the array, as
+	 * docs say that is not allowed, even if it actually does seem
+	 * to work.
+	 */
+	gint i;
+
+	for (i = 0; i < nhandles; i++)
+	  if (handles[i] == (HANDLE) f->fd)
+	    break;
+
+	if (i == nhandles)
 	  {
-	    f->revents = f->events;
-#ifdef G_MAIN_POLL_DEBUG
-	    g_print ("g_poll: got event %#x\n", f->fd);
-#endif
+	    if (nhandles == MAXIMUM_WAIT_OBJECTS)
+	      {
+		g_warning ("Too many handles to wait for!\n");
+		break;
+	      }
+	    else
+	      {
+		if (g_main_poll_debug)
+		  g_print (" %p", (HANDLE) f->fd);
+		handles[nhandles++] = (HANDLE) f->fd;
+	      }
 	  }
       }
-    
-  return 1;
+
+  if (g_main_poll_debug)
+    g_print ("\n");
+
+  for (f = fds; f < &fds[nfds]; ++f)
+    f->revents = 0;
+
+  if (timeout == -1)
+    timeout = INFINITE;
+
+  /* Polling for several things? */
+  if (nhandles > 1 || (nhandles > 0 && poll_msgs))
+    {
+      /* First check if one or several of them are immediately
+       * available
+       */
+      retval = poll_rest (poll_msgs, handles, nhandles, fds, nfds, 0);
+
+      /* If not, and we have a significant timeout, poll again with
+       * timeout then. Note that this will return indication for only
+       * one event, or only for messages. We ignore timeouts less than
+       * ten milliseconds as they are mostly pointless on Windows, the
+       * MsgWaitForMultipleObjectsEx() call will timeout right away
+       * anyway.
+       */
+      if (retval == 0 && (timeout == INFINITE || timeout >= 10))
+	retval = poll_rest (poll_msgs, handles, nhandles, fds, nfds, timeout);
+    }
+  else
+    {
+      /* Just polling for one thing, so no need to check first if
+       * available immediately
+       */
+      retval = poll_rest (poll_msgs, handles, nhandles, fds, nfds, timeout);
+    }
+
+  if (retval == -1)
+    for (f = fds; f < &fds[nfds]; ++f)
+      f->revents = 0;
+
+  return retval;
 }
 
 #else  /* !G_OS_WIN32 */
@@ -628,7 +730,7 @@ g_main_context_init_pipe (GMainContext *context)
   if (pipe (context->wake_up_pipe) < 0)
     g_error ("Cannot create pipe main loop wake-up: %s\n",
 	     g_strerror (errno));
-  
+ 
   fcntl (context->wake_up_pipe[0], F_SETFD, FD_CLOEXEC);
   fcntl (context->wake_up_pipe[1], F_SETFD, FD_CLOEXEC);
 
@@ -641,11 +743,11 @@ g_main_context_init_pipe (GMainContext *context)
   if (context->wake_up_semaphore == NULL)
     g_error ("Cannot create wake-up semaphore: %s",
 	     g_win32_error_message (GetLastError ()));
-  context->wake_up_rec.fd = (gint) context->wake_up_semaphore;
+  context->wake_up_rec.fd = (gintptr) context->wake_up_semaphore;
   context->wake_up_rec.events = G_IO_IN;
-#  ifdef G_MAIN_POLL_DEBUG
-  g_print ("wake-up semaphore: %#x\n", (guint) context->wake_up_semaphore);
-#  endif
+
+  if (g_main_poll_debug)
+    g_print ("wake-up semaphore: %p\n", context->wake_up_semaphore);
 # endif
   g_main_context_add_poll_unlocked (context, 0, &context->wake_up_rec);
 }
@@ -675,6 +777,19 @@ GMainContext *
 g_main_context_new (void)
 {
   GMainContext *context = g_new0 (GMainContext, 1);
+
+#ifdef G_MAIN_POLL_DEBUG
+  {
+    static gboolean beenhere = FALSE;
+
+    if (!beenhere)
+      {
+	if (getenv ("G_MAIN_POLL_DEBUG") != NULL)
+	  g_main_poll_debug = TRUE;
+	beenhere = TRUE;
+      }
+  }
+#endif
 
 #ifdef G_THREADS_ENABLED
   g_static_mutex_init (&context->mutex);
@@ -719,6 +834,12 @@ g_main_context_new (void)
 
   G_LOCK (main_context_list);
   main_context_list = g_slist_append (main_context_list, context);
+
+#ifdef G_MAIN_POLL_DEBUG
+  if (g_main_poll_debug)
+    g_print ("created context=%p\n", context);
+#endif
+
   G_UNLOCK (main_context_list);
 
   return context;
@@ -741,7 +862,13 @@ g_main_context_default (void)
   G_LOCK (main_loop);
 
   if (!default_main_context)
-    default_main_context = g_main_context_new ();
+    {
+      default_main_context = g_main_context_new ();
+#ifdef G_MAIN_POLL_DEBUG
+      if (g_main_poll_debug)
+	g_print ("default context=%p\n", default_main_context);
+#endif
+    }
 
   G_UNLOCK (main_loop);
 
@@ -1659,18 +1786,21 @@ g_get_current_time (GTimeVal *result)
   result->tv_usec = r.tv_usec;
 #else
   FILETIME ft;
-  guint64 *time64 = (guint64 *) &ft;
+  guint64 time64;
+
+  g_return_if_fail (result != NULL);
 
   GetSystemTimeAsFileTime (&ft);
+  memmove (&time64, &ft, sizeof (FILETIME));
 
   /* Convert from 100s of nanoseconds since 1601-01-01
    * to Unix epoch. Yes, this is Y2038 unsafe.
    */
-  *time64 -= G_GINT64_CONSTANT (116444736000000000);
-  *time64 /= 10;
+  time64 -= G_GINT64_CONSTANT (116444736000000000);
+  time64 /= 10;
 
-  result->tv_sec = *time64 / 1000000;
-  result->tv_usec = *time64 % 1000000;
+  result->tv_sec = time64 / 1000000;
+  result->tv_usec = time64 % 1000000;
 #endif
 }
 
@@ -1832,7 +1962,7 @@ GSource *
 g_main_current_source (void)
 {
   GMainDispatch *dispatch = get_dispatch ();
-  return dispatch->source ? dispatch->source->data : NULL;
+  return dispatch->dispatching_sources ? dispatch->dispatching_sources->data : NULL;
 }
 
 /**
@@ -2007,13 +2137,13 @@ g_main_dispatch (GMainContext *context)
 	   * This is a performance hack - do not revert to g_slist_prepend()!
 	   */
 	  current_source_link.data = source;
-	  current_source_link.next = current->source;
-	  current->source = &current_source_link;
+	  current_source_link.next = current->dispatching_sources;
+	  current->dispatching_sources = &current_source_link;
 	  need_destroy = ! dispatch (source,
 				     callback,
 				     user_data);
-	  g_assert (current->source == &current_source_link);
-	  current->source = current_source_link.next;
+	  g_assert (current->dispatching_sources == &current_source_link);
+	  current->dispatching_sources = current_source_link.next;
 	  current->depth--;
 	  
 	  if (cb_funcs)
@@ -2395,23 +2525,25 @@ g_main_context_query (GMainContext *context,
   n_poll = 0;
   while (pollrec && max_priority >= pollrec->priority)
     {
-      if (pollrec->fd->events)
+      /* We need to include entries with fd->events == 0 in the array because
+       * otherwise if the application changes fd->events behind our back and 
+       * makes it non-zero, we'll be out of sync when we check the fds[] array.
+       * (Changing fd->events after adding an FD wasn't an anticipated use of 
+       * this API, but it occurs in practice.) */
+      if (n_poll < n_fds)
 	{
-	  if (n_poll < n_fds)
-	    {
-	      fds[n_poll].fd = pollrec->fd->fd;
-	      /* In direct contradiction to the Unix98 spec, IRIX runs into
-	       * difficulty if you pass in POLLERR, POLLHUP or POLLNVAL
-	       * flags in the events field of the pollfd while it should
-	       * just ignoring them. So we mask them out here.
-	       */
-	      fds[n_poll].events = pollrec->fd->events & ~(G_IO_ERR|G_IO_HUP|G_IO_NVAL);
-	      fds[n_poll].revents = 0;
-	    }
-	  n_poll++;
+	  fds[n_poll].fd = pollrec->fd->fd;
+	  /* In direct contradiction to the Unix98 spec, IRIX runs into
+	   * difficulty if you pass in POLLERR, POLLHUP or POLLNVAL
+	   * flags in the events field of the pollfd while it should
+	   * just ignoring them. So we mask them out here.
+	   */
+	  fds[n_poll].events = pollrec->fd->events & ~(G_IO_ERR|G_IO_HUP|G_IO_NVAL);
+	  fds[n_poll].revents = 0;
 	}
-      
+
       pollrec = pollrec->next;
+      n_poll++;
     }
 
 #ifdef G_THREADS_ENABLED
@@ -2452,7 +2584,7 @@ g_main_context_check (GMainContext *context,
   GPollRec *pollrec;
   gint n_ready = 0;
   gint i;
-  
+   
   LOCK_CONTEXT (context);
 
   if (context->in_check_or_prepare)
@@ -2489,11 +2621,10 @@ g_main_context_check (GMainContext *context,
   while (i < n_fds)
     {
       if (pollrec->fd->events)
-	{
-	  pollrec->fd->revents = fds[i].revents;
-	  i++;
-	}
+	pollrec->fd->revents = fds[i].revents;
+
       pollrec = pollrec->next;
+      i++;
     }
 
   source = next_valid_source (context, NULL);
@@ -2727,7 +2858,7 @@ g_main_loop_new (GMainContext *context,
 		 gboolean      is_running)
 {
   GMainLoop *loop;
-  
+
   if (!context)
     context = g_main_context_default();
   
@@ -2942,8 +3073,12 @@ g_main_context_poll (GMainContext *context,
   if (n_fds || timeout != 0)
     {
 #ifdef	G_MAIN_POLL_DEBUG
-      g_print ("g_main_poll(%d) timeout: %d\n", n_fds, timeout);
-      poll_timer = g_timer_new ();
+      if (g_main_poll_debug)
+	{
+	  g_print ("polling context=%p n=%d timeout=%d\n",
+		   context, n_fds, timeout);
+	  poll_timer = g_timer_new ();
+	}
 #endif
 
       LOCK_CONTEXT (context);
@@ -2962,43 +3097,49 @@ g_main_context_poll (GMainContext *context,
 	}
       
 #ifdef	G_MAIN_POLL_DEBUG
-      LOCK_CONTEXT (context);
-
-      g_print ("g_main_poll(%d) timeout: %d - elapsed %12.10f seconds",
-	       n_fds,
-	       timeout,
-	       g_timer_elapsed (poll_timer, NULL));
-      g_timer_destroy (poll_timer);
-      pollrec = context->poll_records;
-      i = 0;
-      while (i < n_fds)
+      if (g_main_poll_debug)
 	{
-	  if (pollrec->fd->events)
+	  LOCK_CONTEXT (context);
+
+	  g_print ("g_main_poll(%d) timeout: %d - elapsed %12.10f seconds",
+		   n_fds,
+		   timeout,
+		   g_timer_elapsed (poll_timer, NULL));
+	  g_timer_destroy (poll_timer);
+	  pollrec = context->poll_records;
+
+	  while (pollrec != NULL)
 	    {
-	      if (fds[i].revents)
+	      i = 0;
+	      while (i < n_fds)
 		{
-		  g_print (" [%d:", fds[i].fd);
-		  if (fds[i].revents & G_IO_IN)
-		    g_print ("i");
-		  if (fds[i].revents & G_IO_OUT)
-		    g_print ("o");
-		  if (fds[i].revents & G_IO_PRI)
-		    g_print ("p");
-		  if (fds[i].revents & G_IO_ERR)
-		    g_print ("e");
-		  if (fds[i].revents & G_IO_HUP)
-		    g_print ("h");
-		  if (fds[i].revents & G_IO_NVAL)
-		    g_print ("n");
-		  g_print ("]");
+		  if (fds[i].fd == pollrec->fd->fd &&
+		      pollrec->fd->events &&
+		      fds[i].revents)
+		    {
+		      g_print (" [" GPOLLFD_FORMAT " :", fds[i].fd);
+		      if (fds[i].revents & G_IO_IN)
+			g_print ("i");
+		      if (fds[i].revents & G_IO_OUT)
+			g_print ("o");
+		      if (fds[i].revents & G_IO_PRI)
+			g_print ("p");
+		      if (fds[i].revents & G_IO_ERR)
+			g_print ("e");
+		      if (fds[i].revents & G_IO_HUP)
+			g_print ("h");
+		      if (fds[i].revents & G_IO_NVAL)
+			g_print ("n");
+		      g_print ("]");
+		    }
+		  i++;
 		}
-	      i++;
+	      pollrec = pollrec->next;
 	    }
-	  pollrec = pollrec->next;
+	  g_print ("\n");
+
+	  UNLOCK_CONTEXT (context);
 	}
-      g_print ("\n");
-      
-      UNLOCK_CONTEXT (context);
 #endif
     } /* if (n_fds || timeout != 0) */
 }
@@ -3927,8 +4068,8 @@ g_child_watch_source_init (void)
 
 /**
  * g_child_watch_source_new:
- * @pid: process id of a child process to watch. On Windows, a HANDLE
- * for the process to watch (which actually doesn't have to be a child).
+ * @pid: process to watch. On POSIX the pid of a child process. On
+ * Windows a handle for a process (which doesn't have to be a child).
  * 
  * Creates a new child_watch source.
  *
@@ -3961,7 +4102,7 @@ g_child_watch_source_new (GPid pid)
   GChildWatchSource *child_watch_source = (GChildWatchSource *)source;
 
 #ifdef G_OS_WIN32
-  child_watch_source->poll.fd = (int)pid;
+  child_watch_source->poll.fd = (gintptr) pid;
   child_watch_source->poll.events = G_IO_IN;
 
   g_source_add_poll (source, &child_watch_source->poll);
@@ -3978,7 +4119,8 @@ g_child_watch_source_new (GPid pid)
  * g_child_watch_add_full:
  * @priority: the priority of the idle source. Typically this will be in the
  *            range between #G_PRIORITY_DEFAULT_IDLE and #G_PRIORITY_HIGH_IDLE.
- * @pid:      process id of a child process to watch
+ * @pid:      process to watch. On POSIX the pid of a child process. On
+ * Windows a handle for a process (which doesn't have to be a child).
  * @function: function to call
  * @data:     data to pass to @function
  * @notify:   function to call when the idle is removed, or %NULL
@@ -4027,7 +4169,8 @@ g_child_watch_add_full (gint            priority,
 
 /**
  * g_child_watch_add:
- * @pid:      process id of a child process to watch
+ * @pid:      process id to watch. On POSIX the pid of a child process. On
+ * Windows a handle for a process (which doesn't have to be a child).
  * @function: function to call
  * @data:     data to pass to @function
  * 

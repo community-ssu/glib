@@ -20,7 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 #include "gappinfo.h"
 #include "glibintl.h"
 #include <gioerror.h>
@@ -272,7 +272,8 @@ g_app_info_set_as_default_for_extension (GAppInfo    *appinfo,
   if (iface->set_as_default_for_extension)
     return (* iface->set_as_default_for_extension) (appinfo, extension, error);
 
-  g_set_error (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED, "g_app_info_set_as_default_for_extension not supported yet");
+  g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_NOT_SUPPORTED,
+                       "g_app_info_set_as_default_for_extension not supported yet");
   return FALSE;
 }
 
@@ -303,9 +304,9 @@ g_app_info_add_supports_type (GAppInfo    *appinfo,
   if (iface->add_supports_type)
     return (* iface->add_supports_type) (appinfo, content_type, error);
 
-  g_set_error (error, G_IO_ERROR, 
-               G_IO_ERROR_NOT_SUPPORTED, 
-               "g_app_info_add_supports_type not supported yet");
+  g_set_error_literal (error, G_IO_ERROR, 
+                       G_IO_ERROR_NOT_SUPPORTED, 
+                       "g_app_info_add_supports_type not supported yet");
 
   return FALSE;
 }
@@ -361,9 +362,9 @@ g_app_info_remove_supports_type (GAppInfo    *appinfo,
   if (iface->remove_supports_type)
     return (* iface->remove_supports_type) (appinfo, content_type, error);
 
-  g_set_error (error, G_IO_ERROR, 
-               G_IO_ERROR_NOT_SUPPORTED, 
-               "g_app_info_remove_supports_type not supported yet");
+  g_set_error_literal (error, G_IO_ERROR, 
+                       G_IO_ERROR_NOT_SUPPORTED, 
+                       "g_app_info_remove_supports_type not supported yet");
 
   return FALSE;
 }
@@ -392,10 +393,10 @@ g_app_info_get_icon (GAppInfo *appinfo)
 
 /**
  * g_app_info_launch:
- * @appinfo: a #GAppInfo.
- * @files: a #GList of #GFile objects.
- * @launch_context: a #GAppLaunchContext.
- * @error: a #GError.
+ * @appinfo: a #GAppInfo
+ * @files: a #GList of #GFile objects
+ * @launch_context: a #GAppLaunchContext or %NULL
+ * @error: a #GError
  * 
  * Launches the application. Passes @files to the launched application 
  * as arguments, using the optional @launch_context to get information
@@ -475,10 +476,10 @@ g_app_info_supports_files (GAppInfo *appinfo)
 
 /**
  * g_app_info_launch_uris:
- * @appinfo: a #GAppInfo.
+ * @appinfo: a #GAppInfo
  * @uris: a #GList containing URIs to launch. 
- * @launch_context: a #GAppLaunchContext.
- * @error: a #GError.
+ * @launch_context: a #GAppLaunchContext or %NULL
+ * @error: a #GError
  * 
  * Launches the application. Passes @uris to the launched application 
  * as arguments, using the optional @launch_context to get information
@@ -602,9 +603,9 @@ g_app_launch_context_init (GAppLaunchContext *launch_context)
 
 /**
  * g_app_launch_context_get_display:
- * @context: a #GAppLaunchContext.  
- * @info: a #GAppInfo. 
- * @files: a #GList of files.
+ * @context: a #GAppLaunchContext
+ * @info: a #GAppInfo
+ * @files: a #GList of #GFile objects
  *
  * Gets the display string for the display. This is used to ensure new
  * applications are started on the same display as the launching 
@@ -632,16 +633,16 @@ g_app_launch_context_get_display (GAppLaunchContext *context,
 
 /**
  * g_app_launch_context_get_startup_notify_id:
- * @context: a #GAppLaunchContext.
- * @info: a #GAppInfo.
- * @files: a #GList of files.
+ * @context: a #GAppLaunchContext
+ * @info: a #GAppInfo
+ * @files: a #GList of of #GFile objects
  * 
- * Initiates startup notification for the applicaiont and returns the
+ * Initiates startup notification for the application and returns the
  * DESKTOP_STARTUP_ID for the launched operation, if supported.
  *
- * Startup notification IDs are defined in the FreeDesktop.Org Startup 
- * Notifications standard, at 
- * <ulink url="http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt"/>.
+ * Startup notification IDs are defined in the <ulink
+ * url="http://standards.freedesktop.org/startup-notification-spec/startup-notification-latest.txt">
+ * FreeDesktop.Org Startup Notifications standard</ulink>.
  *
  * Returns: a startup notification ID for the application, or %NULL if 
  *     not supported.

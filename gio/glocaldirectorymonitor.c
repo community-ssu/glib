@@ -20,11 +20,13 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include "glocaldirectorymonitor.h"
 #include "gunixmounts.h"
 #include "giomodule-priv.h"
+#include "gfile.h"
+#include "gioerror.h"
 #include "glibintl.h"
 
 #include <string.h>
@@ -58,8 +60,7 @@ g_local_directory_monitor_finalize (GObject *object)
       local_monitor->mount_monitor = NULL;
     }
 
-  if (G_OBJECT_CLASS (g_local_directory_monitor_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_local_directory_monitor_parent_class)->finalize) (object);
+  G_OBJECT_CLASS (g_local_directory_monitor_parent_class)->finalize (object);
 }
 
 static void
@@ -114,7 +115,8 @@ g_local_directory_monitor_constructor (GType                  type,
   if (!klass->mount_notify)
     {
 #ifdef G_OS_WIN32
-      g_warning ("G_OS_WIN32: no mount emulation");
+      /*claim everything was mounted */
+      local_monitor->was_mounted = TRUE;
 #else
       GUnixMountEntry *mount;
       
@@ -128,7 +130,7 @@ g_local_directory_monitor_constructor (GType                  type,
         g_unix_mount_free (mount);
 
       local_monitor->mount_monitor = g_unix_mount_monitor_new ();
-      g_signal_connect_object (local_monitor->mount_monitor, "mounts_changed",
+      g_signal_connect_object (local_monitor->mount_monitor, "mounts-changed",
 			       G_CALLBACK (mounts_changed), local_monitor, 0);
 #endif
     }
@@ -178,7 +180,8 @@ mounts_changed (GUnixMountMonitor *mount_monitor,
   /* Emulate unmount detection */
 #ifdef G_OS_WIN32
   mount = NULL;
-  g_warning ("G_OS_WIN32: no mount emulation");
+  /*claim everything was mounted */
+  is_mounted = TRUE;
 #else  
   mount = g_unix_mount_at (local_monitor->dirname, NULL);
   
@@ -267,7 +270,8 @@ _g_local_directory_monitor_new (const char         *dirname,
   if (type != G_TYPE_INVALID)
     monitor = G_FILE_MONITOR (g_object_new (type, "dirname", dirname, NULL));
   else
-    g_set_error (error, G_IO_ERROR, G_IO_ERROR_FAILED, _("Unable to find default local directory monitor type"));
+    g_set_error_literal (error, G_IO_ERROR, G_IO_ERROR_FAILED,
+                         _("Unable to find default local directory monitor type"));
 
   /* This is non-null on first pass here. Unref the class now.
    * This is to avoid unloading the module and then loading it

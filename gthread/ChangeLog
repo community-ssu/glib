@@ -1,22 +1,69 @@
-2008-09-12  Matthias Clasen  <mclasen@redhat.com>
+2008-09-17  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.16.6 ===
+	* === Released 2.18.1 ===
 
-2008-07-19  Matthias Clasen  <mclasen@redhat.com>
+2008-09-02  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.16.5 === 
+	* === Released 2.18.0 ===
 
-2008-07-01  Matthias Clasen  <mclasen@redhat.com>
+2008-08-18  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.7 ===
+
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	Bug 460920 – build fix for --disable-threads
+
+	* gthread-impl.c: Implement g_thread_init_with_errorcheck_mutexes
+	in the !G_THREAD_ENABLED case. Pointed out by Jan Nieuwenhuizen
+
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.6 ===
+
+2008-08-04  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.5 ===
+
+2008-07-27  Tor Lillqvist  <tml@novell.com>
+
+	* Makefile.am (gthread-2.0.lib): Pass appropriate -machine flag to lib.exe.
+
+2008-07-21  Matthias Clasen  <mclasen2redhat.com>
+
+	* === Released 2.17.4 ===
+
+2008-07-02  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.3 ===
+
+2008-06-12  Matthias Clasen  <mclasen@redhat.com>
 	
-	* === Released 2.16.4 ===
+	* === Released 2.17.2 ===
 
-2008-04-08  Matthias Clasen  <mclasen@redhat.com>
+2008-06-12  Matthias Clasen  <mclasen@redhat.com>
 
-	* === Released 2.16.3 ===
+	* === Released 2.17.1 ===
 
-2008-03-31  Matthias Clasen  <mclasen@redhat.com>
+2008-05-28  Michael Natterer  <mitch@imendio.com>
 
-	* === Released 2.16.2 ===
+	* Makefile.am: don't define G_DISABLE_SINGLE_INCLUDES, it's in
+	the global CPPFLAGS now.
+
+2008-05-27  Matthias Clasen  <mclasen@redhat.com>
+
+	* === Released 2.17.0 ===
+
+2008-05-05  Michael Natterer  <mitch@imendio.com>
+
+	* Makefile.am. build with G_DISABLE_SINGLE_INCLUDES to prevent
+	code from being checked in that breaks the build of applications
+	which use G_DISABLE_SINGLE_INCLUDES.
+
+2008-03-16  Tor Lillqvist  <tml@novell.com>
+
+	* Makefile.am: Define gthread_def locally here instead of using an
+	Autoconf variable.
 
 2008-03-10  Matthias Clasen  <mclasen@redhat.com>
 	

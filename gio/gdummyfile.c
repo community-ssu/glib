@@ -20,7 +20,7 @@
  * Author: Alexander Larsson <alexl@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <sys/types.h>
 #include <sys/stat.h>
@@ -33,6 +33,7 @@
 #include <stdlib.h>
 
 #include "gdummyfile.h"
+#include "gfile.h"
 
 #include "gioalias.h"
 
@@ -87,9 +88,8 @@ g_dummy_file_finalize (GObject *object)
     _g_decoded_uri_free (dummy->decoded_uri);
   
   g_free (dummy->text_uri);
-  
-  if (G_OBJECT_CLASS (g_dummy_file_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_dummy_file_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_dummy_file_parent_class)->finalize (object);
 }
 
 static void

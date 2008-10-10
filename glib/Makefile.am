@@ -81,18 +81,20 @@ BUILT_EXTRA_DIST = 		\
 
 lib_LTLIBRARIES = libglib-2.0.la
 
+if OS_WIN32_AND_DLL_COMPILATION
 if MS_LIB_AVAILABLE
 noinst_DATA = glib-2.0.lib
 
+install_ms_lib_cmd = $(INSTALL) glib-2.0.lib $(DESTDIR)$(libdir)
+uninstall_ms_lib_cmd = -rm $(DESTDIR)$(libdir)/glib-2.0.lib
+endif
+endif
+
 install-ms-lib:
-	$(INSTALL) glib-2.0.lib $(DESTDIR)$(libdir)
+	$(install_ms_lib_cmd)
 
 uninstall-ms-lib:
-	-rm $(DESTDIR)$(libdir)/glib-2.0.lib
-else
-install-ms-lib:
-uninstall-ms-lib:
-endif
+	$(uninstall_ms_lib_cmd)
 
 libglib_2_0_la_SOURCES = 	\
 	garray.c		\
@@ -257,9 +259,13 @@ if PLATFORM_WIN32
 no_undefined = -no-undefined
 endif
 
-if OS_WIN32
-# This requires a very new libtool
+if OS_WIN32_AND_DLL_COMPILATION
 export_symbols = -export-symbols glib.def
+
+glib_win32_res = glib-win32-res.o
+glib_win32_res_ldflag = -Wl,$(glib_win32_res)
+
+glib_def = glib.def
 
 install-def-file:
 	$(INSTALL) glib.def $(DESTDIR)$(libdir)/glib-2.0.def
@@ -271,11 +277,6 @@ install-def-file:
 uninstall-def-file:
 
 export_symbols = $(LIBTOOL_EXPORT_OPTIONS)
-endif
-
-if OS_WIN32
-glib_win32_res = glib-win32-res.o
-glib_win32_res_ldflag = -Wl,$(glib_win32_res)
 endif
 
 if ENABLE_REGEX
@@ -292,7 +293,7 @@ pcre_inc =
 endif
 
 libglib_2_0_la_LIBADD = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ @ICONV_LIBS@ @G_LIBS_EXTRA@ $(pcre_lib)
-libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ $(glib_win32_res) @GLIB_DEF@
+libglib_2_0_la_DEPENDENCIES = libcharset/libcharset.la $(printf_la) @GIO@ @GSPAWN@ @PLATFORMDEP@ $(glib_win32_res) $(glib_def)
 
 libglib_2_0_la_LDFLAGS = \
 	 $(glib_win32_res_ldflag) \
@@ -302,17 +303,32 @@ libglib_2_0_la_LDFLAGS = \
 INSTALL_PROGS=
 
 gspawn-win32-helper-console.c:
+	echo '#define HELPER_CONSOLE' >$@
+	echo '#include "gspawn-win32-helper.c"' >>$@
+
+gspawn-win64-helper.c:
 	echo '#include "gspawn-win32-helper.c"' >$@
 
+gspawn-win64-helper-console.c:
+	echo '#define HELPER_CONSOLE' >$@
+	echo '#include "gspawn-win32-helper.c"' >>$@
+
 if OS_WIN32
+if OS_WIN32_X64
+INSTALL_PROGS += gspawn-win64-helper gspawn-win64-helper-console
+gspawn_win64_helper_LDADD = libglib-2.0.la
+gspawn_win64_helper_LDFLAGS = -mwindows
+gspawn_win64_helper_console_LDADD = libglib-2.0.la
+else
 INSTALL_PROGS += gspawn-win32-helper gspawn-win32-helper-console
 gspawn_win32_helper_LDADD = libglib-2.0.la
 gspawn_win32_helper_LDFLAGS = -mwindows
 gspawn_win32_helper_console_LDADD = libglib-2.0.la
+endif
+endif
 
 glib-win32-res.o: glib.rc
 	$(WINDRES) glib.rc $@
-endif
 
 bin_PROGRAMS	 = ${INSTALL_PROGS}
 
@@ -320,7 +336,7 @@ if OS_UNIX
 
 INSTALL_PROGS	+= gtester
 gtester_SOURCES	 = gtester.c
-gtester_LDADD	 = libglib-2.0.la
+gtester_LDADD	 = libglib-2.0.la 
 
 auto_config_binscripts = gtester-report
 bin_SCRIPTS = ${auto_config_binscripts}
@@ -343,7 +359,7 @@ install-exec-hook:
 endif
 
 glib-2.0.lib: libglib-2.0.la glib.def
-	lib -name:libglib-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:glib.def -out:$@
+	lib -machine:@LIB_EXE_MACHINE_FLAG@ -name:libglib-2.0-$(LT_CURRENT_MINUS_AGE).dll -def:glib.def -out:$@
 
 dist-hook: $(BUILT_EXTRA_DIST)
 	files='$(BUILT_EXTRA_DIST)'; \

@@ -316,7 +316,7 @@ g_file_test (const gchar *filename,
 #endif
 }
 
-#ifdef G_OS_WIN32
+#if defined (G_OS_WIN32) && !defined (_WIN64)
 
 #undef g_file_test
 
@@ -577,13 +577,28 @@ get_contents_stdio (const gchar *display_filename,
         }
 
       memcpy (str + total_bytes, buf, bytes);
+
+      if (total_bytes + bytes < total_bytes) 
+        {
+          g_set_error (error,
+                       G_FILE_ERROR,
+                       G_FILE_ERROR_FAILED,
+                       _("File \"%s\" is too large"),
+                       display_filename);
+
+          goto error;
+        }
+
       total_bytes += bytes;
     }
 
   fclose (f);
 
   if (total_allocated == 0)
-    str = g_new (gchar, 1);
+    {
+      str = g_new (gchar, 1);
+      total_bytes = 0;
+    }
 
   str[total_bytes] = '\0';
 
@@ -845,7 +860,7 @@ g_file_get_contents (const gchar *filename,
 #endif
 }
 
-#ifdef G_OS_WIN32
+#if defined (G_OS_WIN32) && !defined (_WIN64)
 
 #undef g_file_get_contents
 
@@ -1223,7 +1238,7 @@ g_mkstemp (gchar *tmpl)
   return create_temp_file (tmpl, 0600);
 }
 
-#ifdef G_OS_WIN32
+#if defined (G_OS_WIN32) && !defined (_WIN64)
 
 #undef g_mkstemp
 
@@ -1296,7 +1311,7 @@ g_mkstemp (gchar *tmpl)
  * g_file_open_tmp:
  * @tmpl: Template for file name, as in g_mkstemp(), basename only,
  *        or %NULL, to a default template
- * @name_used: location to store actual name used
+ * @name_used: location to store actual name used, or %NULL
  * @error: return location for a #GError
  *
  * Opens a file for writing in the preferred directory for temporary
@@ -1402,7 +1417,7 @@ g_file_open_tmp (const gchar *tmpl,
   return retval;
 }
 
-#ifdef G_OS_WIN32
+#if defined (G_OS_WIN32) && !defined (_WIN64)
 
 #undef g_file_open_tmp
 
@@ -1823,7 +1838,7 @@ char *
 g_format_size_for_display (goffset size)
 {
   if (size < (goffset) KILOBYTE_FACTOR)
-    return g_strdup_printf (dngettext(GETTEXT_PACKAGE, "%u byte", "%u bytes",(guint) size), (guint) size);
+    return g_strdup_printf (g_dngettext(GETTEXT_PACKAGE, "%u byte", "%u bytes",(guint) size), (guint) size);
   else
     {
       gdouble displayed_size;
@@ -1902,10 +1917,10 @@ g_file_read_link (const gchar *filename,
       buffer = g_realloc (buffer, size);
     }
 #else
-  g_set_error (error,
-	       G_FILE_ERROR,
-	       G_FILE_ERROR_INVAL,
-	       _("Symbolic links not supported"));
+  g_set_error_literal (error,
+                       G_FILE_ERROR,
+                       G_FILE_ERROR_INVAL,
+                       _("Symbolic links not supported"));
 	
   return NULL;
 #endif

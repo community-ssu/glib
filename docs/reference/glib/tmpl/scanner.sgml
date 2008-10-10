@@ -65,12 +65,6 @@ handler function is declared by #GScannerMsgFunc.
 @buffer: 
 @scope_id: 
 @msg_handler: function to handle GScanner message output
-@cache_fd: 
-@cache_flags: 
-@cache_size: 
-@cache_base: 
-@cache_p: 
-@cache_end: 
 
 <!-- ##### STRUCT GScannerConfig ##### -->
 <para>

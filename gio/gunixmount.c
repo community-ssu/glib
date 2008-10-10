@@ -23,7 +23,7 @@
  *         David Zeuthen <davidz@redhat.com>
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 #include <sys/wait.h>
@@ -32,11 +32,15 @@
 #include <glib.h>
 #include "gunixvolumemonitor.h"
 #include "gunixmount.h"
+#include "gunixmounts.h"
 #include "gunixvolume.h"
 #include "gmountprivate.h"
+#include "gmount.h"
+#include "gfile.h"
 #include "gvolumemonitor.h"
 #include "gthemedicon.h"
 #include "gsimpleasyncresult.h"
+#include "gioerror.h"
 #include "glibintl.h"
 /* for BUFSIZ */
 #include <stdio.h>
@@ -84,9 +88,8 @@ g_unix_mount_finalize (GObject *object)
   g_free (mount->name);
   g_free (mount->device_path);
   g_free (mount->mount_path);
-  
-  if (G_OBJECT_CLASS (g_unix_mount_parent_class)->finalize)
-    (*G_OBJECT_CLASS (g_unix_mount_parent_class)->finalize) (object);
+
+  G_OBJECT_CLASS (g_unix_mount_parent_class)->finalize (object);
 }
 
 static void
@@ -153,7 +156,7 @@ _g_unix_mount_unset_volume (GUnixMount *mount,
       /* TODO: Emit changed in idle to avoid locking issues */
       g_signal_emit_by_name (mount, "changed");
       if (mount->volume_monitor != NULL)
-        g_signal_emit_by_name (mount->volume_monitor, "mount_changed", mount);
+        g_signal_emit_by_name (mount->volume_monitor, "mount-changed", mount);
     }
 }
 

@@ -1,3 +1,9 @@
+glib2.0 (2.18.1-1maemo1) unstable; urgency=low
+
+  * Upgrade to GLIB 2.18.1
+
+ -- Michael Natterer <mitch@imendio.com>  Thu, 09 Oct 2008 15:15:15 +0200
+
 glib2.0 (2.16.6-1maemo1) unstable; urgency=low
 
   * Upgrade to GLIB 2.16.6

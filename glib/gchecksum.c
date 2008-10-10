@@ -18,7 +18,7 @@
  * Boston, MA 02111-1307, USA.
  */
 
-#include <config.h>
+#include "config.h"
 
 #include <string.h>
 
@@ -122,10 +122,7 @@ sha_byte_reverse (guint32 *buffer,
   length /= sizeof (guint32);
   while (length--)
     {
-      *buffer = ((guint32) (((*buffer & (guint32) 0x000000ffU) << 24) |
-                            ((*buffer & (guint32) 0x0000ff00U) <<  8) |
-                            ((*buffer & (guint32) 0x00ff0000U) >>  8) |
-                            ((*buffer & (guint32) 0xff000000U) >> 24)));
+      *buffer = GUINT32_SWAP_LE_BE (*buffer);
       ++buffer;
     }
 }
@@ -1117,7 +1114,28 @@ g_checksum_new (GChecksumType checksum_type)
   checksum = g_slice_new0 (GChecksum);
   checksum->type = checksum_type;
 
-  switch (checksum_type)
+  g_checksum_reset (checksum);
+
+  return checksum;
+}
+
+/**
+ * g_checksum_reset:
+ * @checksum: the #GChecksum to reset
+ *
+ * Resets the state of the @checksum back to it's initial state.
+ *
+ * Since: 2.18
+ **/
+void
+g_checksum_reset (GChecksum *checksum)
+{
+  g_return_if_fail (checksum != NULL);
+
+  g_free (checksum->digest_str);
+  checksum->digest_str = NULL;
+
+  switch (checksum->type)
     {
     case G_CHECKSUM_MD5:
       md5_sum_init (&(checksum->sum.md5));
@@ -1132,8 +1150,6 @@ g_checksum_new (GChecksumType checksum_type)
       g_assert_not_reached ();
       break;
     }
-
-  return checksum;
 }
 
 /**
@@ -1204,7 +1220,7 @@ g_checksum_update (GChecksum    *checksum,
   g_return_if_fail (data != NULL);
 
   if (length < 0)
-    length = strlen (data);
+    length = strlen ((const gchar *) data);
 
   if (checksum->digest_str)
     {

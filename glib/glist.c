@@ -324,7 +324,7 @@ g_list_concat (GList *list1, GList *list2)
  * If two elements contain the same data, only the first is removed.
  * If none of the elements contain the data, the #GList is unchanged.
  *
- * Return: the new start of the #GList
+ * Returns: the new start of the #GList
  */
 GList*
 g_list_remove (GList	     *list,
@@ -727,7 +727,7 @@ g_list_last (GList *list)
  *
  * Gets the first element in a #GList.
  *
- * Returns: the last element in the #GList, 
+ * Returns: the first element in the #GList, 
  *     or %NULL if the #GList has no elements
  */
 GList*
