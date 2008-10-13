@@ -1,3 +1,10 @@
+2008-10-13  Sven Herzberg  <sven@imendio.com>
+
+	Bug 556101 – static mutex yields warnings with g++
+	Reviewed by Tim Janik
+
+	* configure.in: added an intermediate cast to gpointer
+
 2008-05-14  Michael Natterer  <mitch@imendio.com>
 
 	* === Start Maemo-GLib 2.18.1 ===
