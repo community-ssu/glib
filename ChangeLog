@@ -1,3 +1,9 @@
+2008-11-28 11:56:04  Tim Janik  <timj@imendio.com>
+
+	* glib/Makefile.am: added -fno-omit-frame-pointer and -mapcs-frame
+	compiler flags to gmessages.c and gtestutils.c, so backtraces
+	through noreturn functions work on ARM with gcc-4.2.1. NB#91723.
+
 2008-10-13  Sven Herzberg  <sven@imendio.com>
 
 	Bug 556101 – static mutex yields warnings with g++

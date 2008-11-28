@@ -32,6 +32,12 @@ AM_CPPFLAGS = 				\
 	-DGLIB_COMPILATION 		\
 	-DPCRE_STATIC
 
+# force frame-pointers for source files with noreturn functions for backtraces
+AM_CFLAGS = $(patsubst %, \
+		-fno-omit-frame-pointer -mapcs-frame, \
+		$(filter $(<F), gmessages.c gtestutils.c ))
+
+
 glib.def: glib.symbols
 	(echo -e EXPORTS; $(CPP) -P -DINCLUDE_VARIABLES -DINCLUDE_INTERNAL_SYMBOLS -DG_OS_WIN32 -DALL_FILES - <$(srcdir)/glib.symbols | sed -e '/^$$/d' -e 's/^/	/' -e 's/G_GNUC_[^ ]*//g') > glib.def
 
@@ -165,12 +171,6 @@ libglib_2_0_la_SOURCES = 	\
 	gdebug.h		\
 	gprintf.c		\
 	gprintfint.h
-
-GMESSAGES = gmessages
-$(GMESSAGES).o $(GMESSAGES).obj $(GMESSAGES).lo: $(GMESSAGES).c
-	$(MAKE) $(AM_MAKEFLAGS) \
-		AM_CFLAGS='$(AM_CLFAGS) -fno-omit-frame-pointer' \
-		GMESSAGES=dummy '$@'
 
 EXTRA_libglib_2_0_la_SOURCES = \
 	giounix.c	\
