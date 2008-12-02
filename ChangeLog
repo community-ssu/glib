@@ -1,3 +1,10 @@
+2008-12-02 17:23:20  Tim Janik  <timj@imendio.com>
+
+	* configure.in: provide flags needed for ARM backtraces for ARM CPUs only.
+
+	* glib/Makefile.am: use ARM_FRAME_FLAGS from configure.in, fixes issues on
+	i386 with the fix to NB#91723.
+
 2008-11-28 11:56:04  Tim Janik  <timj@imendio.com>
 
 	* glib/Makefile.am: added -fno-omit-frame-pointer and -mapcs-frame

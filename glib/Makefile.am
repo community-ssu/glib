@@ -33,10 +33,7 @@ AM_CPPFLAGS = 				\
 	-DPCRE_STATIC
 
 # force frame-pointers for source files with noreturn functions for backtraces
-AM_CFLAGS = $(patsubst %, \
-		-fno-omit-frame-pointer -mapcs-frame, \
-		$(filter $(<F), gmessages.c gtestutils.c ))
-
+AM_CFLAGS = $(patsubst %, $(ARM_FRAME_FLAGS), $(filter $(<F), gmessages.c gtestutils.c ))
 
 glib.def: glib.symbols
 	(echo -e EXPORTS; $(CPP) -P -DINCLUDE_VARIABLES -DINCLUDE_INTERNAL_SYMBOLS -DG_OS_WIN32 -DALL_FILES - <$(srcdir)/glib.symbols | sed -e '/^$$/d' -e 's/^/	/' -e 's/G_GNUC_[^ ]*//g') > glib.def

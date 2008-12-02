@@ -2425,6 +2425,9 @@ if test x"$GCC" = xyes; then
                            [special arm linux implementation])
         glib_memory_barrier_needed=yes
       fi
+      # some ARM CPUs and gcc versions need flags for proper backtraces
+      ARM_FRAME_FLAGS="-fno-omit-frame-pointer -mapcs-frame"
+      AC_SUBST(ARM_FRAME_FLAGS)
       ;;
     *)
       AC_MSG_RESULT([none])
