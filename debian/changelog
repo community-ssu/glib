@@ -1,3 +1,11 @@
+glib2.0 (2.18.1-1maemo2) unstable; urgency=low
+
+  * Upstream fixes.
+  * Fixes: NB#91723 (Backtraces don't work through functions having noreturn
+    attribute on ARM)
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 02 Dec 2008 16:52:01 +0100
+
 glib2.0 (2.18.1-1maemo1) unstable; urgency=low
 
   [ Michael Natterer ]
