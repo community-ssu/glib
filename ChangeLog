@@ -1,3 +1,10 @@
+2009-03-12  Michael Natterer  <mitch@imendio.com>
+
+	Merged from upstream:
+
+	* glib/gbase64.c: Avoid integer overflows in the base64
+	functions. Fixes CVE-2008-4316
+ 
 2008-12-02 17:23:20  Tim Janik  <timj@imendio.com>
 
 	* configure.in: provide flags needed for ARM backtraces for ARM CPUs only.
