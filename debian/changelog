@@ -1,3 +1,9 @@
+glib2.0 (2.18.1-1maemo3) unstable; urgency=low
+
+  * Fixes CVE-2008-4316 (from upstream).
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Thu, 12 Mar 2009 21:04:14 +0200
+
 glib2.0 (2.18.1-1maemo2) unstable; urgency=low
 
   * Upstream fixes.

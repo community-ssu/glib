@@ -1,3 +1,7 @@
+2009-03-12  Claudio Saavedra  <csaavedra@igalia.com>
+
+	* debian/changelog: Update for 2.18.1-1maemo3
+
 2009-03-12  Michael Natterer  <mitch@imendio.com>
 
 	Merged from upstream:
