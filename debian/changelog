@@ -1,3 +1,6 @@
+  * Fixes: NB#105436 (GLIB CRITICALSs when tapping insensitive widget if
+    hildon_gtk_menu_new called).
+
 glib2.0 (2.18.1-1maemo3) unstable; urgency=low
 
   * Fixes CVE-2008-4316 (from upstream).
