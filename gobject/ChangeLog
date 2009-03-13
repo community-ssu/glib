@@ -1,3 +1,11 @@
+2009-03-13  Kristian Rietveld  <kris@imendio.com>
+
+	Fixes NB#105436: GLIB CRITICALSs when tapping insensitive widget if
+	hildon_gtk_menu_new called.
+
+	* gsignal.c (signal_lookup_closure): when defaulting to the only item
+	in the array, check if this is indeed the default closure.
+
 2008-09-17  Matthias Clasen  <mclasen@redhat.com>
 
 	* === Released 2.18.1 ===
