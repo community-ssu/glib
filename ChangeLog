@@ -1,3 +1,7 @@
+2009-03-31  Claudio Saavedra  <csaavedra@igalia.com>
+
+	* debian/changelog: Update for 2.18.1-1maemo4
+
 2009-03-27 11:14:15  Tim Janik  <timj@lanedo.com>
 
 	* glib/gfileutils.c (write_to_temp_file): issue fdatasync() before

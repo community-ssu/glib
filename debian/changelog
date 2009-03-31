@@ -1,5 +1,10 @@
+glib2.0 (2.18.1-1maemo4) unstable; urgency=low
+
   * Fixes: NB#105436 (GLIB CRITICALSs when tapping insensitive widget if
     hildon_gtk_menu_new called).
+  * Fixes: NB#102075 (Updating the accounts file atomically)
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 31 Mar 2009 16:58:15 +0300
 
 glib2.0 (2.18.1-1maemo3) unstable; urgency=low
 
