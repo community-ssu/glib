@@ -2,6 +2,7 @@
 
 	* glib/gfileutils.c (write_to_temp_file): issue fdatasync() before
 	closing the file to work around file systems with writeback behaviour.
+	Fixes NB#102075: Updating the accounts file atomically.
 
 2009-03-12  Claudio Saavedra  <csaavedra@igalia.com>
 
