@@ -2400,13 +2400,13 @@ if test x"$GCC" = xyes; then
     arm*)
       AC_MSG_RESULT([arm])
       AC_MSG_CHECKING(arm atomic operations type)
-      if test x$glib_os_linux != xyes; then
+      maemo_changes_check=true	# MAEMO_CHANGES: inline ARM assembler
+      if test x$glib_os_linux != xyes || $maemo_changes_check; then
         AC_MSG_RESULT(inline asm)
         glib_save_CFLAGS=$CFLAGS
         AC_MSG_CHECKING(architecture supports ARMv6 instructions)
-          cp $srcdir/armv6-test.c conftest.$ac_ext
           CFLAGS="$CFLAGS -march=armv6"
-          AC_TRY_RUN(ac_compile,
+          AC_TRY_RUN([#include "$srcdir/armv6-test.c"],
             [AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 6,
                                 [armv6 atomic implementation])
              glib_memory_barrier_needed=yes

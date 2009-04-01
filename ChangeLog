@@ -1,3 +1,11 @@
+2009-04-01 16:30:07  Tim Janik  <timj@lanedo.com>
+
+	* configure.in: use generic ARM platform tests to determine
+	atomic primitive implementations. Fixed armv6-test.c test to
+	actually compile. This enables ARMv6 optimizations on MAEMO
+	(for uniprocessor systems, not SMP save).
+	Fixes NB#106135 - glib does not use fast ARMv6+ atomic operations.
+
 2009-03-31  Claudio Saavedra  <csaavedra@igalia.com>
 
 	* debian/changelog: Update for 2.18.1-1maemo4
