@@ -1,3 +1,13 @@
+2009-04-02  Michael Natterer  <mitch@landeo.com>
+
+	Bug NB#107184 – Gio/GVfs don't emit GVolumeMonitor::mount-pre-unmount
+
+	Applied patch from Carlos Garnacho:
+
+	* gio/gunixmount.c (eject_unmount_cb) (eject_unmount_do_cb)
+	(eject_unmount_do): Emit ::mount-pre-unmount and wait 500msec before
+	actually trying to unmount.
+
 2009-04-01 16:30:07  Tim Janik  <timj@lanedo.com>
 
 	* configure.in: use generic ARM platform tests to determine
