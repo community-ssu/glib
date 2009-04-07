@@ -1,3 +1,7 @@
+2009-04-07  Claudio Saavedra  <csaavedra@igalia.com>
+
+	* debian/changelog: Update for 2.18.1-1maemo5
+
 2009-04-02  Michael Natterer  <mitch@landeo.com>
 
 	Bug NB#107184 – Gio/GVfs don't emit GVolumeMonitor::mount-pre-unmount
