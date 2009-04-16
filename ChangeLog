@@ -1,3 +1,8 @@
+2009-04-16  Claudio Saavedra  <csaavedra@igalia.com>
+
+	* configure.in: Revert fix for NB#106135, since it's
+	causing gstreamer issues.
+
 2009-04-07  Claudio Saavedra  <csaavedra@igalia.com>
 
 	* debian/changelog: Update for 2.18.1-1maemo5

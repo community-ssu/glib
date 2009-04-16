@@ -1,9 +1,8 @@
 glib2.0 (2.18.1-1maemo5) unstable; urgency=low
 
   * Fixes: NB#107184 (Gio/GVfs don't emit GVolumeMonitor::mount-pre-unmount)
-  * Fixes: NB#106135 (glib does not use fast ARMv6+ atomic operations)
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 07 Apr 2009 17:21:47 +0300
+ -- Claudio Saavedra <csaavedra@igalia.com>  Thu, 16 Apr 2009 16:46:04 +0300
 
 glib2.0 (2.18.1-1maemo4) unstable; urgency=low
 
