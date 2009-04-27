@@ -1,3 +1,7 @@
+2009-04-27  Claudio Saavedra  <csaavedra@igalia.com>
+
+	* debian/changelog: Update for 2.18.1-1maemo6
+
 2009-04-07  Claudio Saavedra  <csaavedra@igalia.com>
 
 	* debian/changelog: Update for 2.18.1-1maemo5
