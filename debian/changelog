@@ -1,4 +1,4 @@
-glib2.0 (2.20.1-1) unstable; urgency=low
+glib2.0 (2.20.1-1maemo1) unstable; urgency=low
 
   [ Janne Karhunen ]
   * New upstream release; move maemo changes to debian/patches
@@ -10,7 +10,7 @@ glib2.0 (2.20.1-1) unstable; urgency=low
     + 20-gunixmount.patch, dropped.
     + 55-gsignal.patch, dropped.
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Thu, 07 May 2009 13:58:09 +0300
+ -- Claudio Saavedra <csaavedra@igalia.com>  Thu, 07 May 2009 14:03:16 +0300
 
 glib2.0 (2.20.1-1) unstable; urgency=low
 
