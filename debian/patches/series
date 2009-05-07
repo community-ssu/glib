@@ -7,5 +7,3 @@
 45-gunicode.patch
 50-gthread.patch
 55-gsignal.patch
-100-glib-docs.patch
-105-gobject-doc.patch
