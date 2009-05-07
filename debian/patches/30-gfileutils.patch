@@ -1,0 +1,17 @@
+--- glib-2.18.1/glib/gfileutils.c	2008-09-18 01:33:57.000000000 +0300
++++ glib/glib/gfileutils.c	2009-04-28 09:16:43.000000000 +0300
+@@ -995,7 +995,14 @@ write_to_temp_file (const gchar *content
+     }
+    
+   errno = 0;
++#ifdef MAEMO_CHANGES
++  /* introduce a write-barrier for file contents before close()/rename()
++   * to work around file systems with writeback behaviour like UBIFS.
++   */
++  if (fdatasync (fileno (file)) < 0 || fclose (file) == EOF)
++#else /* !MAEMO_CHANGES */
+   if (fclose (file) == EOF)
++#endif /* MAEMO_CHANGES */
+     { 
+       save_errno = 0;
+       
