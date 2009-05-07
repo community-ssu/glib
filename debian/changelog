@@ -1,8 +1,12 @@
 glib2.0 (2.20.1-1) unstable; urgency=low
 
+  [ Janne Karhunen ]
   * New upstream release; move maemo changes to debian/patches
 
- -- Janne Karhunen <Janne.Karhunen@nokia.com>  Tue, 28 Apr 2009 13:50:24 +0300
+  [ Claudio Saavedra ]
+  * Drop debian unstable patches.
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Thu, 07 May 2009 13:56:43 +0300
 
 glib2.0 (2.20.1-1) unstable; urgency=low
 
