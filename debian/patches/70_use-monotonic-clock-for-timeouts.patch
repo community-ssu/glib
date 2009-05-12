@@ -1,0 +1,169 @@
+diff --git a/configure.in b/configure.in
+index 32d6561..21d617b 100644
+--- a/configure.in
++++ b/configure.in
+@@ -2345,6 +2345,7 @@ AC_CHECK_FUNCS(clock_gettime, [], [
+     AC_DEFINE(HAVE_CLOCK_GETTIME, 1)
+     G_THREAD_LIBS="$G_THREAD_LIBS -lrt"
+     G_THREAD_LIBS_FOR_GTHREAD="$G_THREAD_LIBS_FOR_GTHREAD -lrt"
++    G_LIBS_EXTRA="$G_LIBS_EXTRA -lrt"
+   ])
+ ])
+ 
+@@ -2611,13 +2612,13 @@ dnl **********************
+ 
+ case $host in
+   *-*-cygwin*)
+-	G_LIBS_EXTRA="-luser32 -lkernel32"
++	G_LIBS_EXTRA="$G_LIBS_EXTRA -luser32 -lkernel32"
+     ;;
+   *-*-mingw*)
+-	G_LIBS_EXTRA="-lws2_32 -lole32"
++	G_LIBS_EXTRA="$G_LIBS_EXTRA -lws2_32 -lole32"
+     ;;
+   *)
+-	G_LIBS_EXTRA=""
++	G_LIBS_EXTRA="$G_LIBS_EXTRA"
+     ;;
+ esac
+ AC_SUBST(G_LIBS_EXTRA)
+diff --git a/glib/gmain.c b/glib/gmain.c
+index 17866c7..a0d3a77 100644
+--- a/glib/gmain.c
++++ b/glib/gmain.c
+@@ -77,6 +77,10 @@
+ 
+ #include "galias.h"
+ 
++#if defined(HAVE_CLOCK_GETTIME) && defined(HAVE_MONOTONIC_CLOCK)
++#define USE_CLOCK_GETTIME 1
++#endif
++
+ /* Types */
+ 
+ typedef struct _GTimeoutSource GTimeoutSource;
+@@ -158,6 +162,7 @@ struct _GMainContext
+   GPollFunc poll_func;
+ 
+   GTimeVal current_time;
++  GTimeVal current_time_monotonic;
+   gboolean time_is_current;
+ };
+ 
+@@ -229,6 +234,9 @@ struct _GPollRec
+ 
+ /* Forward declarations */
+ 
++static void g_get_current_time_monotonic        (GTimeVal     *result);
++static void g_source_get_current_time_monotonic (GSource      *source,
++						 GTimeVal     *timeval);
+ static void g_source_unref_internal             (GSource      *source,
+ 						 GMainContext *context,
+ 						 gboolean      have_lock);
+@@ -1477,6 +1485,20 @@ g_get_current_time (GTimeVal *result)
+ }
+ 
+ static void
++g_get_current_time_monotonic (GTimeVal *result)
++{
++#ifdef USE_CLOCK_GETTIME
++  struct timespec r;
++
++  clock_gettime (CLOCK_MONOTONIC, &r);
++  result->tv_sec = r.tv_sec;
++  result->tv_usec = r.tv_nsec / 1000;
++#else
++  g_get_current_time (result);
++#endif
++}
++
++static void
+ g_main_dispatch_free (gpointer dispatch)
+ {
+   g_slice_free (GMainDispatch, dispatch);
+@@ -2968,6 +2990,7 @@ g_source_get_current_time (GSource  *source,
+   if (!context->time_is_current)
+     {
+       g_get_current_time (&context->current_time);
++      g_get_current_time_monotonic (&context->current_time_monotonic);
+       context->time_is_current = TRUE;
+     }
+   
+@@ -2976,6 +2999,30 @@ g_source_get_current_time (GSource  *source,
+   UNLOCK_CONTEXT (context);
+ }
+ 
++static void
++g_source_get_current_time_monotonic (GSource  *source,
++				     GTimeVal *timeval)
++{
++  GMainContext *context;
++
++  g_return_if_fail (source->context != NULL);
++
++  context = source->context;
++
++  LOCK_CONTEXT (context);
++
++  if (!context->time_is_current)
++    {
++      g_get_current_time (&context->current_time);
++      g_get_current_time_monotonic (&context->current_time_monotonic);
++      context->time_is_current = TRUE;
++    }
++
++  *timeval = context->current_time_monotonic;
++
++  UNLOCK_CONTEXT (context);
++}
++
+ /**
+  * g_main_context_set_poll_func:
+  * @context: a #GMainContext
+@@ -3180,7 +3227,7 @@ g_timeout_prepare (GSource *source,
+   
+   GTimeoutSource *timeout_source = (GTimeoutSource *)source;
+ 
+-  g_source_get_current_time (source, &current_time);
++  g_source_get_current_time_monotonic (source, &current_time);
+ 
+   sec = timeout_source->expiration.tv_sec - current_time.tv_sec;
+   msec = (timeout_source->expiration.tv_usec - current_time.tv_usec) / 1000;
+@@ -3229,8 +3276,8 @@ g_timeout_check (GSource *source)
+   GTimeVal current_time;
+   GTimeoutSource *timeout_source = (GTimeoutSource *)source;
+ 
+-  g_source_get_current_time (source, &current_time);
+-  
++  g_source_get_current_time_monotonic (source, &current_time);
++
+   return ((timeout_source->expiration.tv_sec < current_time.tv_sec) ||
+ 	  ((timeout_source->expiration.tv_sec == current_time.tv_sec) &&
+ 	   (timeout_source->expiration.tv_usec <= current_time.tv_usec)));
+@@ -3254,7 +3301,7 @@ g_timeout_dispatch (GSource     *source,
+     {
+       GTimeVal current_time;
+ 
+-      g_source_get_current_time (source, &current_time);
++      g_source_get_current_time_monotonic (source, &current_time);
+       g_timeout_set_expiration (timeout_source, &current_time);
+ 
+       return TRUE;
+@@ -3284,7 +3331,7 @@ g_timeout_source_new (guint interval)
+ 
+   timeout_source->interval = interval;
+ 
+-  g_get_current_time (&current_time);
++  g_get_current_time_monotonic (&current_time);
+   g_timeout_set_expiration (timeout_source, &current_time);
+   
+   return source;
+@@ -3317,7 +3364,7 @@ g_timeout_source_new_seconds (guint interval)
+   timeout_source->interval = 1000*interval;
+   timeout_source->granularity = 1000;
+ 
+-  g_get_current_time (&current_time);
++  g_get_current_time_monotonic (&current_time);
+   g_timeout_set_expiration (timeout_source, &current_time);
+ 
+   return source;
