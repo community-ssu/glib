@@ -11,8 +11,9 @@ glib2.0 (2.20.1-1maemo1) unstable; urgency=low
     + 55-gsignal.patch, dropped.
   * 70_use-monotonic-clock-for-timeouts.patch: new patch.
     Fixes: NB#115307 (Glib should use monotonic clock for timeouts)
+  * Remove libgio-fam and udeb packages.
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 12 May 2009 14:51:17 +0300
+ -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 12 May 2009 15:13:54 +0300
 
 glib2.0 (2.20.1-1) unstable; urgency=low
 
