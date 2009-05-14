@@ -1,6 +1,7 @@
-diff -Naurp glib-2.18.1/gthread/gthread-posix.c glib/gthread/gthread-posix.c
---- glib-2.18.1/gthread/gthread-posix.c	2009-04-29 10:36:55.000000000 +0300
-+++ glib/gthread/gthread-posix.c	2009-04-29 10:37:18.000000000 +0300
+Index: glib-2.20.1/gthread/gthread-posix.c
+===================================================================
+--- glib-2.20.1.orig/gthread/gthread-posix.c	2009-05-14 15:13:03.000000000 +0200
++++ glib-2.20.1/gthread/gthread-posix.c	2009-05-14 15:17:43.000000000 +0200
 @@ -342,9 +342,24 @@ g_thread_create_posix_impl (GThreadFunc 
  #ifdef HAVE_PRIORITIES
  # ifdef G_THREADS_IMPL_POSIX

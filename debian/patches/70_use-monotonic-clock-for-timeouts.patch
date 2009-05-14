@@ -1,8 +1,8 @@
-diff --git a/configure.in b/configure.in
-index 32d6561..21d617b 100644
---- a/configure.in
-+++ b/configure.in
-@@ -2345,6 +2345,7 @@ AC_CHECK_FUNCS(clock_gettime, [], [
+Index: glib-2.20.1/configure.in
+===================================================================
+--- glib-2.20.1.orig/configure.in	2009-05-14 15:17:38.000000000 +0200
++++ glib-2.20.1/configure.in	2009-05-14 15:17:48.000000000 +0200
+@@ -2300,6 +2300,7 @@ AC_CHECK_FUNCS(clock_gettime, [], [
      AC_DEFINE(HAVE_CLOCK_GETTIME, 1)
      G_THREAD_LIBS="$G_THREAD_LIBS -lrt"
      G_THREAD_LIBS_FOR_GTHREAD="$G_THREAD_LIBS_FOR_GTHREAD -lrt"
@@ -10,7 +10,7 @@ index 32d6561..21d617b 100644
    ])
  ])
  
-@@ -2611,13 +2612,13 @@ dnl **********************
+@@ -2592,13 +2593,13 @@ dnl **********************
  
  case $host in
    *-*-cygwin*)
@@ -27,10 +27,10 @@ index 32d6561..21d617b 100644
      ;;
  esac
  AC_SUBST(G_LIBS_EXTRA)
-diff --git a/glib/gmain.c b/glib/gmain.c
-index 17866c7..a0d3a77 100644
---- a/glib/gmain.c
-+++ b/glib/gmain.c
+Index: glib-2.20.1/glib/gmain.c
+===================================================================
+--- glib-2.20.1.orig/glib/gmain.c	2009-05-14 15:13:03.000000000 +0200
++++ glib-2.20.1/glib/gmain.c	2009-05-14 15:17:48.000000000 +0200
 @@ -77,6 +77,10 @@
  
  #include "galias.h"
@@ -81,7 +81,7 @@ index 17866c7..a0d3a77 100644
  g_main_dispatch_free (gpointer dispatch)
  {
    g_slice_free (GMainDispatch, dispatch);
-@@ -2968,6 +2990,7 @@ g_source_get_current_time (GSource  *source,
+@@ -2968,6 +2990,7 @@ g_source_get_current_time (GSource  *sou
    if (!context->time_is_current)
      {
        g_get_current_time (&context->current_time);
@@ -89,7 +89,7 @@ index 17866c7..a0d3a77 100644
        context->time_is_current = TRUE;
      }
    
-@@ -2976,6 +2999,30 @@ g_source_get_current_time (GSource  *source,
+@@ -2976,6 +2999,30 @@ g_source_get_current_time (GSource  *sou
    UNLOCK_CONTEXT (context);
  }
  
@@ -158,7 +158,7 @@ index 17866c7..a0d3a77 100644
    g_timeout_set_expiration (timeout_source, &current_time);
    
    return source;
-@@ -3317,7 +3364,7 @@ g_timeout_source_new_seconds (guint interval)
+@@ -3317,7 +3364,7 @@ g_timeout_source_new_seconds (guint inte
    timeout_source->interval = 1000*interval;
    timeout_source->granularity = 1000;
  

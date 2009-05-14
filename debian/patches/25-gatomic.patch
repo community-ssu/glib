@@ -1,7 +1,7 @@
-Index: glib-2.20.0/glib/gatomic.c
+Index: glib-2.20.1/glib/gatomic.c
 ===================================================================
---- glib-2.20.0.orig/glib/gatomic.c
-+++ glib-2.20.0/glib/gatomic.c
+--- glib-2.20.1.orig/glib/gatomic.c	2009-05-14 15:13:04.000000000 +0200
++++ glib-2.20.1/glib/gatomic.c	2009-05-14 15:17:19.000000000 +0200
 @@ -561,6 +561,7 @@ g_atomic_pointer_compare_and_exchange (v
  #    error "Your system has an unsupported pointer size"
  #  endif /* GLIB_SIZEOF_VOID_P */
@@ -214,11 +214,11 @@ Index: glib-2.20.0/glib/gatomic.c
  gint
  (g_atomic_int_get) (volatile gint G_GNUC_MAY_ALIAS *atomic)
  {
-Index: glib-2.20.0/configure.in
+Index: glib-2.20.1/configure.in
 ===================================================================
---- glib-2.20.0.orig/configure.in
-+++ glib-2.20.0/configure.in
-@@ -2400,9 +2400,35 @@ if test x"$GCC" = xyes; then
+--- glib-2.20.1.orig/configure.in	2009-05-14 15:13:04.000000000 +0200
++++ glib-2.20.1/configure.in	2009-05-14 15:17:19.000000000 +0200
+@@ -2401,9 +2401,35 @@ if test x"$GCC" = xyes; then
        ;;	
      arm*)
        AC_MSG_RESULT([arm])

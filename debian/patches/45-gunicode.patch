@@ -1,6 +1,7 @@
-diff -Naurp glib-2.18.1/glib/gunicode.h glib/glib/gunicode.h
---- glib-2.18.1/glib/gunicode.h	2009-04-29 10:28:01.000000000 +0300
-+++ glib/glib/gunicode.h	2009-04-29 10:26:48.000000000 +0300
+Index: glib-2.20.1/glib/gunicode.h
+===================================================================
+--- glib-2.20.1.orig/glib/gunicode.h	2009-05-14 15:13:03.000000000 +0200
++++ glib-2.20.1/glib/gunicode.h	2009-05-14 15:17:41.000000000 +0200
 @@ -269,6 +269,14 @@ void g_unicode_canonical_ordering (gunic
  gunichar *g_unicode_canonical_decomposition (gunichar  ch,
  					     gsize    *result_len) G_GNUC_MALLOC;
@@ -16,9 +17,10 @@ diff -Naurp glib-2.18.1/glib/gunicode.h glib/glib/gunicode.h
  /* Array of skip-bytes-per-initial character.
   */
  GLIB_VAR const gchar * const g_utf8_skip;
-diff -Naurp glib-2.18.1/glib/gunidecomp.c glib/glib/gunidecomp.c
---- glib-2.18.1/glib/gunidecomp.c	2009-04-29 10:28:06.000000000 +0300
-+++ glib/glib/gunidecomp.c	2009-04-29 10:26:52.000000000 +0300
+Index: glib-2.20.1/glib/gunidecomp.c
+===================================================================
+--- glib-2.20.1.orig/glib/gunidecomp.c	2009-05-14 15:13:03.000000000 +0200
++++ glib-2.20.1/glib/gunidecomp.c	2009-05-14 15:17:41.000000000 +0200
 @@ -258,6 +258,78 @@ g_unicode_canonical_decomposition (gunic
    return r;
  }

@@ -1,6 +1,7 @@
-diff -Naurp glib-2.18.1/glib/gmessages.c glib/glib/gmessages.c
---- glib-2.18.1/glib/gmessages.c	2009-04-28 16:08:20.000000000 +0300
-+++ glib/glib/gmessages.c	2009-04-28 16:08:32.000000000 +0300
+Index: glib-2.20.1/glib/gmessages.c
+===================================================================
+--- glib-2.20.1.orig/glib/gmessages.c	2009-05-14 15:13:04.000000000 +0200
++++ glib-2.20.1/glib/gmessages.c	2009-05-14 15:17:35.000000000 +0200
 @@ -28,6 +28,8 @@
   * MT safe
   */
@@ -21,7 +22,7 @@ diff -Naurp glib-2.18.1/glib/gmessages.c glib/glib/gmessages.c
  /* --- structures --- */
  typedef struct _GLogDomain	GLogDomain;
  typedef struct _GLogHandler	GLogHandler;
-@@ -873,6 +879,141 @@ escape_string (GString *string)
+@@ -882,6 +888,141 @@ escape_string (GString *string)
      }
  }
  
@@ -163,7 +164,7 @@ diff -Naurp glib-2.18.1/glib/gmessages.c glib/glib/gmessages.c
  void
  g_log_default_handler (const gchar   *log_domain,
  		       GLogLevelFlags log_level,
-@@ -951,6 +1092,8 @@ g_log_default_handler (const gchar   *lo
+@@ -960,6 +1101,8 @@ g_log_default_handler (const gchar   *lo
    g_free (string);
  }
  
@@ -172,9 +173,10 @@ diff -Naurp glib-2.18.1/glib/gmessages.c glib/glib/gmessages.c
  GPrintFunc
  g_set_print_handler (GPrintFunc func)
  {
-diff -Naurp glib-2.18.1/glib/gmessages.h glib/glib/gmessages.h
---- glib-2.18.1/glib/gmessages.h	2009-04-28 16:08:20.000000000 +0300
-+++ glib/glib/gmessages.h	2009-04-28 16:08:32.000000000 +0300
+Index: glib-2.20.1/glib/gmessages.h
+===================================================================
+--- glib-2.20.1.orig/glib/gmessages.h	2009-05-14 15:13:04.000000000 +0200
++++ glib-2.20.1/glib/gmessages.h	2009-05-14 15:17:35.000000000 +0200
 @@ -151,9 +151,13 @@ void g_assert_warning         (const cha
  #define g_warning(...)  g_log (G_LOG_DOMAIN,         \
                                 G_LOG_LEVEL_WARNING,  \
