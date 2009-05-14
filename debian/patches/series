@@ -1,0 +1,8 @@
+60_wait-longer-for-threads-to-die.patch
+25-gatomic.patch
+30-gfileutils.patch
+35-gmessages.patch
+40-gscanner.patch
+45-gunicode.patch
+50-gthread.patch
+70_use-monotonic-clock-for-timeouts.patch
