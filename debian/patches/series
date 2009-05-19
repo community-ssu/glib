@@ -1,4 +1,5 @@
 20-gmarkup-speedup.patch
+21-gsimpleasyncresult-memleak.patch
 25-gatomic.patch
 30-gfileutils.patch
 35-gmessages.patch

@@ -5,6 +5,8 @@ glib2.0 (2.20.1-1maemo2) unstable; urgency=low
   * Reorder patches/series to match patch numbers and rediff everything.
   * 20-gmarkup-speedup.patch: new patch.
     Fixes: NB#106936 - glib performance improvements patches shall be applied
+  * 21-gsimpleasyncresult-memleak.patch: new patch.
+    Fixes: NB#108347 - Memory leak found while exporting all contacts from UI.
 
  -- foo bar <foo@bar.com>  Tue, 12 May 2009 15:13:54 +0300
 
