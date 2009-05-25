@@ -1,3 +1,10 @@
+glib2.0 (2.20.1-1maemo3) unstable; urgency=low
+  [ Christian Dywan ]
+  * 80-hildon-user-named-dir.patch: new patch.
+    Implement hildon_get_user_named_dir.
+
+  -- foo bar <foo@bar.com>  Mon, 25 May 2009 12:11:00 +0100
+
 glib2.0 (2.20.1-1maemo2) unstable; urgency=low
 
   [ Michael Natterer ]
