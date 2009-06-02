@@ -1,0 +1,28 @@
+Index: glib-2.20.1/configure.in
+===================================================================
+--- glib-2.20.1.orig/configure.in	2009-06-02 12:51:21.000000000 +0200
++++ glib-2.20.1/configure.in	2009-06-02 12:51:46.000000000 +0200
+@@ -2427,6 +2427,9 @@ if test x"$GCC" = xyes; then
+                            [special arm linux implementation])
+         glib_memory_barrier_needed=yes
+       fi
++      # some ARM CPUs and gcc versions need flags for proper backtraces
++      ARM_FRAME_FLAGS="-fno-omit-frame-pointer -mapcs-frame"
++      AC_SUBST(ARM_FRAME_FLAGS)
+       ;;
+     crisv32*|etraxfs*)
+       AC_MSG_RESULT([crisv32])
+Index: glib-2.20.1/glib/Makefile.am
+===================================================================
+--- glib-2.20.1.orig/glib/Makefile.am	2009-06-02 11:04:36.000000000 +0200
++++ glib-2.20.1/glib/Makefile.am	2009-06-02 12:51:21.000000000 +0200
+@@ -32,6 +32,9 @@ AM_CPPFLAGS = 				\
+ 	-DGLIB_COMPILATION 		\
+ 	-DPCRE_STATIC
+ 
++# force frame-pointers for source files with noreturn functions for backtraces
++AM_CFLAGS = $(patsubst %, $(ARM_FRAME_FLAGS), $(filter $(<F), gmessages.c gtestutils.c ))
++
+ glib.def: glib.symbols
+ 	(echo -e EXPORTS; $(CPP) -P -DINCLUDE_VARIABLES -DINCLUDE_INTERNAL_SYMBOLS -DG_OS_WIN32 -DALL_FILES - <$(srcdir)/glib.symbols | sed -e '/^$$/d' -e 's/^/	/' -e 's/G_GNUC_[^ ]*//g') > glib.def
+ 

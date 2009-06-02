@@ -1,7 +1,7 @@
 Index: glib-2.20.1/glib/gatomic.c
 ===================================================================
---- glib-2.20.1.orig/glib/gatomic.c	2009-05-14 15:13:04.000000000 +0200
-+++ glib-2.20.1/glib/gatomic.c	2009-05-14 15:17:19.000000000 +0200
+--- glib-2.20.1.orig/glib/gatomic.c	2009-06-02 11:04:38.000000000 +0200
++++ glib-2.20.1/glib/gatomic.c	2009-06-02 12:51:21.000000000 +0200
 @@ -561,6 +561,7 @@ g_atomic_pointer_compare_and_exchange (v
  #    error "Your system has an unsupported pointer size"
  #  endif /* GLIB_SIZEOF_VOID_P */
@@ -216,9 +216,9 @@ Index: glib-2.20.1/glib/gatomic.c
  {
 Index: glib-2.20.1/configure.in
 ===================================================================
---- glib-2.20.1.orig/configure.in	2009-05-14 15:13:04.000000000 +0200
-+++ glib-2.20.1/configure.in	2009-05-14 15:17:19.000000000 +0200
-@@ -2401,9 +2401,35 @@ if test x"$GCC" = xyes; then
+--- glib-2.20.1.orig/configure.in	2009-06-02 11:04:38.000000000 +0200
++++ glib-2.20.1/configure.in	2009-06-02 12:51:55.000000000 +0200
+@@ -2401,9 +2401,32 @@ if test x"$GCC" = xyes; then
        ;;	
      arm*)
        AC_MSG_RESULT([arm])
@@ -249,9 +249,6 @@ Index: glib-2.20.1/configure.in
 +                           [special arm linux implementation])
 +        glib_memory_barrier_needed=yes
 +      fi
-+      # some ARM CPUs and gcc versions need flags for proper backtraces
-+      ARM_FRAME_FLAGS="-fno-omit-frame-pointer -mapcs-frame"
-+      AC_SUBST(ARM_FRAME_FLAGS)
        ;;
      crisv32*|etraxfs*)
        AC_MSG_RESULT([crisv32])

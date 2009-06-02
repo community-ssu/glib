@@ -1,7 +1,15 @@
 glib2.0 (2.20.1-1maemo3) unstable; urgency=low
+
   [ Christian Dywan ]
   * 80-hildon-user-named-dir.patch: new patch.
     Implement hildon_get_user_named_dir.
+
+  [ Michael Natterer ]
+  * 26-arm-stack-frames.patch: new patch.
+    Fixes: NB#91723 - Backtraces don't work through functions having
+                      noreturn attribute on ARM
+    Removed a fragment of this patch from 25-gatomic.patch and regenerated
+    the patches that had offsets.
 
   -- foo bar <foo@bar.com>  Mon, 25 May 2009 12:11:00 +0100
 
