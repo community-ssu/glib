@@ -11,7 +11,10 @@ glib2.0 (2.20.1-1maemo3) unstable; urgency=low
     Removed a fragment of this patch from 25-gatomic.patch and regenerated
     the patches that had offsets.
 
-  -- foo bar <foo@bar.com>  Mon, 25 May 2009 12:11:00 +0100
+  [ Claudio Saavedra ]
+  * Sync debian/control with debian/control.in
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 02 Jun 2009 14:37:26 +0300
 
 glib2.0 (2.20.1-1maemo2) unstable; urgency=low
 
