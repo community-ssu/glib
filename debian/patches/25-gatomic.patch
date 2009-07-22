@@ -1,8 +1,29 @@
-Index: glib-2.20.1/glib/gatomic.c
-===================================================================
---- glib-2.20.1.orig/glib/gatomic.c	2009-06-02 11:04:38.000000000 +0200
-+++ glib-2.20.1/glib/gatomic.c	2009-06-02 12:51:21.000000000 +0200
-@@ -561,6 +561,7 @@ g_atomic_pointer_compare_and_exchange (v
+diff -urN glib2.0-2.20.1-orig/configure.in glib2.0-2.20.1-jl2/configure.in
+--- glib2.0-2.20.1-orig/configure.in	2009-04-01 02:04:20.000000000 +0300
++++ glib2.0-2.20.1-jl2/configure.in	2009-06-30 19:17:14.000000000 +0300
+@@ -2401,9 +2401,15 @@
+       ;;	
+     arm*)
+       AC_MSG_RESULT([arm])
+-      AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 1,
+-                         [arm atomic implementation])
+-      glib_memory_barrier_needed=no
++      AC_MSG_CHECKING(arm atomic operations type)
++      AC_MSG_RESULT(inline asm)
++      AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 6,
++                         [armv6 atomic implementation])
++      glib_memory_barrier_needed=yes
++      dnl AC_MSG_RESULT(kernel helper)
++      dnl AC_DEFINE_UNQUOTED(G_ATOMIC_ARM_LINUX, 1,
++      dnl                   [special arm linux implementation])
++      dnl glib_memory_barrier_needed=yes
+       ;;
+     crisv32*|etraxfs*)
+       AC_MSG_RESULT([crisv32])
+diff -urN glib2.0-2.20.1-orig/glib/gatomic.c glib2.0-2.20.1-jl2/glib/gatomic.c
+--- glib2.0-2.20.1-orig/glib/gatomic.c	2009-04-01 02:04:20.000000000 +0300
++++ glib2.0-2.20.1-jl2/glib/gatomic.c	2009-06-30 19:26:29.000000000 +0300
+@@ -561,6 +561,7 @@
  #    error "Your system has an unsupported pointer size"
  #  endif /* GLIB_SIZEOF_VOID_P */
  # elif defined (G_ATOMIC_ARM)
@@ -10,16 +31,14 @@ Index: glib-2.20.1/glib/gatomic.c
  static volatile int atomic_spin = 0;
  
  static int atomic_spin_trylock (void)
-@@ -651,6 +652,194 @@ g_atomic_pointer_compare_and_exchange (v
+@@ -651,6 +652,217 @@
  
    return result;
  }
-+
-+// merge mark
 +#  else /* G_ATOMIC_ARM < 6 */
 +gint
-+g_atomic_int_exchange_and_add (volatile gint *atomic,
-+                              gint           val)
++g_atomic_int_exchange_and_add (volatile gint *atomic, 
++			       gint           val)
 +{
 +  unsigned long result;
 +  int old, tmp;
@@ -38,7 +57,7 @@ Index: glib-2.20.1/glib/gatomic.c
 +
 +void
 +g_atomic_int_add (volatile gint *atomic,
-+                 gint           val)
++		  gint           val)
 +{
 +  unsigned long result;
 +  int tmp;
@@ -55,16 +74,16 @@ Index: glib-2.20.1/glib/gatomic.c
 +}
 +
 +gboolean
-+g_atomic_int_compare_and_exchange (volatile gint *atomic,
-+                                  gint           oldval,
-+                                  gint           newval)
++g_atomic_int_compare_and_exchange (volatile gint *atomic, 
++				   gint           oldval, 
++				   gint           newval)
 +{
 +  unsigned long result;
 +  int old;
 +
 +  asm volatile (
 +    "ldrex %1, [%2]\n"
-+    "mov %0, #0\n"
++    "mov %0, #1\n"
 +    "teq %1, %3\n"
 +    "strexeq %0, %4, [%2]\n"
 +    : "=&r" (result), "=&r" (old)
@@ -74,16 +93,16 @@ Index: glib-2.20.1/glib/gatomic.c
 +}
 +
 +gboolean
-+g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic,
-+                                      gpointer           oldval,
-+                                      gpointer           newval)
++g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic, 
++				       gpointer           oldval, 
++				       gpointer           newval)
 +{
 +  unsigned long result;
 +  void *old;
 +
 +  asm volatile (
 +    "ldrex %1, [%2]\n"
-+    "mov %0, #0\n"
++    "mov %0, #1\n"
 +    "teq %1, %3\n"
 +    "strexeq %0, %4, [%2]\n"
 +    : "=&r" (result), "=&r" (old)
@@ -92,15 +111,14 @@ Index: glib-2.20.1/glib/gatomic.c
 +  return (result) ? FALSE : TRUE;
 +}
 +
-+
 +gint
-+g_atomic_int_get (volatile gint *atomic)
++(g_atomic_int_get) (volatile gint *atomic)
 +{
 +  return *atomic;
 +}
 +
 +void
-+g_atomic_int_set (volatile gint *atomic,
++(g_atomic_int_set) (volatile gint *atomic,
 +                  gint           newval)
 +{
 +  unsigned long result;
@@ -116,12 +134,13 @@ Index: glib-2.20.1/glib/gatomic.c
 +}
 +
 +gpointer
-+g_atomic_pointer_get (volatile gpointer *atomic)
++(g_atomic_pointer_get) (volatile gpointer *atomic)
 +{
 +  return *atomic;
-+}
++}   
++
 +void
-+g_atomic_pointer_set (volatile gpointer *atomic,
++(g_atomic_pointer_set) (volatile gpointer *atomic,
 +                      gpointer           newval)
 +{
 +  unsigned long result;
@@ -141,15 +160,15 @@ Index: glib-2.20.1/glib/gatomic.c
 +
 +typedef void (_khelper_barrier_t)(void);
 +#define _khelper_barrier (*(_khelper_barrier_t *)0xffff0fa0)
-+/*#define G_ATOMIC_MEMORY_BARRIER _khelper_barrier()*/
++#define G_ATOMIC_MEMORY_BARRIER _khelper_barrier()
 +/* scratchbox/qemu explodes on barrier */
-+#define G_ATOMIC_MEMORY_BARRIER while(0)
++/*#define G_ATOMIC_MEMORY_BARRIER while(0)*/
 +typedef int (_khelper_cmpxchg_t)(int oldval, int newval, volatile int *ptr);
 +#define _khelper_cmpxchg (*(_khelper_cmpxchg_t *)0xffff0fc0)
 +
 +gint
-+g_atomic_int_exchange_and_add (volatile gint *atomic,
-+                              gint           val)
++g_atomic_int_exchange_and_add (volatile gint *atomic, 
++			       gint           val)
 +{
 +  int result;
 +  int old, new;
@@ -164,7 +183,7 @@ Index: glib-2.20.1/glib/gatomic.c
 +
 +void
 +g_atomic_int_add (volatile gint *atomic,
-+                 gint           val)
++		  gint           val)
 +{
 +  int result;
 +  int old, new;
@@ -177,9 +196,9 @@ Index: glib-2.20.1/glib/gatomic.c
 +}
 +
 +gboolean
-+g_atomic_int_compare_and_exchange (volatile gint *atomic,
-+                                  gint           oldval,
-+                                  gint           newval)
++g_atomic_int_compare_and_exchange (volatile gint *atomic, 
++				   gint           oldval, 
++				   gint           newval)
 +{
 +  int result;
 +
@@ -188,9 +207,9 @@ Index: glib-2.20.1/glib/gatomic.c
 +}
 +
 +gboolean
-+g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic,
-+                                      gpointer           oldval,
-+                                      gpointer           newval)
++g_atomic_pointer_compare_and_exchange (volatile gpointer *atomic, 
++				       gpointer           oldval, 
++				       gpointer           newval)
 +{
 +  int result;
 +
@@ -200,55 +219,43 @@ Index: glib-2.20.1/glib/gatomic.c
 +  return (result) ? FALSE : TRUE;
 +}
 +
-+// merge mark
++gint
++(g_atomic_int_get) (volatile gint *atomic)
++{
++  return *atomic;
++}
 +
++void
++(g_atomic_int_set) (volatile gint *atomic,
++                  gint           newval)
++{
++  while (_khelper_cmpxchg(*atomic, newval, atomic));
++}
++
++gpointer
++(g_atomic_pointer_get) (volatile gpointer *atomic)
++{
++  return *atomic;
++}   
++
++void
++(g_atomic_pointer_set) (volatile gpointer *atomic,
++                      gpointer           newval)
++{
++  while (_khelper_cmpxchg(*((int *) atomic),
++                          *((int *) &newval),
++                          (int *) atomic));
++}
  # elif defined (G_ATOMIC_CRIS) || defined (G_ATOMIC_CRISV32)
  #  ifdef G_ATOMIC_CRIS
  #   define CRIS_ATOMIC_INT_CMP_XCHG(atomic, oldval, newval)		\
-@@ -954,7 +1143,7 @@ void
+@@ -954,7 +1166,8 @@
    g_mutex_unlock (g_atomic_mutex);
  }
  #endif /* G_ATOMIC_OP_MEMORY_BARRIER_NEEDED */   
 -#elif defined (G_ATOMIC_OP_MEMORY_BARRIER_NEEDED)
-+#elif (defined(G_ATOMIC_OP_MEMORY_BARRIER_NEEDED) && !defined(G_ATOMIC_ARM))
++#elif (defined (G_ATOMIC_OP_MEMORY_BARRIER_NEEDED) && \
++       !defined(G_ATOMIC_ARM) && !defined(G_ATOMIC_ARM_LINUX))
  gint
  (g_atomic_int_get) (volatile gint G_GNUC_MAY_ALIAS *atomic)
  {
-Index: glib-2.20.1/configure.in
-===================================================================
---- glib-2.20.1.orig/configure.in	2009-06-02 11:04:38.000000000 +0200
-+++ glib-2.20.1/configure.in	2009-06-02 12:51:55.000000000 +0200
-@@ -2401,9 +2401,32 @@ if test x"$GCC" = xyes; then
-       ;;	
-     arm*)
-       AC_MSG_RESULT([arm])
--      AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 1,
-+      AC_MSG_CHECKING(arm atomic operations type)
-+      maemo_changes_check=true	# MAEMO_CHANGES: inline ARM assembler
-+      if test x$glib_os_linux != xyes || $maemo_changes_check; then
-+        AC_MSG_RESULT(inline asm)
-+        glib_save_CFLAGS=$CFLAGS
-+        AC_MSG_CHECKING(architecture supports ARMv6 instructions)
-+          CFLAGS="$CFLAGS -march=armv6"
-+          AC_TRY_RUN([#include "$srcdir/armv6-test.c"],
-+            [AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 6,
-+                                [armv6 atomic implementation])
-+             glib_memory_barrier_needed=yes
-+             add_flags="-march=armv6"
-+             AC_MSG_RESULT(armv6)],
-+            [AC_DEFINE_UNQUOTED(G_ATOMIC_ARM, 1,
-                          [arm atomic implementation])
-       glib_memory_barrier_needed=no
-+             add_flags=""
-+             AC_MSG_RESULT(pre-armv6)])
-+        CFLAGS=$glib_save_CFLAGS
-+        CFLAGS="$CFLAGS $add_flags"
-+      else
-+        AC_MSG_RESULT(kernel helper)
-+        AC_DEFINE_UNQUOTED(G_ATOMIC_ARM_LINUX, 1,
-+                           [special arm linux implementation])
-+        glib_memory_barrier_needed=yes
-+      fi
-       ;;
-     crisv32*|etraxfs*)
-       AC_MSG_RESULT([crisv32])

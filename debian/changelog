@@ -1,3 +1,14 @@
+glib2.0 (2.20.3-1maemo2) unstable; urgency=low
+
+  [ Jussi Laako ]
+  * Fix ARM atomic operations once more
+
+  [ Claudio Saavedra ]
+  * 25-gatomic.patch: updated
+    + Fixes: NB#106135 (glib does not use fast ARMv6+ atomic operations)
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Wed, 22 Jul 2009 11:01:54 +0200
+
 glib2.0 (2.20.3-1maemo1) unstable; urgency=low
 
   [ Michael Natterer ]
