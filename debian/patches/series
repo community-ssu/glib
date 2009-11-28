@@ -1,5 +1,3 @@
-20-gmarkup-speedup.patch
-21-gsimpleasyncresult-memleak.patch
 22-g-object-unref-toggle-refs.patch
 25-gatomic.patch
 26-arm-stack-frames.patch
@@ -11,3 +9,4 @@
 60_wait-longer-for-threads-to-die.patch
 70_use-monotonic-clock-for-timeouts.patch
 80-hildon-user-named-dir.patch
+81-workaround-old-automake.patch

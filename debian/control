@@ -1,7 +1,7 @@
 Source: glib2.0
 Section: libs
 Priority: optional
-Maintainer: Janne Karhunen <Janne.Karhunen@nokia.com>
+Maintainer: Kristian Rietveld <kris@lanedo.com>
 Uploaders: 
 Build-Depends: debhelper (>> 5.0.22),
                pkg-config (>= 0.14.0),

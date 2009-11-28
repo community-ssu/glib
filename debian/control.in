@@ -1,7 +1,7 @@
 Source: glib@APIVER@
 Section: libs
 Priority: optional
-Maintainer: Janne Karhunen <Janne.Karhunen@nokia.com>
+Maintainer: Kristian Rietveld <kris@lanedo.com>
 Uploaders: @GNOME_TEAM@
 Build-Depends: debhelper (>> 5.0.22),
                pkg-config (>= 0.14.0),

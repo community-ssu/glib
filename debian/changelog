@@ -1,3 +1,9 @@
+glib2.0 (2.22.0-1maemo1) unstable; urgency=low
+
+  * Try a 2.22 upgrade.
+
+ -- Kristian Rietveld <kris@lanedo.com>  Sat, 28 Nov 2009 12:11:01 +0200
+
 glib2.0 (2.20.3-1maemo3) unstable; urgency=low
 
   [ Michael Natterer ]

@@ -1,0 +1,30 @@
+diff -urp glib-2.22.0.orig/gio/Makefile.am ./glib-2.22.0/gio/Makefile.am
+--- glib-2.22.0.orig/gio/Makefile.am	2009-09-22 19:43:48.000000000 +0200
++++ glib-2.22.0/gio/Makefile.am	2009-09-28 12:02:50.000000000 +0200
+@@ -433,4 +433,6 @@ install-data-hook:
+ 	mv $(DESTDIR)$(libdir)/libgio-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+ 	rm -f $(DESTDIR)$(libdir)/libgio-2.0.so
+ 	ln -s $(GLIB_RUNTIME_LIBDIR)/libgio-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/libgio-2.0.so
++else
++install-data-hook:
+ endif
+diff -urp glib-2.22.0.orig/gmodule/Makefile.am ./glib-2.22.0/gmodule/Makefile.am
+--- glib-2.22.0.orig/gmodule/Makefile.am	2009-08-29 04:52:23.000000000 +0200
++++ glib-2.22.0/gmodule/Makefile.am	2009-09-28 12:03:17.000000000 +0200
+@@ -124,4 +124,6 @@ install-data-hook:
+ 	mv $(DESTDIR)$(libdir)/libgmodule-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+ 	rm -f $(DESTDIR)$(libdir)/libgmodule-2.0.so
+ 	ln -s $(GLIB_RUNTIME_LIBDIR)/libgmodule-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/libgmodule-2.0.so
++else
++install-data-hook:
+ endif
+diff -urp glib-2.22.0.orig/gthread/Makefile.am ./glib-2.22.0/gthread/Makefile.am
+--- glib-2.22.0.orig/gthread/Makefile.am	2009-08-29 04:52:23.000000000 +0200
++++ glib-2.22.0/gthread/Makefile.am	2009-09-28 12:03:36.000000000 +0200
+@@ -99,4 +99,6 @@ install-data-hook:
+ 	mv $(DESTDIR)$(libdir)/libgthread-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/$(GLIB_RUNTIME_LIBDIR)
+ 	rm -f $(DESTDIR)$(libdir)/libgthread-2.0.so
+ 	ln -s $(GLIB_RUNTIME_LIBDIR)/libgthread-2.0.so.0.$(LT_CURRENT).0 $(DESTDIR)$(libdir)/libgthread-2.0.so
++else
++install-data-hook:
+ endif
