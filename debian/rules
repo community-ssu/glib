@@ -194,8 +194,8 @@ binary-indep: build $(maybe_check) install
 	dh_testdir
 	dh_testroot
 	dh_install -i
-	dh_installchangelogs -i -N$(DATA_PKG) ChangeLog
-	dh_installdocs -N$(DATA_PKG) -i NEWS README
+	dh_installchangelogs -p$(DOC_PKG) ChangeLog
+	dh_installdocs -p$(DOC_PKG) NEWS README
 	dh_link -i
 	dh_compress -i -X.sgml -X.devhelp
 	dh_fixperms -i
@@ -210,9 +210,6 @@ binary-arch: build $(maybe_check) install
 	dh_install -s
 	# empty the dependency_libs in the *.la files
 	sed -i -e "/dependency_libs/ s/'.*'/''/" debian/$(DEV_PKG)/usr/lib/*.la
-	dh_installchangelogs -s -N$(DEV_PKG) -N$(DEBUG_PKG) \
-		ChangeLog
-	dh_installdocs -s -N$(DEV_PKG) -N$(DEBUG_PKG) NEWS README
 	dh_link -s
 	dh_strip -s --dbg-package=$(DEBUG_PKG)
 	dh_compress -s -X.sgml -X.devhelp
