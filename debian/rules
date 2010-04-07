@@ -33,12 +33,16 @@ CFLAGS += -Wall -DMAEMO_CHANGES -g -O$(if $(findstring noopt,$(DEB_BUILD_OPTIONS
 # symbols
 LDFLAGS += -Wl,-z,defs
 
+# NB: do NOT use -Wl,--as-needed to build glib; for instance the link to
+# pthread is carefully crafted to allow dlopen()ing pthread-using libs; see
+# http://mid.gmane.org/1257999019.21780.15.camel@marzipan
+
 # Make the linker work a bit harder so dynamic loading can be done faster
 LDFLAGS += -Wl,-O1
 
 APIVER := 2.0
 SONAME := 0
-SHVER := 2.20.0
+SHVER := 2.24.0
 
 # package names
 SHARED_PKG := libglib$(APIVER)-$(SONAME)
@@ -55,11 +59,9 @@ FLAVORS := deb
 # list of flavors to run the test suite on
 CHECK_FLAVORS := $(filter deb, $(FLAVORS))
 
-# list of arches on which testsuite failures are fatal
-# XXX testsuite failures currently disabled as testsuite fails everywhere when
-# $HOME isn't writable
 CHECK_SUPPORTED_ARCHES :=
-# CHECK_SUPPORTED_ARCHES := alpha amd64 i386 ia64 lpia m68k s390
+#CHECK_SUPPORTED_ARCHES := amd64 i386 s390
+# CHECK_SUPPORTED_ARCHES := alpha ia64 lpia m68k
 # testsuite is known to fail on hppa, hurd, kfreebsd-amd64, kfreebsd-i386; see
 # Debian #428674
 # testsuite is known to fail on arm, mips, mipsel, powerpc, sparc; see GNOME #481573
@@ -83,7 +85,6 @@ common_configure_flags := \
 			--with-html-dir=\$${prefix}/share/doc/$(DOC_PKG) \
 			--with-pcre=internal \
 			--disable-fam
-
 ifeq ($(DEB_BUILD_GNU_TYPE),$(DEB_HOST_GNU_TYPE))
 	common_configure_flags += --build=$(DEB_BUILD_GNU_TYPE)
 else
@@ -104,7 +105,7 @@ $(STAMP_DIR)/patch-stamp:
 	-test -r /usr/share/misc/config.guess && \
 		cp -f /usr/share/misc/config.guess config.guess
 	-mkdir -p $(STAMP_DIR)
-	autoreconf -f -i
+	AUTOGEN_SUBDIR_MODE=1 $(CURDIR)/autogen.sh
 	touch $@
 
 patch: $(STAMP_DIR)/patch-stamp

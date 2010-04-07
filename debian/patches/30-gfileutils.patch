@@ -1,8 +1,8 @@
-Index: glib-2.20.1/glib/gfileutils.c
-===================================================================
---- glib-2.20.1.orig/glib/gfileutils.c	2009-05-14 15:13:04.000000000 +0200
-+++ glib-2.20.1/glib/gfileutils.c	2009-05-14 15:17:33.000000000 +0200
-@@ -987,7 +987,14 @@ write_to_temp_file (const gchar  *conten
+diff --git a/glib/gfileutils.c b/glib/gfileutils.c
+index 76335fa..3a35d59 100644
+--- a/glib/gfileutils.c
++++ b/glib/gfileutils.c
+@@ -996,7 +996,14 @@ write_to_temp_file (const gchar  *contents,
  #endif
    
    errno = 0;

@@ -10,9 +10,10 @@ Build-Depends: debhelper (>> 5.0.22),
                gnome-pkg-tools (>= 0.10),
                quilt,
                dpkg-dev (>= 1.14.13),
+               desktop-file-utils,
                gtk-doc-tools,
-               libc6-dev | not+linux-gnu,
-Standards-Version: 3.8.0
+               zlib1g-dev
+Standards-Version: 3.8.4
 Homepage: http://www.gtk.org/
 Vcs-Browser: http://svn.debian.org/wsvn/pkg-gnome/desktop/unstable/glib2.0/
 Vcs-Svn: svn://svn.debian.org/svn/pkg-gnome/desktop/unstable/glib2.0/
@@ -25,6 +26,7 @@ Depends: ${misc:Depends},
 Recommends: libglib2.0-data,
             shared-mime-info
 Conflicts: libpango1.0-0 (<< 1.11)
+Replaces: libglib2.0-dev (<< 2.23.2-2)
 Description: The GLib library of C routines
  GLib is a library containing many useful C routines for things such
  as trees, hashes, lists, and strings.  It is a useful general-purpose
@@ -38,7 +40,8 @@ Architecture: any
 Depends: ${misc:Depends},
          ${shlibs:Depends},
          libglib2.0-0 (= ${binary:Version}),
-         pkg-config (>= 0.14.0)
+         pkg-config (>= 0.14.0),
+         zlib1g-dev
 Recommends: python
 Suggests: libglib2.0-doc
 Replaces: libglib1.3-dev
@@ -70,7 +73,6 @@ Description: The GLib libraries and debugging symbols
  Most people will not need this package.
 
 Package: libglib2.0-data
-Section: misc
 Architecture: all
 Depends: ${misc:Depends},
          libglib2.0-0 (>= ${source:Version})

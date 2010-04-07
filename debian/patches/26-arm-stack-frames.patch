@@ -1,22 +1,22 @@
-Index: glib-2.20.3/configure.in
-===================================================================
---- glib-2.20.3.orig/configure.in	2009-07-22 13:15:42.000000000 +0300
-+++ glib-2.20.3/configure.in	2009-07-22 13:16:08.000000000 +0300
-@@ -2410,6 +2410,9 @@
-       dnl AC_DEFINE_UNQUOTED(G_ATOMIC_ARM_LINUX, 1,
-       dnl                   [special arm linux implementation])
-       dnl glib_memory_barrier_needed=yes
-+      # some ARM CPUs and gcc versions need flags for proper backtraces
-+      ARM_FRAME_FLAGS="-fno-omit-frame-pointer -mapcs-frame"
-+      AC_SUBST(ARM_FRAME_FLAGS)
-       ;;
-     crisv32*|etraxfs*)
-       AC_MSG_RESULT([crisv32])
-Index: glib-2.20.3/glib/Makefile.am
-===================================================================
---- glib-2.20.3.orig/glib/Makefile.am	2009-07-22 13:15:29.000000000 +0300
-+++ glib-2.20.3/glib/Makefile.am	2009-07-22 13:15:42.000000000 +0300
-@@ -32,6 +32,9 @@
+diff --git a/configure.in b/configure.in
+index eaa6943..e3264cd 100644
+--- a/configure.in
++++ b/configure.in
+@@ -2522,6 +2522,9 @@ if test x"$GCC" = xyes; then
+         dnl AC_DEFINE_UNQUOTED(G_ATOMIC_ARM_LINUX, 1,
+         dnl                   [special arm linux implementation])
+         dnl glib_memory_barrier_needed=yes
++        # some ARM CPUs and gcc versions need flags for proper backtraces
++        ARM_FRAME_FLAGS="-fno-omit-frame-pointer -mapcs-frame"
++        AC_SUBST(ARM_FRAME_FLAGS)
+         ;;
+       crisv32*|etraxfs*)
+         AC_MSG_RESULT([crisv32])
+diff --git a/glib/Makefile.am b/glib/Makefile.am
+index 97eae45..8b4e5dd 100644
+--- a/glib/Makefile.am
++++ b/glib/Makefile.am
+@@ -38,6 +38,9 @@ AM_CPPFLAGS = 				\
  	-DGLIB_COMPILATION 		\
  	-DPCRE_STATIC
  

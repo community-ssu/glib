@@ -1,88 +1,279 @@
-glib2.0 (2.20.3-1maemo4) unstable; urgency=low
+glib2.0 (2.24.0-1maemo1) unstable; urgency=low
 
-  [ Michael Natterer ]
-  * debian/rules: install ChangeLog, INSTALL and README only in the
-    doc package.
-    Fixes: NB#149126 - Remove doc files from glib deb
+  * Update from glib 2.20.3-1maemo4.
+    See changelog1 for maemo changes up to that version.
+  * 20-gmarkup-speedup.patch:
+    - removed, merged upstream.
+  * 21-gsimpleasyncresult-memleak.patch:
+    - removed, merged upstream.
+  * 22-g-object-unref-toggle-refs.patch:
+    - removed, merged upstream.
+  * New build dependencies: desktop-file-utils, zlib1g-dev.
 
- -- Michael Natterer <mitch@lanedo.com>  Thu, 07 Jan 2010 16:50:00 +0100
+ -- Claudio Saavedra <csaavedra@igalia.com>  Wed, 07 Apr 2010 12:13:38 +0300
 
-glib2.0 (2.20.3-1maemo3) unstable; urgency=low
+glib2.0 (2.24.0-1) unstable; urgency=low
 
-  [ Michael Natterer ]
-  * 22-g-object-unref-toggle-refs.patch: added
-    Addresses: NB#140259 - [Random]Telepathy-stream-engine crash during
-    Voip call when network is unstable
+  * New upstream stable release:
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated 2.23 symbols to 2.24 to force dependencies on a stable release.
+    + debian/rules:
+      - Remove check-dist.mk include to allow uploads to unstable again.
 
- -- Michael Natterer <mitch@lanedo.com>  Thu, 22 Oct 2009 16:00:00 +0200
+ -- Sebastian Dröge <slomo@debian.org>  Fri, 26 Mar 2010 16:59:18 +0100
 
-glib2.0 (2.20.3-1maemo2) unstable; urgency=low
+glib2.0 (2.23.6-1) experimental; urgency=low
 
-  [ Jussi Laako ]
-  * Fix ARM atomic operations once more
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/05_gvariant_test_failure.patch:
+    - Backport patch from upstream git to fix a gvariant test that fails
+      randomly on x86.
 
-  [ Claudio Saavedra ]
-  * 25-gatomic.patch: updated
-    + Fixes: NB#106135 (glib does not use fast ARMv6+ atomic operations)
-  * 26-arm-stack-frames.patch: updated
-    Do not enable arm specific optimizations in non arm architectures.
+  [ Sebastian Dröge ]
+  * New upstream development release:
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated for the new API.
+    + debian/patches/05_gvariant_test_failure.patch:
+      - Dropped, merged upstream.
+  * debian/rules:
+    + Make unit test failures non-fatal again because of race conditions
+      in some tests.
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Wed, 22 Jul 2009 12:20:09 +0200
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 22 Mar 2010 06:10:18 +0100
 
-glib2.0 (2.20.3-1maemo1) unstable; urgency=low
+glib2.0 (2.23.5-1) experimental; urgency=low
 
-  [ Michael Natterer ]
-  * Upgrade to GLib 2.20.3
-  * Regenerate one patch to remove offsets
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/05-dont-fail-a-couple-of-tests-when-running-as-root.patch:
+    - Updated.
+  * 06-test-for-unexisting-files-in-TMP-and-not-in-HOME.patch:
+    - Added, don't look for an unexisting file in $HOME since it will
+      fail with an unexpected result if it's not writable (which happens
+      on some buildds). Look at $TMP instead.
+  * debian/rules:
+    - Make test suite failures fatal on amd64, i386 and s390.
 
- -- Michael Natterer <mitch@lanedo.com>  Thu, 18 Jun 2009 15:00:00 +0200
+  [ Sebastian Dröge ]
+  * New upstream development release:
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated for the new API.
+    + debian/patches/05-dont-fail-a-couple-of-tests-when-running-as-root.patch,
+      debian/patches/06-test-for-unexisting-files-in-TMP-and-not-in-HOME.patch:
+      - Dropped, merged upstream.
 
-glib2.0 (2.20.1-1maemo3) unstable; urgency=low
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 08 Mar 2010 18:49:00 +0000
 
-  [ Christian Dywan ]
-  * 80-hildon-user-named-dir.patch: new patch.
-    Implement hildon_get_user_named_dir.
+glib2.0 (2.23.4-1) experimental; urgency=low
 
-  [ Michael Natterer ]
-  * 26-arm-stack-frames.patch: new patch.
-    Fixes: NB#91723 - Backtraces don't work through functions having
-                      noreturn attribute on ARM
-    Removed a fragment of this patch from 25-gatomic.patch and regenerated
-    the patches that had offsets.
+  [ Emilio Pozuelo Monfort ]
+  * debian/patches/05-dont-fail-a-couple-of-tests-when-running-as-root.patch:
+    - Added, expect a couple of tests that play with file permissions
+      to succeed when running as root.
+  * debian/control.in:
+    - Add desktop-file-utils to build depends to fix another test.
+    - Standards-Version is 3.8.4, no changes needed.
+    - Let libgio-fam depend on ${misc:Depends}.
 
-  [ Claudio Saavedra ]
-  * Sync debian/control with debian/control.in
+  [ Sebastian Dröge ]
+  * New upstream development release:
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated for the new API.
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 02 Jun 2009 14:37:26 +0300
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 22 Feb 2010 09:04:48 +0100
 
-glib2.0 (2.20.1-1maemo2) unstable; urgency=low
+glib2.0 (2.23.3-1) experimental; urgency=low
 
-  [ Michael Natterer ]
-  * Move glib-2-20 branch back to trunk.
-  * Reorder patches/series to match patch numbers and rediff everything.
-  * 20-gmarkup-speedup.patch: new patch.
-    Fixes: NB#106936 - glib performance improvements patches shall be applied
-  * 21-gsimpleasyncresult-memleak.patch: new patch.
-    Fixes: NB#108347 - Memory leak found while exporting all contacts from UI.
+  * New upstream development release:
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated for the new API.
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Fri, 22 May 2009 12:48:02 +0300
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 09 Feb 2010 16:48:07 +0100
 
-glib2.0 (2.20.1-1maemo1) unstable; urgency=low
+glib2.0 (2.23.2-2) experimental; urgency=low
 
-  [ Janne Karhunen ]
-  * New upstream release; move maemo changes to debian/patches
+  * debian/control.in,
+    debian/libglib2.0-0.triggers,
+    debian/libglib2.0-0.install,
+    debian/libglib2.0-dev.install:
+    + Ship gio-querymodules in the shared library package
+      and triggers calls to every time /usr/lib/gio/modules
+      is touched by a package.
 
-  [ Claudio Saavedra ]
-  * Drop debian unstable patches.
-  * Remove patches with autogenerated documentation.
-  * Drop patches applied upstream:
-    + 20-gunixmount.patch, dropped.
-    + 55-gsignal.patch, dropped.
-  * 70_use-monotonic-clock-for-timeouts.patch: new patch.
-    Fixes: NB#115307 (Glib should use monotonic clock for timeouts)
-  * Remove libgio-fam and udeb packages.
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 26 Jan 2010 09:40:47 +0100
 
- -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 12 May 2009 15:13:54 +0300
+glib2.0 (2.23.2-1) experimental; urgency=low
+
+  * New upstream development release:
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated for the new API.
+
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 26 Jan 2010 08:14:26 +0100
+
+glib2.0 (2.23.1-1) experimental; urgency=low
+
+  [ Sebastian Dröge ]
+  * debian/control.in:
+    + Let the -dev package depend on zlib1g-dev as it's required by
+      the pkg-config file now.
+
+  [ Emilio Pozuelo Monfort ]
+  * New upstream release.
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Updated for the new API.
+
+ -- Emilio Pozuelo Monfort <pochu@debian.org>  Tue, 22 Dec 2009 23:25:41 +0100
+
+glib2.0 (2.23.0-1) experimental; urgency=low
+
+  [ Loïc Minier ]
+  * -refdbg package is section/prio debug/extra.
+  * Add note to NOT use -Wl,--as-needed as it might drop a critical -lpthread
+    link in gio (which dlopen()s gvfs); see
+    mid:<1257999019.21780.15.camel@marzipan>.
+
+  [ Sebastian Dröge ]
+  * New upstream development release:
+    + debian/patches/90_mimetype-sorting.patch:
+      - Dropped, merged upstream.
+    + debian/rules,
+      debian/libglib2.0-0.symbols:
+      - Update for new API.
+    + debian/control.in:
+      - Build depend on zlib.
+    + debian/rules:
+      - Include check-dist.mk to prevent accidental uploads to unstable.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 30 Nov 2009 10:04:07 +0100
+
+glib2.0 (2.22.2-2) unstable; urgency=low
+
+  * debian/patches/90_mimetype-sorting.patch:
+    + Fix sorting of mimetypes by weight. Highest weight means most
+      important, not the other way around. Patch from upstream GIT.
+
+ -- Sebastian Dröge <slomo@debian.org>  Thu, 08 Oct 2009 18:34:23 +0200
+
+glib2.0 (2.22.2-1) unstable; urgency=low
+
+  [ Emilio Pozuelo Monfort ]
+  * Move libglib2.0-data to section libs. Closes: #549079.
+
+  [ Sebastian Dröge ]
+  * New upstream bugfix release.
+
+ -- Sebastian Dröge <slomo@debian.org>  Thu, 08 Oct 2009 12:48:51 +0200
+
+glib2.0 (2.22.1-1) unstable; urgency=low
+
+  * New upstream bugfix release:
+    + debian/patches/10_inotify_init1.patch,
+      debian/patches/30_metadata_symlinks.patch:
+      - Dropped, merged upstream.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 30 Sep 2009 08:17:57 +0200
+
+glib2.0 (2.22.0-2) unstable; urgency=low
+
+  * Don’t install Python GDB macros for now, they only work with an 
+    experimental GDB branch.
+  * 30_metadata_symlinks.patch: stolen upstream. Get metadata to work 
+    with symbolic links. Closes: #548142.
+
+ -- Josselin Mouette <joss@debian.org>  Wed, 30 Sep 2009 01:02:11 +0200
+
+glib2.0 (2.22.0-1) unstable; urgency=low
+
+  [ Josselin Mouette ]
+  * Move libglib-2.0.so.0 to /lib so that DeviceKit (and other potential 
+    sources) can work without having /usr mounted.
+  * 11_chmod_symlinks.patch: new patch. Fix potential security issue 
+    when manipulating symlink permissions. Thanks Arand Nash for the 
+    heads up.
+
+  [ Sebastian Dröge ]
+  * New upstream stable release:
+    + debian/patches/11_chmod_symlinks.patch:
+      - Dropped, merged upstream.
+    + debian/libglib2.0-0.symbols,
+      debian/rules:
+      - Update for the new version.
+
+ -- Sebastian Dröge <slomo@debian.org>  Wed, 23 Sep 2009 05:04:37 +0200
+
+glib2.0 (2.21.6-1) experimental; urgency=low
+
+  [ Josselin Mouette ]
+  * 10_inotify_init1.patch: fall back on inotify_init when inotify_init1 
+    does not work, as happens with kernel versions < 2.6.27.
+    Closes: #544354.
+
+  [ Sebastian Dröge ]
+  * New upstream development release:
+    + debian/libglib2.0-0.symbols:
+      - Update for the new version.
+    + debian/rules:
+      - Update SHVER to 2.21.6.
+  * debian/control.in:
+    + Updated Standards-Version to 3.8.3, no additional changes needed.
+
+ -- Sebastian Dröge <slomo@debian.org>  Sat, 05 Sep 2009 07:15:58 +0200
+
+glib2.0 (2.21.5-1) experimental; urgency=low
+
+  * New upstream development release:
+    + debian/libglib2.0-0.symbols:
+      - Update for the new version.
+    + debian/rules:
+      - Update SHVER to 2.21.5.
+  * debian/control.in:
+    + Updated Standards-Version to 3.8.2, no additional changes needed.
+
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 25 Aug 2009 18:38:51 +0200
+
+glib2.0 (2.21.4-1) experimental; urgency=low
+
+  * New upstream development release:
+    + debian/rules:
+      - Include check-dist.mk to prevent accidental uploads to unstable.
+      - Update shlib version to 2.21.4.
+    + debian/libglib2.0-0.symbols:
+      - Update for the API additions.
+  * debian/control.in:
+    + Updated Standards-Version to 3.8.1, no additional changes needed.
+
+ -- Sebastian Dröge <slomo@debian.org>  Tue, 21 Jul 2009 09:35:33 +0200
+
+glib2.0 (2.20.4-1) unstable; urgency=low
+
+  * New upstream bugfix release.
+
+ -- Sebastian Dröge <slomo@debian.org>  Sat, 27 Jun 2009 09:56:08 +0200
+
+glib2.0 (2.20.3-1) unstable; urgency=low
+
+  [ Josselin Mouette ]
+  * Only build the libgio-fam package for hurd and kfreebsd, it is 
+    totally useless under Linux.
+  * Make it recommend gamin for kqueue support.
+  * Make libgamin-dev the primary build-dependency. Closes: #526219.
+
+  [ Sebastian Dröge ]
+  * New upstream bugfix release.
+
+ -- Sebastian Dröge <slomo@debian.org>  Mon, 01 Jun 2009 15:35:40 +0200
+
+glib2.0 (2.20.1-2) unstable; urgency=low
+
+  * Add refdbg package: libglib2.0-0-refdbg. (Closes: #525915)
+
+ -- Jonny Lamb <jonny@debian.org>  Tue, 28 Apr 2009 15:11:27 +0100
 
 glib2.0 (2.20.1-1) unstable; urgency=low
 
