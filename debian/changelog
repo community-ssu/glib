@@ -1,3 +1,11 @@
+glib2.0 (2.20.3-1maemo5) unstable; urgency=low
+
+  [ Alberto Garcia ]
+  * 90-xdgmime-optimizations.patch: optimize xdgmime calls
+    Fixes: NB#161576 - Call UI slugginesh caused by mime handling
+
+ -- Alberto Garcia <agarcia@igalia.com>  Mon, 12 Apr 2010 13:04:44 +0200
+
 glib2.0 (2.20.3-1maemo4) unstable; urgency=low
 
   [ Michael Natterer ]
