@@ -1,8 +1,8 @@
-Index: glib-2.20.3/configure.in
+Index: glib/configure.in
 ===================================================================
---- glib-2.20.3.orig/configure.in	2009-06-18 15:04:46.000000000 +0200
-+++ glib-2.20.3/configure.in	2009-06-18 15:04:46.000000000 +0200
-@@ -2300,6 +2300,7 @@
+--- glib.orig/configure.in	2010-04-26 10:14:41.000000000 +0100
++++ glib/configure.in	2010-04-26 10:14:47.000000000 +0100
+@@ -2397,6 +2397,7 @@ AC_CHECK_FUNCS(clock_gettime, [], [
      AC_DEFINE(HAVE_CLOCK_GETTIME, 1)
      G_THREAD_LIBS="$G_THREAD_LIBS -lrt"
      G_THREAD_LIBS_FOR_GTHREAD="$G_THREAD_LIBS_FOR_GTHREAD -lrt"
@@ -10,7 +10,7 @@ Index: glib-2.20.3/configure.in
    ])
  ])
  
-@@ -2592,13 +2593,13 @@
+@@ -2717,13 +2718,13 @@ dnl **********************
  
  case $host in
    *-*-cygwin*)
@@ -27,11 +27,11 @@ Index: glib-2.20.3/configure.in
      ;;
  esac
  AC_SUBST(G_LIBS_EXTRA)
-Index: glib-2.20.3/glib/gmain.c
+Index: glib/glib/gmain.c
 ===================================================================
---- glib-2.20.3.orig/glib/gmain.c	2009-06-18 14:58:44.000000000 +0200
-+++ glib-2.20.3/glib/gmain.c	2009-06-18 15:04:46.000000000 +0200
-@@ -77,6 +77,10 @@
+--- glib.orig/glib/gmain.c	2010-04-26 10:13:58.000000000 +0100
++++ glib/glib/gmain.c	2010-04-26 10:14:47.000000000 +0100
+@@ -79,6 +79,10 @@
  
  #include "galias.h"
  
@@ -42,7 +42,7 @@ Index: glib-2.20.3/glib/gmain.c
  /* Types */
  
  typedef struct _GTimeoutSource GTimeoutSource;
-@@ -158,6 +162,7 @@
+@@ -160,6 +164,7 @@ struct _GMainContext
    GPollFunc poll_func;
  
    GTimeVal current_time;
@@ -50,7 +50,7 @@ Index: glib-2.20.3/glib/gmain.c
    gboolean time_is_current;
  };
  
-@@ -229,6 +234,9 @@
+@@ -231,6 +236,9 @@ struct _GPollRec
  
  /* Forward declarations */
  
@@ -60,7 +60,7 @@ Index: glib-2.20.3/glib/gmain.c
  static void g_source_unref_internal             (GSource      *source,
  						 GMainContext *context,
  						 gboolean      have_lock);
-@@ -1477,6 +1485,20 @@
+@@ -1623,6 +1631,20 @@ g_get_current_time (GTimeVal *result)
  }
  
  static void
@@ -81,7 +81,7 @@ Index: glib-2.20.3/glib/gmain.c
  g_main_dispatch_free (gpointer dispatch)
  {
    g_slice_free (GMainDispatch, dispatch);
-@@ -2965,6 +2987,7 @@
+@@ -3111,6 +3133,7 @@ g_source_get_current_time (GSource  *sou
    if (!context->time_is_current)
      {
        g_get_current_time (&context->current_time);
@@ -89,7 +89,7 @@ Index: glib-2.20.3/glib/gmain.c
        context->time_is_current = TRUE;
      }
    
-@@ -2973,6 +2996,30 @@
+@@ -3119,6 +3142,30 @@ g_source_get_current_time (GSource  *sou
    UNLOCK_CONTEXT (context);
  }
  
@@ -120,7 +120,7 @@ Index: glib-2.20.3/glib/gmain.c
  /**
   * g_main_context_set_poll_func:
   * @context: a #GMainContext
-@@ -3177,7 +3224,7 @@
+@@ -3323,7 +3370,7 @@ g_timeout_prepare (GSource *source,
    
    GTimeoutSource *timeout_source = (GTimeoutSource *)source;
  
@@ -129,7 +129,7 @@ Index: glib-2.20.3/glib/gmain.c
  
    sec = timeout_source->expiration.tv_sec - current_time.tv_sec;
    msec = (timeout_source->expiration.tv_usec - current_time.tv_usec) / 1000;
-@@ -3226,8 +3273,8 @@
+@@ -3372,8 +3419,8 @@ g_timeout_check (GSource *source)
    GTimeVal current_time;
    GTimeoutSource *timeout_source = (GTimeoutSource *)source;
  
@@ -140,7 +140,7 @@ Index: glib-2.20.3/glib/gmain.c
    return ((timeout_source->expiration.tv_sec < current_time.tv_sec) ||
  	  ((timeout_source->expiration.tv_sec == current_time.tv_sec) &&
  	   (timeout_source->expiration.tv_usec <= current_time.tv_usec)));
-@@ -3251,7 +3298,7 @@
+@@ -3397,7 +3444,7 @@ g_timeout_dispatch (GSource     *source,
      {
        GTimeVal current_time;
  
@@ -149,7 +149,7 @@ Index: glib-2.20.3/glib/gmain.c
        g_timeout_set_expiration (timeout_source, &current_time);
  
        return TRUE;
-@@ -3281,7 +3328,7 @@
+@@ -3427,7 +3474,7 @@ g_timeout_source_new (guint interval)
  
    timeout_source->interval = interval;
  
@@ -158,7 +158,7 @@ Index: glib-2.20.3/glib/gmain.c
    g_timeout_set_expiration (timeout_source, &current_time);
    
    return source;
-@@ -3314,7 +3361,7 @@
+@@ -3460,7 +3507,7 @@ g_timeout_source_new_seconds (guint inte
    timeout_source->interval = 1000*interval;
    timeout_source->granularity = 1000;
  

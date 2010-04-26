@@ -1,19 +1,19 @@
-Index: glib-2.20.1/glib/glib.symbols
+Index: glib/glib/glib.symbols
 ===================================================================
---- glib-2.20.1.orig/glib/glib.symbols	2009-06-02 12:51:21.000000000 +0200
-+++ glib-2.20.1/glib/glib.symbols	2009-06-02 12:51:22.000000000 +0200
-@@ -1550,6 +1550,7 @@ g_get_user_cache_dir
- g_get_user_config_dir
+--- glib.orig/glib/glib.symbols	2010-04-26 10:14:41.000000000 +0100
++++ glib/glib/glib.symbols	2010-04-26 10:14:51.000000000 +0100
+@@ -1594,6 +1594,7 @@ g_get_user_config_dir
  g_get_user_data_dir
+ g_reload_user_special_dirs_cache
  g_get_user_special_dir
 +hildon_get_user_named_dir
  #ifndef _WIN64
  g_get_user_name PRIVATE
  #endif
-Index: glib-2.20.1/glib/gutils.c
+Index: glib/glib/gutils.c
 ===================================================================
---- glib-2.20.1.orig/glib/gutils.c	2009-06-02 11:04:16.000000000 +0200
-+++ glib-2.20.1/glib/gutils.c	2009-06-02 12:51:22.000000000 +0200
+--- glib.orig/glib/gutils.c	2010-04-26 10:13:58.000000000 +0100
++++ glib/glib/gutils.c	2010-04-26 10:14:51.000000000 +0100
 @@ -1465,6 +1465,7 @@ static  gchar   *g_user_config_dir = NUL
  static  gchar  **g_system_config_dirs = NULL;
  
@@ -89,9 +89,9 @@ Index: glib-2.20.1/glib/gutils.c
      }
  
    g_strfreev (lines);
-@@ -2471,6 +2490,34 @@ load_user_special_dirs (void)
- 
+@@ -2472,6 +2491,34 @@ load_user_special_dirs (void)
  #endif /* G_OS_UNIX && !HAVE_CARBON */
+ 
  
 +static void
 +g_ensure_user_special_dirs ()
@@ -122,9 +122,9 @@ Index: glib-2.20.1/glib/gutils.c
 +}
 +
  /**
-  * g_get_user_special_dir:
-  * @directory: the logical id of special directory
-@@ -2482,9 +2529,7 @@ load_user_special_dirs (void)
+  * g_reload_user_special_dirs_cache:
+  *
+@@ -2535,9 +2582,7 @@ g_reload_user_special_dirs_cache (void)
   * falls back to <filename>$HOME/Desktop</filename> when XDG special
   * user directories have not been set up. 
   *
@@ -135,7 +135,7 @@ Index: glib-2.20.1/glib/gutils.c
   *
   * Return value: the path to the specified special directory, or %NULL
   *   if the logical id was not found. The returned string is owned by
-@@ -2498,27 +2543,37 @@ g_get_user_special_dir (GUserDirectory d
+@@ -2551,27 +2596,37 @@ g_get_user_special_dir (GUserDirectory d
    g_return_val_if_fail (directory >= G_USER_DIRECTORY_DESKTOP &&
                          directory < G_USER_N_DIRECTORIES, NULL);
  
@@ -191,11 +191,11 @@ Index: glib-2.20.1/glib/gutils.c
  }
  
  #ifdef G_OS_WIN32
-Index: glib-2.20.1/glib/gutils.h
+Index: glib/glib/gutils.h
 ===================================================================
---- glib-2.20.1.orig/glib/gutils.h	2009-06-02 11:04:16.000000000 +0200
-+++ glib-2.20.1/glib/gutils.h	2009-06-02 12:51:22.000000000 +0200
-@@ -191,6 +191,8 @@ typedef enum {
+--- glib.orig/glib/gutils.h	2010-04-26 10:13:58.000000000 +0100
++++ glib/glib/gutils.h	2010-04-26 10:14:51.000000000 +0100
+@@ -192,6 +192,8 @@ typedef enum {
  
  G_CONST_RETURN gchar* g_get_user_special_dir (GUserDirectory directory);
  

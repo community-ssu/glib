@@ -1,7 +1,7 @@
-Index: glib-2.20.1/glib/gscanner.c
+Index: glib/glib/gscanner.c
 ===================================================================
---- glib-2.20.1.orig/glib/gscanner.c	2009-05-14 15:13:03.000000000 +0200
-+++ glib-2.20.1/glib/gscanner.c	2009-05-14 15:17:38.000000000 +0200
+--- glib.orig/glib/gscanner.c	2010-04-26 10:13:59.000000000 +0100
++++ glib/glib/gscanner.c	2010-04-26 10:14:41.000000000 +0100
 @@ -33,21 +33,31 @@
  
  #include "config.h"
@@ -477,10 +477,10 @@ Index: glib-2.20.1/glib/gscanner.c
  void
  g_scanner_input_file (GScanner *scanner,
  		      gint	input_fd)
-Index: glib-2.20.1/glib/gscanner.h
+Index: glib/glib/gscanner.h
 ===================================================================
---- glib-2.20.1.orig/glib/gscanner.h	2009-05-14 15:13:03.000000000 +0200
-+++ glib-2.20.1/glib/gscanner.h	2009-05-14 15:17:38.000000000 +0200
+--- glib.orig/glib/gscanner.h	2010-04-26 10:13:59.000000000 +0100
++++ glib/glib/gscanner.h	2010-04-26 10:14:41.000000000 +0100
 @@ -124,6 +124,14 @@ union	_GTokenValue
    guint		v_error;
  };
@@ -523,11 +523,11 @@ Index: glib-2.20.1/glib/gscanner.h
  void		g_scanner_sync_file_offset	(GScanner	*scanner);
  void		g_scanner_input_text		(GScanner	*scanner,
  						 const	gchar	*text,
-Index: glib-2.20.1/glib/glib.symbols
+Index: glib/glib/glib.symbols
 ===================================================================
---- glib-2.20.1.orig/glib/glib.symbols	2009-05-14 15:13:03.000000000 +0200
-+++ glib-2.20.1/glib/glib.symbols	2009-05-14 15:17:38.000000000 +0200
-@@ -987,6 +987,7 @@ g_scanner_set_scope
+--- glib.orig/glib/glib.symbols	2010-04-26 10:13:59.000000000 +0100
++++ glib/glib/glib.symbols	2010-04-26 10:14:41.000000000 +0100
+@@ -1011,6 +1011,7 @@ g_scanner_set_scope
  g_scanner_sync_file_offset
  g_scanner_unexp_token
  g_scanner_warn G_GNUC_PRINTF(2,3)
@@ -535,11 +535,11 @@ Index: glib-2.20.1/glib/glib.symbols
  #endif
  #endif
  
-Index: glib-2.20.1/configure.in
+Index: glib/configure.in
 ===================================================================
---- glib-2.20.1.orig/configure.in	2009-05-14 15:17:19.000000000 +0200
-+++ glib-2.20.1/configure.in	2009-05-14 15:17:38.000000000 +0200
-@@ -183,7 +183,7 @@ AM_CONDITIONAL(MS_LIB_AVAILABLE, [test x
+--- glib.orig/configure.in	2010-04-26 10:14:23.000000000 +0100
++++ glib/configure.in	2010-04-26 10:14:41.000000000 +0100
+@@ -187,7 +187,7 @@ AM_CONDITIONAL(MS_LIB_AVAILABLE, [test x
  if test "$glib_native_win32" != yes; then
      # libtool option to control which symbols are exported
      # right now, symbols starting with _ are not exported
