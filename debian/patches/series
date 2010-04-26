@@ -8,3 +8,4 @@
 60_wait-longer-for-threads-to-die.patch
 70_use-monotonic-clock-for-timeouts.patch
 80-hildon-user-named-dir.patch
+90-xdgmime-optimizations.patch
