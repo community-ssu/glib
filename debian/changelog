@@ -1,3 +1,12 @@
+glib2.0 (2.24.1-1maemo1) unstable; urgency=low
+
+  * New upstream release.
+  * 90-xdgmime-optimizations.patch:
+    - new, ported from previous 2.20 maemo branch.
+  * Refresh all existing patches so that they apply cleanly
+
+ -- Claudio Saavedra <csaavedra@igalia.com>  Tue, 04 May 2010 15:51:56 +0300
+
 glib2.0 (2.24.0-1maemo1) unstable; urgency=low
 
   * Update from glib 2.20.3-1maemo4.
