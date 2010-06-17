@@ -1,5 +1,5 @@
 diff --git a/gio/xdgmime/xdgmime.c b/gio/xdgmime/xdgmime.c
-index 0888583..cb89763 100644
+index 0888583..bf60e47 100644
 --- a/gio/xdgmime/xdgmime.c
 +++ b/gio/xdgmime/xdgmime.c
 @@ -411,6 +411,12 @@ xdg_check_dirs (void)
@@ -28,7 +28,7 @@ index 0888583..cb89763 100644
 +               || DUMA_OUTPUT_STDERR
 +               || DUMA_OUTPUT_FILE)))
      {
-+      g_warning("curr %d last %d duma %d %d %d %s", current_time, last_stat_time, DUMA_OUTPUT_DEBUG, DUMA_OUTPUT_STDOUT, DUMA_OUTPUT_STDERR, DUMA_OUTPUT_FILE);
++      fprintf(stderr, "curr %d last %d duma %d %d %d %s\n", current_time, last_stat_time, DUMA_OUTPUT_DEBUG, DUMA_OUTPUT_STDOUT, DUMA_OUTPUT_STDERR, DUMA_OUTPUT_FILE);
        retval = xdg_check_dirs ();
        last_stat_time = current_time;
      }
