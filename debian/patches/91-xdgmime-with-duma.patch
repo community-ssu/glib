@@ -1,5 +1,5 @@
 diff --git a/gio/xdgmime/xdgmime.c b/gio/xdgmime/xdgmime.c
-index 0888583..bf60e47 100644
+index 0888583..fbf72f3 100644
 --- a/gio/xdgmime/xdgmime.c
 +++ b/gio/xdgmime/xdgmime.c
 @@ -411,6 +411,12 @@ xdg_check_dirs (void)
@@ -7,10 +7,10 @@ index 0888583..bf60e47 100644
  }
  
 +/* These variables are interposed by libduma if it's preloaded. */
-+int   DUMA_OUTPUT_DEBUG;
-+int   DUMA_OUTPUT_STDOUT;
-+int   DUMA_OUTPUT_STDERR;
-+char *DUMA_OUTPUT_FILE;
++int   DUMA_OUTPUT_DEBUG  __attribute__((visibility("default")));
++int   DUMA_OUTPUT_STDOUT __attribute__((visibility("default")));
++int   DUMA_OUTPUT_STDERR __attribute__((visibility("default")));
++char *DUMA_OUTPUT_FILE   __attribute__((visibility("default")));
 +
  /* We want to avoid stat()ing on every single mime call, so we only look for
   * newer files every 5 seconds.  This will return TRUE if we need to reread the
