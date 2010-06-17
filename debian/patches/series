@@ -9,3 +9,4 @@
 70_use-monotonic-clock-for-timeouts.patch
 80-hildon-user-named-dir.patch
 90-xdgmime-optimizations.patch
+91-xdgmime-with-duma.patch

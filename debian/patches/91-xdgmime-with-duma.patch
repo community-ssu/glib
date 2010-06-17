@@ -1,0 +1,32 @@
+diff --git a/gio/xdgmime/xdgmime.c b/gio/xdgmime/xdgmime.c
+index 0888583..4f217a6 100644
+--- a/gio/xdgmime/xdgmime.c
++++ b/gio/xdgmime/xdgmime.c
+@@ -411,6 +411,12 @@ xdg_check_dirs (void)
+   return FALSE;
+ }
+ 
++/* These variables are interposed by libduma if it's preloaded. */
++int   DUMA_OUTPUT_DEBUG;
++int   DUMA_OUTPUT_STDOUT;
++int   DUMA_OUTPUT_STDERR;
++char *DUMA_OUTPUT_FILE;
++
+ /* We want to avoid stat()ing on every single mime call, so we only look for
+  * newer files every 5 seconds.  This will return TRUE if we need to reread the
+  * mime data from disk.
+@@ -425,7 +431,13 @@ xdg_check_time_and_dirs (void)
+   gettimeofday (&tv, NULL);
+   current_time = tv.tv_sec;
+ 
+-  if (current_time >= last_stat_time + 5)
++  /* Don't recheck the dirs if we're running with duma. */
++  if (current_time >= last_stat_time + 5
++      && (!last_stat_time
++          || !(DUMA_OUTPUT_DEBUG
++               || DUMA_OUTPUT_STDOUT
++               || DUMA_OUTPUT_STDERR
++               || DUMA_OUTPUT_FILE)))
+     {
+       retval = xdg_check_dirs ();
+       last_stat_time = current_time;
