@@ -1,34 +1,33 @@
 diff --git a/gio/xdgmime/xdgmime.c b/gio/xdgmime/xdgmime.c
-index 0888583..fbf72f3 100644
+index 0888583..c5c76ed 100644
 --- a/gio/xdgmime/xdgmime.c
 +++ b/gio/xdgmime/xdgmime.c
-@@ -411,6 +411,12 @@ xdg_check_dirs (void)
-   return FALSE;
- }
- 
-+/* These variables are interposed by libduma if it's preloaded. */
-+int   DUMA_OUTPUT_DEBUG  __attribute__((visibility("default")));
-+int   DUMA_OUTPUT_STDOUT __attribute__((visibility("default")));
-+int   DUMA_OUTPUT_STDERR __attribute__((visibility("default")));
-+char *DUMA_OUTPUT_FILE   __attribute__((visibility("default")));
-+
- /* We want to avoid stat()ing on every single mime call, so we only look for
-  * newer files every 5 seconds.  This will return TRUE if we need to reread the
-  * mime data from disk.
-@@ -425,8 +431,15 @@ xdg_check_time_and_dirs (void)
+@@ -418,6 +418,8 @@ xdg_check_dirs (void)
+ static int
+ xdg_check_time_and_dirs (void)
+ {
++  static gboolean check_interval_checked = FALSE;
++  static gint check_interval = 5;
+   struct timeval tv;
+   time_t current_time;
+   int retval = FALSE;
+@@ -425,7 +427,18 @@ xdg_check_time_and_dirs (void)
    gettimeofday (&tv, NULL);
    current_time = tv.tv_sec;
  
 -  if (current_time >= last_stat_time + 5)
-+  /* Don't recheck the dirs if we're running with duma. */
-+  if (current_time >= last_stat_time + 5
-+      && (!last_stat_time
-+          || !(DUMA_OUTPUT_DEBUG
-+               || DUMA_OUTPUT_STDOUT
-+               || DUMA_OUTPUT_STDERR
-+               || DUMA_OUTPUT_FILE)))
++  if (!check_interval_checked)
++    {
++      const char *env;
++
++      env = getenv ("XDG_CHECK_INTERVAL");
++      if (env != NULL)
++        check_interval = atoi(env);
++      check_interval_checked = TRUE;
++    }
++
++  if (current_time >= last_stat_time + check_interval
++      && (!last_stat_time || check_interval > 0))
      {
-+      fprintf(stderr, "curr %d last %d duma %d %d %d %s\n", current_time, last_stat_time, DUMA_OUTPUT_DEBUG, DUMA_OUTPUT_STDOUT, DUMA_OUTPUT_STDERR, DUMA_OUTPUT_FILE);
        retval = xdg_check_dirs ();
        last_stat_time = current_time;
-     }
