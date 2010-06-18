@@ -1,13 +1,13 @@
 diff --git a/gio/xdgmime/xdgmime.c b/gio/xdgmime/xdgmime.c
-index 0888583..c5c76ed 100644
+index 0888583..a88dad2 100644
 --- a/gio/xdgmime/xdgmime.c
 +++ b/gio/xdgmime/xdgmime.c
 @@ -418,6 +418,8 @@ xdg_check_dirs (void)
  static int
  xdg_check_time_and_dirs (void)
  {
-+  static gboolean check_interval_checked = FALSE;
-+  static gint check_interval = 5;
++  static int check_interval_checked = 0;
++  static int check_interval = 5;
    struct timeval tv;
    time_t current_time;
    int retval = FALSE;
@@ -23,7 +23,7 @@ index 0888583..c5c76ed 100644
 +      env = getenv ("XDG_CHECK_INTERVAL");
 +      if (env != NULL)
 +        check_interval = atoi(env);
-+      check_interval_checked = TRUE;
++      check_interval_checked = 1;
 +    }
 +
 +  if (current_time >= last_stat_time + check_interval
