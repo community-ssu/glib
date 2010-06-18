@@ -1,5 +1,5 @@
 diff --git a/gio/xdgmime/xdgmime.c b/gio/xdgmime/xdgmime.c
-index 0888583..a88dad2 100644
+index 0888583..5cb9285 100644
 --- a/gio/xdgmime/xdgmime.c
 +++ b/gio/xdgmime/xdgmime.c
 @@ -418,6 +418,8 @@ xdg_check_dirs (void)
@@ -11,13 +11,13 @@ index 0888583..a88dad2 100644
    struct timeval tv;
    time_t current_time;
    int retval = FALSE;
-@@ -425,7 +427,18 @@ xdg_check_time_and_dirs (void)
+@@ -425,8 +427,20 @@ xdg_check_time_and_dirs (void)
    gettimeofday (&tv, NULL);
    current_time = tv.tv_sec;
  
 -  if (current_time >= last_stat_time + 5)
 +  if (!check_interval_checked)
-+    {
+     {
 +      const char *env;
 +
 +      env = getenv ("XDG_CHECK_INTERVAL");
@@ -28,6 +28,8 @@ index 0888583..a88dad2 100644
 +
 +  if (current_time >= last_stat_time + check_interval
 +      && (!last_stat_time || check_interval > 0))
-     {
++    {
++      fputs("HERE!\n", stderr);
        retval = xdg_check_dirs ();
        last_stat_time = current_time;
+     }
