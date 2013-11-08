@@ -22,7 +22,8 @@ Package: @SHARED_PKG@
 Section: libs
 Architecture: any
 Depends: ${misc:Depends},
-         ${shlibs:Depends}
+         ${shlibs:Depends},
+         kernel-feature-errata-430973-workaround [armel]         
 Recommends: @DATA_PKG@,
             shared-mime-info
 Conflicts: libpango1.0-0 (<< 1.11)
