@@ -29,6 +29,12 @@ DEB_HOST_ARCH  ?= $(shell dpkg-architecture -qDEB_HOST_ARCH)
 
 CFLAGS += -Wall -DMAEMO_CHANGES -g -O$(if $(findstring noopt,$(DEB_BUILD_OPTIONS)),0,2)
 
+ifneq (,$(findstring thumb,$(DEB_BUILD_OPTIONS)))
+ifeq ($(DEB_BUILD_ARCH), armel)
+	CFLAGS += -mthumb -fgnu89-inline
+endif
+endif
+
 # Ensure the build aborts when there are still references to undefined
 # symbols
 LDFLAGS += -Wl,-z,defs
